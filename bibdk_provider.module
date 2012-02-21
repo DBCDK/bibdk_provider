@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * Implement hook_ding_provider().
+ */
+function bibdk_provider_ding_provider() ¢{
+  return array(
+    'title' => 'Bibliotek.dk provider',
+    'settings' => 'bibdk_provider_settings_form',
+    'provides' => array(
+      'availability' => array(
+        'prefix' => 'availability',
+        'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.availability.inc',
+      ),
+      'user' => array(
+        'prefix' => 'user',
+        'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.user.inc',
+      ),
+      'reservation' => array(
+        'prefix' => 'reservation',
+        'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.reservation.inc',
+      ),
+      'loan' => array(
+        'prefix' => 'loan',
+        'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.loan.inc',
+      ),
+      'debt' => array(
+        'prefix' => 'debt',
+        'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.debt.inc',
+      ),
+    ),
+  );
+}
+
+/**
+ * Form callback for provider module settings.
+ *
+ * This is a regular form callback.
+ */
+function bibdk_provider_settings_form() {
+  $form['bibdk_provider'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Bibdk provider service settings'),
+    '#tree' => FALSE,
+  );
+
+  $form['bibdk_provider']['bibdk_provider_wsdl_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Bibdk provider WSDL URL'),
+    '#description' => t('The WSDL URL for Bibdk provider SOAP service, usually something like http://
+/bibdk_provider.addi.dk/1.0/bibdk_provider.wsdl'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('bibdk_provider_wsdl_url', ''),
+  );
+
+  $form['bibdk_provider']['bibdk_provider_agency_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Agency Id'),
+    '#default_value' => variable_get('bibdk_provider_agency_id', ''),
+    '#description' => t('The Bibdk provider agency id of the library.'),
+  );
+
+  $form['bibdk_provider']['bibdk_provider_enable_logging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable logging'),
+    '#default_value' => variable_get('bibdk_provider_enable_logging', FALSE),
+    '#description' => t('Logs requests to the Bibdk provider webservice. Sensitive information such 
+as CPR number and PIN code is stripped from the requests.'),
+  );
+
+  return system_settings_form($form);
+}
