@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Test bibdk user provider implementation.
+ *
+ * @TODO do some real testing
+ */
+
+class BibdkUserProviderImplementationTestCase extends DingUserProviderImplementationTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'bibdk user provider',
+      'description' => 'Test bibdk user provider functionality.',
+      'group' => 'Ding! - bibdk provider',
+    );
+  }
+
+  function setUp() {
+    // Need ding_user to test login.
+    parent::setup(array('bibdk_provider', 'ding_user'));
+    //variable_set('openruth_wsdl_url', 'http://openruth.addi.dk/0.7/openruth.wsdl');
+    //variable_set('openruth_agency_id', '100200');
+  }
+
+ function getGoodUser() {
+   return array('name' => 'pjo@dbc.dk','pass'=>'2222');
+ } 
+}
