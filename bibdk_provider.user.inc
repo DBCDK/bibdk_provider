@@ -1,5 +1,7 @@
 <?php
 
+
+
 /**
  * Implements provider user authenticate
  */
@@ -9,21 +11,20 @@ function bibdk_provider_user_authenticate($name, $pass) {
     'success' => FALSE,
   );
 
-  // FAKE A LOGIN;   
-  //@todo; do a proper login
-  $return['creds'] = array(
-    'name' => 'pjo@dbc.dk',
-    'pass' => '2222',
-  );
+  if( BibdkUser::instance()->login($name,$pass) ) {
+    $return['creds'] = 
+      array(
+	    'name' => $name,
+	    'pass' => $pass,
+	    );
 
-  $return['user'] = array(
-      'data' => array(
-        'display_name' => 'HEST',
-      ),
-    );
-  $return['success'] = TRUE;
-
-  dpm($return);
+    $return['user'] = 
+      array(
+	    'data' => 
+	    array('display_name' => 'HEST',),
+	    );
+    $return['success'] = TRUE;
+  }
 
   return $return;
 }
