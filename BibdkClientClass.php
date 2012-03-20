@@ -1,7 +1,7 @@
 <?php
 
 class BibdkClient {
-  const SERVICE_URL = 'http://mobilebib.addi.dk/1.1/';
+  const SERVICE_URL = 'http://metode.dbc.dk/~pjo/webservices/DDBUserInfo/trunk/server.php';
 
   public static function request($action,$params) {
     if( !is_array($params) ) {
@@ -15,7 +15,7 @@ class BibdkClient {
     }
 
     $url = self::SERVICE_URL.$request;
-        
+            
     $nano = new NanoSOAPClient(self::SERVICE_URL);
     $response = $nano->curlRequest($url);
 
@@ -44,15 +44,12 @@ class BibdkUser {
   }
 
   public function login($name,$pass) {
-    $response = BibdkClient::request('login',array('user'=>$name,'psw'=>$pass,'outputType'=>'xml'));
+    $response = BibdkClient::request('login',array('userId'=>$name,'userPinCode'=>$pass,'outputType'=>'xml'));
     $this->set_xpath($response);
-    $query = '//errorCode';
-    $status = $this->xpath->query($query)->item(0)->nodeValue;
-       
-    if( $status != '200' ) {
-      // @todo; log?
-      return false;
-    }
-    return true;   
+    $query = '//error';
+    $status = $this->xpath->query($query);
+    $ok = isset($status->item(0)->nodeValue) ? FALSE : TRUE;
+    
+    return $ok;   
   } 
 }
