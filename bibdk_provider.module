@@ -3,6 +3,55 @@
 require_once('BibdkClientClass.php');
 
 /**
+ * Impelements hook_menu
+ */
+
+function bibdk_provider_menu() {
+  $items['user/create_login'] = array(
+      'page callback' => 'bibdk_provider_get_drupal_user_form',
+      'access callback' => TRUE,
+   );
+    return $items;
+}
+
+function bibdk_provider_get_drupal_user_form() {
+  return drupal_get_form('user_register_form');
+}
+
+function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
+  print_r($form_state);
+  $password = array();
+  $password['#type'] = 'textfield';
+  $password['#title'] = t('Password');
+  /*  [#maxlength] => 60
+                    [#description] => Spaces are allowed; punctuation is not allowed except for periods, hyphens, apostrophes, and underscores.
+                    [#required] => 1
+                    [#attributes] => Array
+                        (
+                            [class] => Array
+                                (
+                                    [0] => username
+                                )
+
+                        )
+  */
+  $password['#default_value'] ='';
+    $password['#access'] ='1';
+  $password['#weight'] = '-10';
+  $password['#required']=1;
+  $form['password'] = $password;
+
+  $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
+}
+
+function bibdk_provider_user_register_form_validate(&$elements,&$form, &$form_state) {
+  return true;
+  
+}
+
+
+
+/**
  * Implement hook_ding_provider().
  */
 function bibdk_provider_ding_provider() {
