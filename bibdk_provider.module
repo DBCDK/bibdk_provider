@@ -8,23 +8,36 @@ require_once('BibdkClientClass.php');
 
 function bibdk_provider_menu() {
   $items['user/create_login'] = array(
-      'page callback' => 'bibdk_provider_get_drupal_user_form',
+				      //'page callback' => 'drupal_get_form',
+      'page callback' => 'bibdk_provider_get_drupal_user_form',				     
       'access callback' => TRUE,
+      //   'page arguments' => array('user_register_form'),
    );
     return $items;
 }
 
 function bibdk_provider_get_drupal_user_form() {
   return drupal_get_form('user_register_form');
+  }
+
+function bibdk_provider_form_user_register_form_submit( $form, &$form_state ) {
+  
+  dpm($form_state);
+  $form_state['values']['name'] = $form_state['values']['mail'];
+  
+  // @TODO this is wrong .. use some hook
+  user_register_submit($form, $form_state);
 }
 
 function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
-  var_dump($form['account']['name']);
-  
-  $form['account']['name'] = array(
+   $form['account']['name'] = array(
     '#access' => FALSE
-  );
+    );
   
+
+
+  $form['account']['mail']['#title'] = t('Username');
+
   $form['account']['password'] = array(
     '#type' => 'textfield',
     '#title' => t('Password'),
@@ -33,40 +46,46 @@ function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
     '#weight' => '10',
     '#required' => 1,
   );
+
+
+  //@TODO this is wrong .. use some drupal method
+  $form['#submit']=array();
+  $form['#submit'][] = 'bibdk_provider_form_user_register_form_submit';
+
+    $form['account']['confirm_password'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Confirm password'),
+    '#default_value' => '',
+    '#access' => '1',
+    '#weight' => '11',
+    '#required' => 1,
+    );
   
-  #$form['#validate'][] = 'bibdk_provider_user_register_form_validate';
-}
-
-function user_register_form_validate(&$elements,&$form) {
-  var_dump($elements, $form);
-  #return true;
-  print_r($form_state);
-  $password = array();
-  $password['#type'] = 'textfield';
-  $password['#title'] = t('Password');
-  /*  [#maxlength] => 60
-                    [#description] => Spaces are allowed; punctuation is not allowed except for periods, hyphens, apostrophes, and underscores.
-                    [#required] => 1
-                    [#attributes] => Array
-                        (
-                            [class] => Array
-                                (
-                                    [0] => username
-                                )
-
-                        )
-  */
-  $password['#default_value'] ='';
-  $password['#access'] ='1';
-  $password['#weight'] = '-10';
-  $password['#required']=1;
-  $form['password'] = $password;
+    dpm($form);
 
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 }
 
-function bibdk_provider_user_register_form_validate(&$elements,&$form, &$form_state) {
-  return true;  
+
+/**
+ * Implements hook_mail_alter
+ */
+function bibdk_provider_mail_alter(&$message) {
+  dpm($message);
+}
+
+/**
+ * Implements hook_mail
+ */
+function bibdk_provider_mail($key, &$message, $params) {
+}
+
+
+function bibdk_provider_user_register_form_validate(&$form,&$form_state) {
+  if( $form_state['values']['confirm_password'] != $form_state['values']['password'] ){
+    form_error($form['account']['password'], t('Mismatch in password and confirm password'));
+    }
+  //return false;
 }
 
 
