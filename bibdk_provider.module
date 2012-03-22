@@ -33,7 +33,7 @@ function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
     '#weight' => '10',
     '#required' => 1,
   );
-
+  
   #$form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 }
 
