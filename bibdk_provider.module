@@ -20,9 +20,16 @@ function bibdk_provider_get_drupal_user_form() {
   return drupal_get_form('user_register_form');
   }
 
+/**
+ * Implements hook_user_presave
+ */
+function bibdk_provider_user_presave(&$edit, $account, $category) {
+  dpm(func_get_args());
+}
+
 function bibdk_provider_form_user_register_form_submit( $form, &$form_state ) {
   
-  dpm($form_state);
+  //  dpm($form_state);
   $form_state['values']['name'] = $form_state['values']['mail'];
   
   // @TODO this is wrong .. use some hook
@@ -61,9 +68,17 @@ function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
     '#required' => 1,
     );
   
-    dpm($form);
+    // dpm($form);
 
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter (user_profile_form)
+ * catch username and password (not encrypted) and save them using ding_user_creds_save
+ */
+function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
+  // @ TODO implement; 
 }
 
 
