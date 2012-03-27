@@ -11,6 +11,8 @@ function bibdk_provider_user_authenticate($name, $pass) {
     'success' => FALSE,
   );
 
+  
+
   if( BibdkUser::instance()->login($name,$pass) ) {
     $return['creds'] = 
       array(
@@ -27,6 +29,22 @@ function bibdk_provider_user_authenticate($name, $pass) {
   }
 
   return $return;
+}
+
+function bibdk_provider_user_verify( $name ) {
+  return BibdkUser::instance()->verify($name);
+}
+
+
+function bibdk_provider_user_create( $name, $pass ) {
+  if( BibdkUser::instance()->create( $name, $pass ) ) {
+      return TRUE;
+    }
+    return FALSE;
+}
+
+function bibdk_provider_user_update_password( $name, $pass ) {
+  return BibdkUser::instance()->update_password($name, $pass);
 }
 
 
