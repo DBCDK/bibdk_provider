@@ -6,18 +6,18 @@ require_once('BibdkClientClass.php');
  * Impelements hook_menu
  */
 
-function bibdk_provider_menu() {
+/*function bibdk_provider_menu() {
   $items['user/create_login'] = 
     array(
 	  'page callback' => 'bibdk_provider_get_drupal_user_form',
 	  'access callback' => TRUE, // @TODO is this correct??
 	  );
     return $items;
-}
+    }*/
 
-function bibdk_provider_get_drupal_user_form() {
+/*function bibdk_provider_get_drupal_user_form() {
   return drupal_get_form('user_register_form');
-  }
+  }*/
 
 /**
  * Implements hook_user_presave
