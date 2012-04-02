@@ -6,39 +6,76 @@ require_once('BibdkClientClass.php');
  * Impelements hook_menu
  */
 
-function bibdk_provider_menu() {
+/*function bibdk_provider_menu() {
   $items['user/create_login'] = array(
       'page callback' => 'bibdk_provider_get_drupal_user_form',
       'access callback' => TRUE,
    );
     return $items;
+    }*/
+
+
+/*
+* Implements hook_ctools_plugin_directory -
+* This lets ctools know to scan my module for a content_type plugin file
+* Detailed docks in ctools/ctools.api.php
+*/
+function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
+  // we'll be nice and limit scandir() calls
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/content_types';
+  }
 }
 
-function bibdk_provider_get_drupal_user_form() {
+/**
+ * Implement hook_ctools_plugin_api().
+ *
+ * If you do this, CTools will pick up default panels pages in
+ * <modulename>.pages_default.inc
+ */
+
+// @TODO; enable this function when code has been exported
+
+function ctools_plugin_example_ctools_plugin_api($module, $api) {
+  if ($module == 'panels_mini' && $api == 'panels_default') {
+    return array('version' => 1);
+  }
+  if ($module == 'page_manager' && $api == 'pages_default') {
+    return array('version' => 1);
+  }
+  }
+
+
+/*function bibdk_provider_get_drupal_user_form() {
   return drupal_get_form('user_register_form');
-}
+  }*/
 
 function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
-  var_dump($form['account']['name']);
+  // var_dump($form['account']['name']);
   
   $form['account']['name'] = array(
     '#access' => FALSE
   );
+
+  form['#submit'][] = 'bibdk_provider_form_user_register_form_delete_temp_user';
   
-  $form['account']['password'] = array(
+  /* $form['account']['password'] = array(
     '#type' => 'textfield',
     '#title' => t('Password'),
     '#default_value' => '',
     '#access' => '1',
     '#weight' => '10',
     '#required' => 1,
-  );
+    );*/
   
   #$form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 }
 
+function bibdk_provider_form_user_register_form_delete_temp_user( $form, $form_state ) {
+}
+
 function user_register_form_validate(&$elements,&$form) {
-  var_dump($elements, $form);
+  //  var_dump($elements, $form);
   #return true;
   print_r($form_state);
   $password = array();
