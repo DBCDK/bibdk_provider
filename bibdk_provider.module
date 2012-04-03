@@ -57,7 +57,7 @@ function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
     '#access' => FALSE
   );
 
-  form['#submit'][] = 'bibdk_provider_form_user_register_form_delete_temp_user';
+  $form['#submit'][] = 'bibdk_provider_form_user_register_form_delete_temp_user';
   
   /* $form['account']['password'] = array(
     '#type' => 'textfield',
