@@ -11,8 +11,6 @@ function bibdk_provider_user_authenticate($name, $pass) {
     'success' => FALSE,
   );
 
-  
-
   if( BibdkUser::instance()->login($name,$pass) ) {
     $return['creds'] = 
       array(
@@ -27,7 +25,6 @@ function bibdk_provider_user_authenticate($name, $pass) {
 	    );
     $return['success'] = TRUE;
   }
-
   return $return;
 }
 
