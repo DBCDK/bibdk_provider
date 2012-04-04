@@ -21,9 +21,14 @@ function bibdk_provider_user_authenticate($name, $pass) {
     $return['user'] = 
       array(
 	    'data' => 
-	    array('display_name' => 'HEST',),
+	    array('display_name' => 'HEST',
+		  'mail' => $name ),
 	    );
     $return['success'] = TRUE;
+
+    // @TODO; set a proper authname - some hash of mail
+    // $return['authname'] = 'HEST';
+    
   }
   return $return;
 }
