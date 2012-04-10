@@ -21,16 +21,14 @@ function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
  * <modulename>.pages_default.inc
  */
 
-// @TODO; enable this function when code has been exported
-
-/*function ctools_plugin_example_ctools_plugin_api($module, $api) {
+function ctools_plugin_example_ctools_plugin_api($module, $api) {
   if ($module == 'panels_mini' && $api == 'panels_default') {
     return array('version' => 1);
   }
   if ($module == 'page_manager' && $api == 'pages_default') {
     return array('version' => 1);
   }
-  }*/
+}
 
 /**
  * Implements hook_form_FORM_ID_alter (user_login)
