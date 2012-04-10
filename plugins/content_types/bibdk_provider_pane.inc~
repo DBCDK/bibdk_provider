@@ -1,0 +1,20 @@
+<?php
+/**
+* This plugin array is more or less self documenting
+*/
+$plugin = array(
+  // the title in the admin
+  'title' => t('Log in area'),
+  // no one knows if "single" defaults to FALSE...
+  'single' => TRUE,
+  // oh joy, I get my own section of panel panes
+  'category' => array(t('Login category'), -9),
+  'render callback' => 'bibdk_provider_get_drupal_user_form',
+  
+);
+
+
+function bibdk_provider_get_drupal_user_form() {
+  $block->content = drupal_get_form('user_register_form');
+  return $block;
+}
