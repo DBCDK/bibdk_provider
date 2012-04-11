@@ -37,7 +37,7 @@ function ctools_plugin_example_ctools_plugin_api($module, $api) {
  * @TODO - should we have this link?? if so alter template
  */
 function bibdk_provider_form_user_login_block_alter( &$form, &$form_state ) {
-  $form['links']['#markup'] = l(t('Create login'),'user/create_login');
+  $form['links']['#markup'] = '';//l(t('Create login'),'user/create_login');
 }
 
 
@@ -91,8 +91,12 @@ function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
     // clear messages
     drupal_get_messages();
     // set correct message
-    drupal_set_message( _bibdk_provider_first_time_message() );
-  }
+    drupal_set_message( _bibdk_provider_first_time_message() );    
+    // set a flag for deletion of temporary user
+    $form['firsttime'] =
+      array('#type'=>'hidden');
+    $form_state['values']['firsttime'] = 'true';
+  }  
 }
 
 function _bibdk_provider_first_time_message(){
@@ -139,24 +143,24 @@ function _bibdk_provider_user_profile_form_validate_email( $form, &$form_state )
 function _bibdk_provider_user_profile_form_save_creds( $form, &$form_state ) { 
   if( isset($form['input']['edit_cancel']) )  {
     // @TODO; implement cancelling of user account
-      dpm(func_get_args());
-    }
+    dpm(func_get_args());
+  }
   if( !empty( $form_state['values']['mail']) && !empty($form_state['values']['pass'])) {
     $creds['name'] = $form_state['values']['mail'];
     $creds['pass'] = $form_state['values']['pass'];
 
     /*    $creds['user'] = 
-	array(
-	'data' => 
-	array('display_name' => 'HEST',),
-	); */
+	  array(
+	  'data' => 
+	  array('display_name' => 'HEST',),
+	  ); */
 
     $hest['creds'] = $creds;
     // save credentials in plain text for later use
     ding_user_save_creds($hest,$form['#user']);
 
- 
-    // bibdk-part -  check if user exists
+
+     // bibdk-part -  check if user exists
     if( !bibdk_provider_user_verify($form_state['values']['mail'] ) ) {
       // user does not exist - create
       bibdk_provider_user_create($creds['name'], $creds['pass'] );
@@ -166,7 +170,37 @@ function _bibdk_provider_user_profile_form_save_creds( $form, &$form_state ) {
 	drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available'));
       }	   
     }
+
+    if( isset($form_state['values']['firsttime']) ) {
+      dpm(func_get_args());
+      // delete messages
+      drupal_get_messages();
+      // @TODO - logout;delete temporary user;login
+      
+      //logout
+      $creds = _bibdk_provider_user_custom_logout();
+      drupal_set_message(t('Your new password has been saved. Please login using your new password'));
+      drupal_goto();
+      // delete user
+      //      user_delete($creds['uid']);
+      // login
+      //$form_state = array();
+      //$form_state['uid'] = $creds['uid'];      
+      //user_login_submit(array(), $form_state);
+    }
   }
+}
+
+function _bibdk_provider_user_custom_logout() {
+  global $user;
+  // $creds = ding_user_get_creds($user);
+  $creds['uid'] = $user->uid;
+  watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
+  module_invoke_all('user_logout', $user);
+  // Destroy the current session, and reset $user to the anonymous user.
+  session_destroy();
+  
+  return $creds;
 }
 
 
