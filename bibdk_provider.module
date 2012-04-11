@@ -2,48 +2,7 @@
 
 require_once('BibdkClientClass.php');
 
-/**
- * Impelements hook_menu
- */
 
-/*function bibdk_provider_menu() {
-  $items['user/create_login'] = array(
-      'page callback' => 'bibdk_provider_get_drupal_user_form',
-      'access callback' => TRUE,
-   );
-    return $items;
-    }*/
-
-
-/*
-* Implements hook_ctools_plugin_directory -
-* This lets ctools know to scan my module for a content_type plugin file
-* Detailed docks in ctools/ctools.api.php
-*/
-function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
-  // we'll be nice and limit scandir() calls
-  if ($owner == 'ctools' && $plugin_type == 'content_types') {
-    return 'plugins/content_types';
-  }
-}
-
-/**
- * Implement hook_ctools_plugin_api().
- *
- * If you do this, CTools will pick up default panels pages in
- * <modulename>.pages_default.inc
- */
-
-// @TODO; enable this function when code has been exported
-
-function ctools_plugin_example_ctools_plugin_api($module, $api) {
-  if ($module == 'panels_mini' && $api == 'panels_default') {
-    return array('version' => 1);
-  }
-  if ($module == 'page_manager' && $api == 'pages_default') {
-    return array('version' => 1);
-  }
-  }
 
 
 /*function bibdk_provider_get_drupal_user_form() {
