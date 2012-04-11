@@ -1,75 +1,349 @@
 <?php
-
+require_once('bibdk_provider.user.inc');
 require_once('BibdkClientClass.php');
 
+/*
+* Implements hook_ctools_plugin_directory -
+* This lets ctools know to scan my module for a content_type plugin file
+* Detailed docks in ctools/ctools.api.php
+*/
+function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
+  // we'll be nice and limit scandir() calls
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/content_types';
+  }
+}
+
 /**
- * Impelements hook_menu
+ * Implement hook_ctools_plugin_api().
+ *
+ * If you do this, CTools will pick up default panels pages in
+ * <modulename>.pages_default.inc
  */
 
-function bibdk_provider_menu() {
-  $items['user/create_login'] = array(
-      'page callback' => 'bibdk_provider_get_drupal_user_form',
-      'access callback' => TRUE,
-   );
-    return $items;
+function ctools_plugin_example_ctools_plugin_api($module, $api) {
+  if ($module == 'panels_mini' && $api == 'panels_default') {
+    return array('version' => 1);
+  }
+  if ($module == 'page_manager' && $api == 'pages_default') {
+    return array('version' => 1);
+  }
 }
 
-function bibdk_provider_get_drupal_user_form() {
-  return drupal_get_form('user_register_form');
+/**
+ * Implements hook_form_FORM_ID_alter (user_login)
+ * add a link to create user
+ * this doesn't work - overridden in templates 
+ * @TODO - should we have this link?? if so alter template
+ */
+function bibdk_provider_form_user_login_block_alter( &$form, &$form_state ) {
+  $form['links']['#markup'] = '';//l(t('Create login'),'user/create_login');
 }
+
 
 function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
-  var_dump($form['account']['name']);
-  
-  $form['account']['name'] = array(
+   $form['account']['name'] = array(
     '#access' => FALSE
-  );
-  
-  $form['account']['password'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Password'),
-    '#default_value' => '',
-    '#access' => '1',
-    '#weight' => '10',
-    '#required' => 1,
-  );
-  
-  #$form['#validate'][] = 'bibdk_provider_user_register_form_validate';
-}
+    );
 
-function user_register_form_validate(&$elements,&$form) {
-  var_dump($elements, $form);
-  #return true;
-  print_r($form_state);
-  $password = array();
-  $password['#type'] = 'textfield';
-  $password['#title'] = t('Password');
-  /*  [#maxlength] => 60
-                    [#description] => Spaces are allowed; punctuation is not allowed except for periods, hyphens, apostrophes, and underscores.
-                    [#required] => 1
-                    [#attributes] => Array
-                        (
-                            [class] => Array
-                                (
-                                    [0] => username
-                                )
-
-                        )
-  */
-  $password['#default_value'] ='';
-  $password['#access'] ='1';
-  $password['#weight'] = '-10';
-  $password['#required']=1;
-  $form['password'] = $password;
+   // we use mail for username - easy fix.. alter title for mail field to username
+  $form['account']['mail']['#title'] = t('Username');
+   // add submit function to START of the array
+  array_unshift($form['#submit'], 'bibdk_provider_form_user_register_form_submit');
 
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 }
 
-function bibdk_provider_user_register_form_validate(&$elements,&$form, &$form_state) {
-  return true;  
+/*
+ * custom submit method ('user_register_form')
+ * set name = email - we use email for username
+ */
+function bibdk_provider_form_user_register_form_submit( $form, &$form_state ) {
+  //  $form_state['values']['name'] = $form_state['values']['mail'];
+  // generate a username from mail
+  $form_state['values']['name'] = strrev($form_state['values']['mail']);
+  //$form_state['values']['name'] = 'HEST';
 }
 
 
+/**
+ * Implements hook_form_FORM_ID_alter (user_profile_form)
+ * catch username and password (not encrypted) and save them using ding_user_creds_save
+ */
+function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) { 
+  // replace the general user_account_form_validate with a mail validator
+  // ... for some reason unknown the email did not validate
+  // @TODO; why does drupal validator return an error
+  $pos = array_search('user_account_form_validate',$form['#validate']);
+  if( $pos !== FALSE ) {
+    unset($form['#validate'][$pos]);
+    $form['#validate'][$pos]='_bibdk_provider_user_profile_form_validate_email';
+  }  
+
+  // add a submit handler for deleting an account
+  array_unshift( $form['actions']['cancel']['#submit'],'_bibdk_provider_user_profile_form_cancel' );
+  // add a submit handler for creating bibdk password
+  array_unshift( $form['#submit'], '_bibdk_provider_user_profile_form_save_creds' );
+  
+  // check if this is first time login - if so set appropiate message
+  $first_time = isset( $_GET['pass-reset-token'] ) ? TRUE : FALSE;
+  if( $first_time ) {
+    // clear messages
+    drupal_get_messages();
+    // set correct message
+    drupal_set_message( _bibdk_provider_first_time_message() );    
+    // set a flag for deletion of temporary user
+    $form['firsttime'] =
+      array('#type'=>'hidden');
+    $form_state['values']['firsttime'] = 'true';
+  }  
+}
+
+function _bibdk_provider_first_time_message(){
+  $message = t('You have just used your one-time login link, and have been assigned a temporary username. Change your password to retain a permanent login. If you do not change your password your login will not be valid');
+  return $message;
+}
+
+/*
+ * Submit handler for cancelling user account
+ * @TODO; implement - delete account on bibdk
+ */
+function _bibdk_provider_user_profile_form_cancel( $form, &$form_state ) {
+  dpm(func_get_args());  
+}
+
+function _bibdk_provider_user_profile_form_validate_email( $form, &$form_state ) {
+   global $user;
+  //validate email
+  if( $user->mail != $form_state['values']['mail'] ) {
+    $error = user_validate_mail($form_state['values']['mail']);
+    if( isset($error) ) {
+      form_set_error('mail', $error);
+    }
+    elseif ((bool) db_select('users')->fields('users', array('uid'))->condition('uid', $account->uid, '<>')->condition('mail', db_like($form_state['values']['mail']), 'LIKE')->range(0, 1)->execute()->fetchField()) {
+      // Format error message dependent on whether the user is logged in or not.
+      if ($GLOBALS['user']->uid) {
+        form_set_error('mail', t('The e-mail address %email is already taken.', array('%email' => $form_state['values']['mail'])));
+      }
+      else {
+        form_set_error('mail', t('The e-mail address %email is already registered. <a href="@password">Have you forgotten your password?</a>', array('%email' => $form_state['values']['mail'], '@password' => url('user/password'))));
+      }
+    }
+
+  } 
+}
+
+/**
+ * custom method. create or update bibdk account
+ * check if name and pass are set on user_profile_form
+ * verify if user exists on bibdk
+ * create if user does not exist
+ * update if user exists
+ */
+function _bibdk_provider_user_profile_form_save_creds( $form, &$form_state ) { 
+  if( isset($form['input']['edit_cancel']) )  {
+    // @TODO; implement cancelling of user account
+    dpm(func_get_args());
+  }
+  if( !empty( $form_state['values']['mail']) && !empty($form_state['values']['pass'])) {
+    $creds['name'] = $form_state['values']['mail'];
+    $creds['pass'] = $form_state['values']['pass'];
+
+    /*    $creds['user'] = 
+	  array(
+	  'data' => 
+	  array('display_name' => 'HEST',),
+	  ); */
+
+    $hest['creds'] = $creds;
+    // save credentials in plain text for later use
+    ding_user_save_creds($hest,$form['#user']);
+
+
+     // bibdk-part -  check if user exists
+    if( !bibdk_provider_user_verify($form_state['values']['mail'] ) ) {
+      // user does not exist - create
+      bibdk_provider_user_create($creds['name'], $creds['pass'] );
+    }
+    else {
+      if( ! bibdk_provider_user_update_password( $creds['name'], $creds['pass'] ) ) {
+	drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available'));
+      }	   
+    }
+
+    if( isset($form_state['values']['firsttime']) ) {
+      dpm(func_get_args());
+      // delete messages
+      drupal_get_messages();
+      // @TODO - logout;delete temporary user;login
+      
+      //logout
+      $creds = _bibdk_provider_user_custom_logout();
+      drupal_set_message(t('Your new password has been saved. Please login using your new password'));
+      drupal_goto();
+      // delete user
+      //      user_delete($creds['uid']);
+      // login
+      //$form_state = array();
+      //$form_state['uid'] = $creds['uid'];      
+      //user_login_submit(array(), $form_state);
+    }
+  }
+}
+
+function _bibdk_provider_user_custom_logout() {
+  global $user;
+  // $creds = ding_user_get_creds($user);
+  $creds['uid'] = $user->uid;
+  watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
+  module_invoke_all('user_logout', $user);
+  // Destroy the current session, and reset $user to the anonymous user.
+  session_destroy();
+  
+  return $creds;
+}
+
+
+/**
+ * Implements hook_mail_alter
+ */
+function bibdk_provider_mail_alter(&$message) {
+  // dpm($message);
+}
+
+/**
+ * Implements hook_mail
+ */
+function bibdk_provider_mail($key, &$message, $params) {
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ * delete user account.
+ */
+function bibdk_provider_user_cancel_confirm_form_alter( &$form, &$form_state) {
+  // @TODO implement
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter ('user_pass')
+ * add custom validate function 
+ */
+function bibdk_provider_form_user_pass_alter( &$form, &$form_state ) {
+  if( isset($form_state['input']['name']) ) {
+    $form_state['input']['mail'] = $form_state['input']['name'];
+  }  
+  array_unshift( $form['#validate'], '_bibdk_provider_user_pass_validate');
+}
+/**
+ * custom validator for user_pass (change password)
+ * check if user exists on drupal if not create a temporary user 
+ * for drupal to have an email to confirm against
+ */
+function _bibdk_provider_user_pass_validate( &$form, &$form_state ) {
+  if( isset($form_state['values']['name']) ) {
+    $form_state['values']['mail'] = $form_state['input']['name'];
+  }
+
+  $mail =  isset($form_state['values']['mail']) ? $form_state['values']['mail'] : FALSE;
+
+  if( $mail ) {  
+    $drupal_ok = user_load_by_mail($mail);
+    $bib_ok = bibdk_provider_user_verify( $mail );
+    
+    if( $bib_ok && !$drupal_ok ) {    
+      // remove standard drupal error-message
+      drupal_get_messages( 'error' );  
+      // create a drupal user here, for drupal to have an email-address to confirm against 
+      _bibdk_provider_create_random_user( $mail );
+    }
+  }  
+}
+
+
+/**
+ * Implement user_account_update called from ding_user/ding_user_user_presave
+ * this method handles updates when user is a ding_provider_user
+ */
+function bibdk_provider_user_account_update( $account, $changes ) {
+  // for now handle only password changes
+  if( isset($changes['pass']) ) {
+    $creds = ding_user_get_creds( $account );
+    if( ! bibdk_provider_user_update_password( $creds['name'], $changes['pass'] ) ) {
+      drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available'));
+    }
+  }
+}
+
+
+/**
+ * custom validator for user_register_form
+ * calls bibdk_user ( bibdk_provider_user_verify ) to see if user exists
+ * check if a drupal user is registred with given mail
+ */
+function bibdk_provider_user_register_form_validate( &$form,&$form_state ) {
+  $mail =  $form_state['values']['mail'];
+  if( !$mail ) {
+    form_error($form['account']['mail'], t('No email'));
+  }
+  $drupal_ok = user_load_by_mail($mail);
+  $bib_ok = bibdk_provider_user_verify( $mail );
+
+  // users registred in bibdk but not in drupal
+   if( $bib_ok && !$drupal_ok ) {    
+    // remove drupal error-messages
+    drupal_get_messages( 'error' );
+    // set custom message
+    _bibdk_provider_set_confirm_message($form_state);
+    // stop form submit
+    form_set_error( 'submit ');
+  }
+  // other cases are handled drupal standard way
+}
+
+/*
+ * custom method
+ * if users are not registred in drupal, but already are registred in bibdk, but forgot their passwords...
+ * create a drupal user to have an email to confirm against
+ *
+ * TODO - delete this user when password has been changed
+ *
+ */
+function _bibdk_provider_create_random_user( $mail ) {
+  $userinfo = array(
+		    'name' => strrev($mail),
+		    'init' => $mail,
+		    'mail' => $mail,
+		    'pass' => 'hest',
+		    'status' => 1
+		    );
+
+  $account = user_save('', $userinfo);
+
+  if (!$account) {
+    drupal_set_message('Error saving user','error');
+  }
+}
+
+/**
+ * custom method
+ * drupal message to display for already registred users
+ * @TODO theming here?? maybe overlay??
+ */
+function _bibdk_provider_set_confirm_message($form_state) {
+   // set a custom error-message
+  drupal_set_message( _bibdk_provider_already_registred_message( $form_state['values']['mail'] ) );
+}
+
+/**
+ * custom method
+ * set a message to display if user is already registred in bibdk
+ */
+function _bibdk_provider_already_registred_message( $email ) {
+  $message = t('You are already a registred user. Please log in with your usual username and password. ');
+  $message .= l(t('Have you forgotten your password?'),'user/password');
+  return $message;
+}
 
 /**
  * Implement hook_ding_provider().
