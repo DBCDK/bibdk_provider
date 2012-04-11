@@ -1,9 +1,6 @@
 configure = "admin/config/ding/provider/bibdk_provider"
 core = "7.x"
 description = "Implementation of bibdk provider API."
-dependencies[] = ctools
-dependencies[] = panels
-dependencies[] = page_manager
 files[] = "bibdk_provider.module"
 files[] = "bibdk_provider.test"
 name = "Bibdk provider"
