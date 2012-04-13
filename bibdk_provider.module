@@ -36,8 +36,42 @@ function ctools_plugin_example_ctools_plugin_api($module, $api) {
  * this doesn't work - overridden in templates 
  * @TODO - should we have this link?? if so alter template
  */
-function bibdk_provider_form_user_login_block_alter( &$form, &$form_state ) {
-  $form['links']['#markup'] = '';//l(t('Create login'),'user/create_login');
+function bibdk_provider_form_user_login_block_alter( &$form, &$form_state ) {  
+   
+  $form['inputs']['#weight'] = 1;
+  $form['inputs']['name'] = $form['name'];
+  $form['inputs']['name']['#attributes']['placeholder'] = t('Username');
+  $form['inputs']['name']['#type'] = 'password';
+  $form['inputs']['pass'] = $form['pass'];
+  $form['inputs']['pass']['#attributes']['placeholder'] = t('Password');
+
+  $form['inputs']['#prefix'] = '<div class="'.drupal_html_class('bibdk_provider_form_inputs').'">';
+  $form['inputs']['#suffix'] = '</div>';
+  
+  unset($form['name']);
+  unset($form['pass']);
+
+  $form['actions']['#weight'] = 2;
+
+  unset($form['links']);
+  // Forgot password link.
+  $form['links']['request_password'] = array(
+    '#markup' => l(t('Forgot password'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.')))),  
+  );
+ 
+  // Sign up link
+  if (variable_get('user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)) {
+    $form['links']['signup'] = array(
+      '#markup' => l(t('New user'), 'user/register', array('attributes' => array('id' => 'create-new-account', 'title' => t('Create a new user account.')))),
+    );
+  }
+  $form['links']['#weight'] = 3;
+  $form['links']['#prefix'] = '<div class="'.drupal_html_class('bibdk_provider_form_links').'">';
+  $form['links']['#suffix'] ='</div>';
+  
+  // dpm($form);
+  //dpm($form_state);
+  // $form['links']['#markup'] = l(t('Create login'),'user/create_login');
 }
 
 
