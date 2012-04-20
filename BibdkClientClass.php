@@ -15,7 +15,6 @@ class BibdkClient {
     }
 
     $url = self::SERVICE_URL.$request;
-
     $nano = new NanoSOAPClient(self::SERVICE_URL);
     $response = $nano->curlRequest($url);
 
@@ -38,8 +37,12 @@ class BibdkUser {
   
   private function set_xpath($xml){
     $dom = new DomDocument();
-    $dom->loadXML($xml);
+    if( !$dom->loadXML($xml) ) {
+      watchdog('CLIENT',$xml);
+      return false;
+    }
     $this->xpath = new DomXPATH($dom);
+    return true;
   }
 
   public function login($name,$pass) {
@@ -65,7 +68,10 @@ class BibdkUser {
 
   public function verify($name) {
     $response =  BibdkClient::request('verifyUser', array('userId'=>$name,'outputType'=>'xml'));
-    $this->set_xpath($response);
+    if( !$this->set_xpath($response) ) {
+      // TODO ; do something
+      return false;
+    }
     $query = "//verified";
     $status = $this->xpath->query($query);
     return $status->item(0)->nodeValue == 'TRUE';       
@@ -73,6 +79,7 @@ class BibdkUser {
 
   public function update_password( $name, $pass ) {
     $response =  BibdkClient::request('updatePassword', array('userId'=>$name,'userPinCode'=>$pass,'outputType'=>'xml'));
+    
     $this->set_xpath($response);
 
     $query = '//error';
@@ -81,5 +88,18 @@ class BibdkUser {
     
     
     return $ok;   
+  }
+
+  public function delete($name, $password) {
+     $response =  BibdkClient::request('deleteUser', array('userId'=>$name,'userPinCode'=>$pass,'outputType'=>'xml'));
+    
+    $this->set_xpath($response);
+
+    $query = '//error';
+    $status = $this->xpath->query($query);
+    $ok = isset($status->item(0)->nodeValue) ? FALSE : TRUE;
+    
+    
+    return $ok;
   }
 }

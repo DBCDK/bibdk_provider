@@ -26,6 +26,8 @@ function bibdk_provider_user_authenticate($name, $pass) {
 	    );
     $return['success'] = TRUE;
 
+    $return['messages']=array('HEJ','notice');
+
     // @TODO; set a proper authname - some hash of mail
     // $return['authname'] = 'HEST';
     
@@ -47,6 +49,10 @@ function bibdk_provider_user_create( $name, $pass ) {
 
 function bibdk_provider_user_update_password( $name, $pass ) {
   return BibdkUser::instance()->update_password($name, $pass);
+}
+
+function bibdk_provider_client_user_delete($name,$pass) {
+  return  BibdkUser::instance()->delete($name, $pass);
 }
 
 
