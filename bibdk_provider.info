@@ -4,6 +4,13 @@ description = "Implementation of bibdk provider API."
 dependencies[] = ctools
 dependencies[] = panels
 dependencies[] = page_manager
+
+features[ctools][] = "page_manager:pages_default:1"
+features[page_manager_pages][] = "create_login"
+features[page_manager_pages][] = "reset_password"
+features[page_manager_pages][] = "user_password_change"
+
+
 files[] = "bibdk_provider.module"
 files[] = "bibdk_provider.test"
 files[] = "bibdk_provider.user.inc"
