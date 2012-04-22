@@ -20,7 +20,6 @@ function _bibdk_provider_get_drupal_user_pass_reset_form($form, &$form_state) {
   $args = func_get_args();
   $real_args = $args[2];
  
-  dpm($args);
   if( !isset($form_state) ) {
     $form_state = array();
   }
