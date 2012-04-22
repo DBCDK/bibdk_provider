@@ -20,11 +20,21 @@ function _bibdk_provider_get_drupal_user_pass_reset_form($form, &$form_state) {
   $args = func_get_args();
   $real_args = $args[2];
  
+  $path = base_path();
+  $path = str_replace('/','',$path);
+  
+  $key = array_search($path, $real_args);
+  if( $key !== FALSE ) {
+    unset($real_args[$key]);
+  }
+  // reset array keys
+  $real_args = array_values($real_args);
+
   if( !isset($form_state) ) {
     $form_state = array();
   }
   form_load_include($form_state, 'inc', 'user','user.pages');
-
+ 
   if( isset($real_args[2]) && isset( $real_args[3] ) && isset($real_args[4]) ) {
     $block->content = drupal_get_form('user_pass_reset',$real_args[2],$real_args[3],$real_args[4]);
   }
