@@ -184,12 +184,23 @@ function _bibdk_provider_welcome_message(){
  */
 function _bibdk_provider_user_profile_form_save( $form, &$form_state ) { 
   if( !empty( $form_state['values']['mail']) && !empty($form_state['values']['pass'])) {
+    
+    $drupal_user = user_load_by_mail($form_state['values']['mail']);
+
     // bibdk-part -  check if user exists
 
     // TODO this might be a conflict with admin - admin might not want to create bibdk-user. check roles
     if( !bibdk_provider_user_verify($form_state['values']['mail'] ) ) {
       // user does not exist - create
       bibdk_provider_user_create($form_state['values']['name'], $form_state['values']['pass'] );
+    }
+    elseif( $drupal_user ) {
+      if( $drupal_user->data['temporary'] ) {
+	// this is a temporary user created if bibdk user forgot password
+	// update bibdkprovider with new password
+	bibdk_provider_user_update_password( $form_state['values']['mail'],$form_state['values']['pass'] );
+	_bibdk_provider_profile_form_login($form,$form_state);
+      }     
     }
   }
 }
@@ -217,75 +228,6 @@ function _bibdk_provider_user_profile_form_validate_email( $form, &$form_state )
       }
     }
   } 
-}
-
-/**
-<<<<<<< HEAD
- * custom method. create or update bibdk account
- * check if name and pass are set on user_profile_form
- * verify if user exists on bibdk
- * create if user does not exist
- * update if user exists
- */
-function _bibdk_provider_user_profile_form_save_creds( $form, &$form_state ) { 
-  if( isset($form['input']['edit_cancel']) )  {
-    // @TODO; implement cancelling of user account
-  }
-  if( !empty( $form_state['values']['mail']) && !empty($form_state['values']['pass'])) {
-    $creds['name'] = $form_state['values']['mail'];
-    $creds['pass'] = $form_state['values']['pass'];
-
-    /*    $creds['user'] = 
-	  array(
-	  'data' => 
-	  array('display_name' => 'HEST',),
-	  ); */
-
-    $hest['creds'] = $creds;
-    // save credentials in plain text for later use
-    ding_user_save_creds($hest,$form['#user']);
-
-
-     // bibdk-part -  check if user exists
-    if( !bibdk_provider_user_verify($form_state['values']['mail'] ) ) {
-      // user does not exist - create
-      bibdk_provider_user_create($creds['name'], $creds['pass'] );
-    }
-    else {
-      if( ! bibdk_provider_user_update_password( $creds['name'], $creds['pass'] ) ) {
-	drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available'));
-      }	   
-    }
-
-    if( isset($form_state['values']['firsttime']) ) {
-      // delete messages
-      drupal_get_messages();
-      // @TODO - logout;delete temporary user;login
-      
-      //logout
-      $creds = _bibdk_provider_user_custom_logout();
-      drupal_set_message(t('Your new password has been saved. Please login using your new password'));
-      drupal_goto();
-      // delete user
-      //      user_delete($creds['uid']);
-      // login
-      //$form_state = array();
-      //$form_state['uid'] = $creds['uid'];      
-      //user_login_submit(array(), $form_state);
-    }
-  }
-}
-
-function _bibdk_provider_user_custom_logout() {
-  global $user;
-  // $creds = ding_user_get_creds($user);
-  $creds['uid'] = $user->uid;
-  watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
-  module_invoke_all('user_logout', $user);
-  // Destroy the current session, and reset $user to the anonymous user.
-  session_destroy();
-  
-  return $creds;
 }
 
 
@@ -340,7 +282,6 @@ function _bibdk_provider_user_pass_validate( &$form, &$form_state ) {
   if( isset($form_state['values']['name']) ) {
     $form_state['values']['mail'] = $form_state['input']['name'];
   }
-
   $mail =  isset($form_state['values']['mail']) ? $form_state['values']['mail'] : FALSE;
 
   if( $mail ) {  
@@ -423,10 +364,12 @@ function _bibdk_provider_create_random_user( $mail ) {
 		    'init' => $mail,
 		    'mail' => $mail,
 		    'pass' => 'hest',
-		    'status' => 1
+		    'status' => 1,
+		    'data' => array('temporary'=>1),
 		    );
 
   $account = user_save('', $userinfo);
+  
 
   if (!$account) {
     drupal_set_message('Error saving user','error');
