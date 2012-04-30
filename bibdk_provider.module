@@ -53,8 +53,26 @@ function bibdk_provider_form_user_login_block_alter( &$form, &$form_state ) {
   $form['links']['#weight'] = 3;
   $form['links']['#prefix'] = '<div class="'.drupal_html_class('bibdk_provider_form_links').'">';
   $form['links']['#suffix'] ='</div>';
-  
 }
+
+/**
+ * Implements hook_username_alter
+ * show email address instead of username when administering people
+ */
+function bibdk_provider_username_alter(&$name, $account) {
+  global $user;
+  // only when somebody else is administering another account
+  if( $account->uid != $user->uid ) {
+    // only provider users
+    if( ding_user_is_provider_user($account) ) {
+      $whole_account = user_load($account->uid);
+      // set email as name
+      $name = $whole_account->mail;
+    }
+  }
+}
+
+
 
 /** Implements hook_form_FORM_ID_alter ( user_register_form ) 
  * we use mail for username - set username=mail
@@ -78,8 +96,6 @@ function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
  * set name =  email - we use  email for username
  */
 function bibdk_provider_form_user_register_form_submit( $form, &$form_state ) {
-  // generate a temporary username (strrev) from mail
-  //$form_state['values']['name'] = strrev($form_state['values']['mail']);
   $form_state['values']['name'] = $form_state['values']['mail'];
 }
 
