@@ -21,19 +21,23 @@ function _bibdk_provider_get_drupal_user_pass_reset_form($form, &$form_state) {
   $args = func_get_args();
   // real arguments are in [2]
   $real_args = $args[2];
- 
-  // remove front and tailing '/'
   $path = base_path();
+  // remove front and tailing '/'
   $path = str_replace('/','',$path);
-
-  // unset base_path from args
-  $key = array_search($path, $real_args);
-  // key might be 0
-  if( $key !== FALSE ) {
-    unset($real_args[$key]);
+  // also remove language prefixes if any
+  $go_away = array('en','da',$path);
+  
+  foreach($go_away as $away) {
+    $key = array_search($away, $real_args);
+    // key might be 0
+    if( $key !== FALSE ) {
+      unset($real_args[$key]);
+    }
   }
+  
   // reset array keys
   $real_args = array_values($real_args);
+ 
   // set form_state
   if( !isset($form_state) ) {
     $form_state = array();
