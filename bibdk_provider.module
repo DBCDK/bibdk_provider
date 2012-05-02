@@ -200,11 +200,8 @@ function _bibdk_provider_welcome_message(){
  */
 function _bibdk_provider_user_profile_form_save( $form, &$form_state ) { 
   if( !empty( $form_state['values']['mail']) && !empty($form_state['values']['pass'])) {
-    
     $drupal_user = user_load_by_mail($form_state['values']['mail']);
-
     // bibdk-part -  check if user exists
-
     // TODO this might be a conflict with admin - admin might not want to create bibdk-user. check roles
     if( !bibdk_provider_user_verify($form_state['values']['mail'] ) ) {
       // user does not exist - create
@@ -214,8 +211,10 @@ function _bibdk_provider_user_profile_form_save( $form, &$form_state ) {
       if( $drupal_user->data['temporary'] ) {
 	// this is a temporary user created if bibdk user forgot password
 	// update bibdkprovider with new password
-	bibdk_provider_user_update_password( $form_state['values']['mail'],$form_state['values']['pass'] );
-	_bibdk_provider_profile_form_login($form,$form_state);
+	if( bibdk_provider_user_update_password( $form_state['values']['mail'],$form_state['values']['pass'] ) ) {
+	  // log user in
+	  _bibdk_provider_profile_form_login($form,$form_state);
+	}
       }     
     }
   }
@@ -226,7 +225,14 @@ function _bibdk_provider_first_time_message(){
   return $message;
 }
 
+
+/**
+ *
+ **/
+
 function _bibdk_provider_user_profile_form_validate_email( $form, &$form_state ) {
+  dpm(func_get_args());
+
    global $user;
   //validate email
   if( $user->mail != $form_state['values']['mail'] ) {
@@ -248,7 +254,10 @@ function _bibdk_provider_user_profile_form_validate_email( $form, &$form_state )
 
 
 /**
- * Implements hook_mail_alter
+ * Implements hook_mail_alter (user_cancel_confirm) 
+ * Drupal WANTS the user to confirm deletion, but we don't
+ * so -- change message body to not show confirmation link, and simply delete the user
+ * @ TODO; this is probably not the right place to delete a user ...
  */
 function bibdk_provider_mail_alter(&$message) {
   if( $message['id'] == 'user_cancel_confirm' ) {
@@ -264,14 +273,16 @@ function bibdk_provider_mail_alter(&$message) {
  * Implements hook_user_delete
  */
 function bibdk_provider_user_delete( $account ) {
+  $enable_logging = variable_get('bibdk_provider_enable_logging');
   //$creds = ding_user_get_creds($account);
   if( ding_user_is_provider_user($account) ) {
     try{ 
       $creds = ding_user_get_creds($account); 
-       bibdk_provider_client_user_delete($creds['name'],$creds['pass']);
-       watchdog('BIBDK user_delete',$creds['name'].$creds['pass']);
-
-       drupal_set_message(t('Your account has been deleted'));
+      bibdk_provider_client_user_delete($creds['name'],$creds['pass']);
+      if( $enable_logging ) {
+	watchdog('BIBDK user_delete',$creds['name'].$creds['pass']);
+      }
+      drupal_set_message(t('Your account has been deleted'));
     }
     catch(Exception $e){
       //do nothing
@@ -289,6 +300,7 @@ function bibdk_provider_form_user_pass_alter( &$form, &$form_state ) {
   }  
   array_unshift( $form['#validate'], '_bibdk_provider_user_pass_validate');
 }
+
 /**
  * custom validator for user_pass (change password)
  * check if user exists on drupal if not create a temporary user 
@@ -323,7 +335,10 @@ function bibdk_provider_user_account_update( $account, $changes ) {
   $result = array();  
   if( isset($changes['pass']) ) {
     //$creds = ding_user_get_creds( $account );
-    watchdog('BIBDK','%user , %pass user_account_update',array('%user' => $account->mail , '%pass' =>  $changes['pass']));
+    $enable_logging = variable_get('bibdk_provider_enable_logging');
+    if( $enable_logging ) {
+      watchdog('BIBDK','%user , %pass user_account_update',array('%user' => $account->mail , '%pass' =>  $changes['pass']));
+    }
     if( ! bibdk_provider_user_update_password( $account->mail, $changes['pass'] ) ) {
       drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available'));
       }
@@ -381,7 +396,7 @@ function _bibdk_provider_create_random_user( $mail ) {
 		    'mail' => $mail,
 		    'pass' => 'hest',
 		    'status' => 1,
-		    'data' => array('temporary'=>1),
+		    'data' => array('temporary'=>1,'timestamp'=>time()),
 		    );
 
   $account = user_save('', $userinfo);
@@ -390,6 +405,18 @@ function _bibdk_provider_create_random_user( $mail ) {
   if (!$account) {
     drupal_set_message('Error saving user','error');
   }
+}
+
+/**
+ * Implements hook_cron
+ * there might be some temporary users created that has not been activated - delete them
+ */
+function bibdk_provider_cron() {
+  // @TODO implement a'la :
+  // get all users
+  // foreach(user)
+  // if user->data['timestamp'] > (time() - 24 hr)
+  // if user->data['temporary'] { user_delete($user->uid); }
 }
 
 /**
@@ -464,6 +491,14 @@ function bibdk_provider_settings_form() {
 /bibdk_provider.addi.dk/1.0/bibdk_provider.wsdl'),
     '#required' => TRUE,
     '#default_value' => variable_get('bibdk_provider_wsdl_url', ''),
+  );
+
+  $form['bibdk_provider']['bibdk_provider_security_code'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Bibdk provider security code'),
+    '#description' => t('The security-code for Bibdk provider SOAP service'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('bibdk_provider_security_code', ''),
   );
 
   //no need for an agencyid
