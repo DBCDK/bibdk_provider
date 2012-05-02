@@ -1,26 +1,54 @@
 <?php
 
 class BibdkClient {
-  const SERVICE_URL = 'http://metode.dbc.dk/~pjo/webservices/DDBUserInfo/trunk/server.php';
+private static $SERVICE_URL;
+private static $SECURITY_CODE;
 
-  public static function request($action,$params) {
-    if( !is_array($params) ) {
-      return false;
+/** \brief
+ * Send a request to bibdk provider using nanosoap
+ */
+public static function request($action,$params) {
+  if( !isset(self::$SERVICE_URL) ) {
+    self::$SERVICE_URL = variable_get('bibdk_provider_wsdl_url');
+
+    if( !isset(self::$SERVICE_URL) ) {
+      // somehow bibdk_provider url is not set - FATAL
+      watchdog('BIBDK_PROVIDER',t('Provider url is not set'),array(),WATCHDOG_ERROR,l(t('Set provider url'),'admin/config/ding/provider/bibdk_provider'));
     }
-    
-    $request = '?action='.$action;
-    foreach( $params as $key=>$value ) {
-      $request .= '&';
-      $request .= $key.'='.$value;
-    }
-
-    $url = self::SERVICE_URL.$request;
-
-    $nano = new NanoSOAPClient(self::SERVICE_URL);
-    $response = $nano->curlRequest($url);
-
-    return $response;
   }
+
+  if( !isset(self::$SECURITY_CODE) ) {
+    self::$SECURITY_CODE = variable_get('bibdk_provider_security_code');
+
+    if( !isset(self::$SECURITY_CODE) ) {
+      // somehow bibdk_provider security code is not set - FATAL
+      watchdog('BIBDK_PROVIDER',t('Security code is not set'),array(),WATCHDOG_ERROR,l(t('Set securitycode'),'admin/config/ding/provider/bibdk_provider'));
+    }
+  }    
+
+  if( !is_array($params) ) {
+    return false;
+  }
+  
+  $request = '?action='.$action;
+  foreach( $params as $key=>$value ) {
+    $request .= '&';
+    // encode specialchars
+    $request .= $key.'='.htmlspecialchars($value);
+  }
+  // add securitycode
+  if( isset(self::$SECURITY_CODE) ) {
+    $request .= '&';
+    $request .= 'securityCode='.self::$SECURITY_CODE;
+  }
+
+  $url = self::$SERVICE_URL.$request;
+
+  $nano = new NanoSOAPClient(self::$SERVICE_URL);
+  $response = $nano->curlRequest($url);
+
+  return $response;
+}
 
 }
 
@@ -39,7 +67,7 @@ class BibdkUser {
   private function set_xpath($xml){
     $dom = new DomDocument();
     if( !@$dom->loadXML($xml) ) {
-      watchdog('CLIENT',$xml);
+      watchdog('BIBKD client could not load response',$xml,array(),WATCHDOG_ERROR);
       return false;
     }
     $this->xpath = new DomXPATH($dom);
