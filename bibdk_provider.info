@@ -4,6 +4,7 @@ description = "Implementation of bibdk provider API."
 dependencies[] = ctools
 dependencies[] = panels
 dependencies[] = page_manager
+dependencies[] = nanosoap
 
 features[ctools][] = "page_manager:pages_default:1"
 features[page_manager_pages][] = "create_login"
