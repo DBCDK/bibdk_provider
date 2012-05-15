@@ -26,7 +26,7 @@ function bibdk_provider_form_user_login_block_alter( &$form, &$form_state ) {
   $form['inputs']['#weight'] = 1;
   $form['inputs']['name'] = $form['name'];
   $form['inputs']['name']['#attributes']['placeholder'] = t('Username');
-  $form['inputs']['name']['#type'] = 'password';
+ 
   $form['inputs']['pass'] = $form['pass'];
   $form['inputs']['pass']['#attributes']['placeholder'] = t('Password');
 
@@ -119,6 +119,8 @@ function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
   // set length of pincode field
   $form['account']['pincode']['#size'] = 16;
   $form['account']['pincode']['#maxlength'] = 64;
+  
+  
 
   // add a handler for creating bibdk password
   $form['#validate'][] = '_bibdk_provider_user_profile_form_save';
