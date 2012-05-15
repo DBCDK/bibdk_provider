@@ -116,6 +116,10 @@ function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
     $form['#validate'][$pos]='_bibdk_provider_user_profile_form_validate_email';
   }  
 
+  // set length of pincode field
+  $form['account']['pincode']['#size'] = 16;
+  $form['account']['pincode']['#maxlength'] = 64;
+
   // add a handler for creating bibdk password
   $form['#validate'][] = '_bibdk_provider_user_profile_form_save';
  
