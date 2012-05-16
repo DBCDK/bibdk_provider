@@ -106,7 +106,6 @@ function bibdk_provider_form_user_register_form_submit( $form, &$form_state ) {
 function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) { 
   //make email-address readonly for now
   $form['account']['mail']['#attributes'][] = array('readonly' => 'readonly');
-
   // replace the general user_account_form_validate with a mail validator
   // ... for some reason unknown the email did not validate
   // @TODO; why does drupal validator return an error
@@ -338,7 +337,10 @@ function bibdk_provider_user_account_update( $account, $changes ) {
   // for now handle only password changes
   $result = array();  
   if( isset($changes['pass']) ) {
-    //$creds = ding_user_get_creds( $account );
+    if( empty($account->data['temporary']) ) {
+      // just to time user out
+      $creds = ding_user_get_creds( $account );
+    }
     $enable_logging = variable_get('bibdk_provider_enable_logging');
     if( $enable_logging ) {
       watchdog('BIBDK','%user , %pass user_account_update',array('%user' => $account->mail , '%pass' =>  $changes['pass']));
@@ -388,8 +390,6 @@ function bibdk_provider_user_register_form_validate( &$form,&$form_state ) {
  * custom method
  * if users are not registred in drupal, but already are registred in bibdk, but forgot their passwords...
  * create a drupal user to have an email to confirm against
- *
- * TODO - delete this user when password has been changed
  *
  */
 function _bibdk_provider_create_random_user( $mail ) {
