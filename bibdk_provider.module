@@ -1,7 +1,5 @@
 <?php
 require_once('bibdk_provider.user.inc');
-require_once('BibdkClientClass.php');
-
 include_once('bibdk_provider.features.inc');
 
 /*
