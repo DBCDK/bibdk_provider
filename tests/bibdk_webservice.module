@@ -1,0 +1,156 @@
+<?php
+
+define('SOAP_FAULT', -1);
+
+function bibdk_webservice_menu() {
+  $item['bibdk_webservice'] = array(
+    'page callback' => 'bibdk_webservice_request',
+    'access callback' => 'bibdk_webservice_access',
+    'delivery callback' => 'bibdk_webservice_delivery',
+  );
+  $item['bibdk_webservice_test'] = array(
+    'page callback' => 'bibdk_webservice_test',
+    'access callback' => 'bibdk_webservice_access',
+  );
+
+  return $item;
+}
+
+function bibdk_webservice_test() {
+  return '<form name="test" action="bibdk_webservice" method="POST" target="_blank"><textarea name="xml"></textarea><input type="submit" name="sub" value="submit"/></form>';
+}
+
+function bibdk_webservice_request() {
+  if (isset($_POST['xml'])) {
+    $data = rawurldecode($_POST['xml']);
+  }
+  else {
+    $data = file_get_contents('php://input');
+  }
+
+  $pattern = "/:?SOAP-ENV:?/";
+  $replace = '';
+  $data = preg_replace($pattern, $replace, $data);
+
+  $envelope = new SimpleXMLElement($data);
+  $request = $envelope->Body->children();
+
+  switch ($request->getName()) {
+    case 'loginRequest':
+      return bibdk_webservice_loginRequest($request);
+    break;
+
+    default:
+      return SOAP_FAULT;
+  }
+}
+
+/**
+ * Detect wrong or missing security code
+ */
+function bibdk_webservice_security_code_error($securityCode) {
+  if ($securityCode != 'securityCode') {
+    return '<error>authentication error</error>';
+  }
+  else {
+    return FALSE;
+  }
+}
+
+function bibdk_webservice_access() {
+  return TRUE;
+}
+
+function bibdk_webservice_delivery($page_callback_result) {
+  if (isset($page_callback_result) && is_null(drupal_get_http_header('Content-Type'))) {
+    drupal_add_http_header('Content-Type', 'text/xml; charset=utf-8');
+  }
+
+  if ($page_callback_result === NULL) {
+    return;
+  }
+  elseif (is_int($page_callback_result)) {
+    switch ($page_callback_result) {
+      case SOAP_FAULT:
+        echo '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Fault xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><faultcode>SOAP-ENV:Server</faultcode><faultstring>Incorrect SOAP envelope or wrong/unsupported request</faultstring></SOAP-ENV:Fault>';
+        return;
+      break;
+      default:
+        $soap_body = $page_callback_result;
+    }
+  }
+  elseif (is_string($page_callback_result)) {
+    $soap_body = $page_callback_result;
+  }
+  else {
+    $soap_body = var_export($page_callback_result, TRUE);
+  }
+
+  print '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body>'
+    . $soap_body
+    . '</SOAP-ENV:Body></SOAP-ENV:Envelope>';
+}
+
+/**
+ * Serves request of type:
+ *   <loginRequest>
+ *     <userId>dummy@dbc.dk</userId>
+ *     <userPinCode>secretpassword</userPinCode>
+ *     <securityCode>securityCode</securityCode>
+ *   </loginRequest>
+ *
+ * @param (SimpleXMLElement) $request
+ *   Object containing loginRequest
+ *
+ * @return
+ *   string containing <loginResponse> xml
+ */
+function bibdk_webservice_loginRequest($request) {
+  $username = (string) $request->loginRequest->userId;
+  $password = (string) $request->loginRequest->userPinCode;
+
+  if ($security = bibdk_webservice_security_code_error((string) $request->loginRequest->securityCode)) {
+    $response = $security;
+  } 
+  elseif ($username && $password) {
+    if ($userId = _bibdk_webservice_lookup_user($username, $password)) {
+      $response = "<userId>$userId</userId>";
+    }
+    else {
+      $response = '<error>Wrong username or password</error>';
+    }
+  }
+  else {
+    $response = '<error>No userid or no password given</error>';
+  }
+
+  return "<loginResponse>$response</loginResponse>";
+}
+
+/**
+ * Emulating looking up user credentials
+ *
+ * @param $username
+ *   id of the user
+ * @param $password
+ *   password of the user
+ *
+ * @return
+ *   id of the user upon succes otherwise FALSE
+ */
+function _bibdk_webservice_lookup_user($username, $password) {
+  $users = array(
+    array(
+      'user' => 'dummy@dbc.dk',
+      'password' => 'secretPassword',
+    ),
+  );
+
+  foreach ($users as $user) {
+    if ($user['user'] == $username && $user['password'] == $password) {
+      return $username;
+    }
+  }
+
+  return FALSE;
+}

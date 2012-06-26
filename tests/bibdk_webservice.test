@@ -1,0 +1,249 @@
+<?php
+
+/**
+ * Test suite to verify functionality of webservice mockup.
+ */
+class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
+  private $username = 'dummy@dbc.dk';
+  private $password = 'securityCode';
+  private $securityCode = 'securityCode';
+
+  /**
+   * Description of tests
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'bibdk webservice mockup',
+      'description' => 'Test bibdk webservice mockup.',
+      'group' => 'Ding! - bibdk provider',
+    );
+  }
+
+  /**
+   * Setting up webservice mockup.
+   */
+  function setUp() {
+    parent::setUp('bibdk_webservice');
+    variable_set('securityCode', $this->securityCode);
+  }
+
+  /**
+   * Runner
+   */
+  function testRunTestSuite() {
+    $this->_testWebserviceUnsupportedRequest();
+    $this->_testWebserviceLoginSuccessful();
+    $this->_testWebserviceLoginCredentials();
+    $this->_testWebserviceLoginMissingUsername();
+    $this->_testWebserviceLoginMissingPassword();
+    $this->_testWebserviceLoginMissingSecurityCode();
+    $this->_testWebserviceLoginWrongSecurityCode();
+  }
+
+  /**
+   * Making an invalid request
+   */
+  function _testWebserviceUnsupportedRequest() {
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+  <SOAP-ENV:Body>
+    <invalidRequest/>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,); 
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Fault xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><faultcode>SOAP-ENV:Server</faultcode><faultstring>Incorrect SOAP envelope or wrong/unsupported request</faultstring></SOAP-ENV:Fault>';
+
+    $this->assertTrue($expected_soap == $response, t('Unsupported request')); 
+  }
+
+  /**
+   * Successful login
+   */
+  function _testWebserviceLoginSuccessful() {
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+  <SOAP-ENV:Body>
+    <loginRequest>
+      <userId>dummy@dbc.dk</userId>
+      <userPinCode>secretPassword</userPinCode>
+      <securityCode>securityCode</securityCode>
+    </loginRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,); 
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><userId>dummy@dbc.dk</userId></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Succeful login.')); 
+  }
+
+  /**
+   * Wrong credentials
+   */
+  function _testWebserviceLoginCredentials() {
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+  <SOAP-ENV:Body>
+    <loginRequest>
+      <userId>dummy@dbc.dk</userId>
+      <userPinCode>wrong</userPinCode>
+      <securityCode>securityCode</securityCode>
+    </loginRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,); 
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>Wrong username or password</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Failed login.')); 
+  }
+
+  /**
+   * Missing username
+   */
+  function _testWebserviceLoginMissingUsername() {
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+  <SOAP-ENV:Body>
+    <loginRequest>
+      <userId></userId>
+      <userPinCode>secretpassword</userPinCode>
+      <securityCode>securityCode</securityCode>
+    </loginRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,); 
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>No userid or no password given</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Missing username.')); 
+  }
+
+  /**
+   * Missing password
+   */
+  function _testWebserviceLoginMissingPassword() {
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+  <SOAP-ENV:Body>
+    <loginRequest>
+      <userId>dummy@dbc.dk</userId>
+      <userPinCode></userPinCode>
+      <securityCode>securityCode</securityCode>
+    </loginRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,); 
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>No userid or no password given</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Missing password.')); 
+  }
+
+  /**
+   * Missing security code
+   */
+  function _testWebserviceLoginMissingSecurityCode() {
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+  <SOAP-ENV:Body>
+    <loginRequest>
+      <userId>dummy@dbc.dk</userId>
+      <userPinCode>secretpassword</userPinCode>
+      <securityCode></securityCode>
+    </loginRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,); 
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>authentication error</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Missing security code')); 
+  }
+
+  /** 
+   * Wrong security code
+   */
+  function _testWebserviceLoginWrongSecurityCode() {
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+  <SOAP-ENV:Body>
+    <loginRequest>
+      <userId>dummy@dbc.dk</userId>
+      <userPinCode>secretpassword</userPinCode>
+      <securityCode>CodeSecurity</securityCode>
+    </loginRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,); 
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>authentication error</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Wrong security code')); 
+  }
+}
+
