@@ -12,7 +12,7 @@ create table ddbuser
        WAYF_ID character varying(64),
        UCD_CONCENT bit(1) not null,
        CPR_HASH character varying(32),
-       CPR_CONCENT bit(1) not null);
+       CPR_CONSENT bit(1) not null);
 alter table ddbuser add constraint pk_username primary key(USERNAME);
 create index idx_password on ddbuser(PASSWORD);
 drop user bibdk;
