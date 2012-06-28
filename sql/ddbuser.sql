@@ -7,12 +7,12 @@ create table ddbuser
        LASTLOGIN date,
        LASTMOD date,
        CONFIRMED integer,
-       IMPORTED bit(1) not null,
+       IMPORTED character varying(1) not null,
        USERALIAS character varying(64),
        WAYF_ID character varying(64),
-       UCD_CONCENT bit(1) not null,
+       UCD_CONCENT character varying(1) not null,
        CPR_HASH character varying(32),
-       CPR_CONSENT bit(1) not null);
+       CPR_CONSENT character varying(1) not null);
 alter table ddbuser add constraint pk_username primary key(USERNAME);
 create index idx_password on ddbuser(PASSWORD);
 drop user bibdk;
