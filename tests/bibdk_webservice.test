@@ -246,4 +246,3 @@ XML;
     $this->assertTrue($expected_soap == $response, t('Wrong security code')); 
   }
 }
-

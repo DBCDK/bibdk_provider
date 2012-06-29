@@ -32,16 +32,21 @@ function bibdk_webservice_request() {
   $replace = '';
   $data = preg_replace($pattern, $replace, $data);
 
-  $envelope = new SimpleXMLElement($data);
-  $request = $envelope->Body->children();
+  try {
+    $envelope = new SimpleXMLElement($data);
+    $request = $envelope->Body->children();
 
-  switch ($request->getName()) {
-    case 'loginRequest':
-      return bibdk_webservice_loginRequest($request);
-    break;
+    switch ($request->getName()) {
+      case 'loginRequest':
+        return bibdk_webservice_loginRequest($request);
+      break;
 
-    default:
-      return SOAP_FAULT;
+      default:
+        return SOAP_FAULT;
+    }
+  }
+  catch (Exception $e) {
+    return SOAP_FAULT;
   }
 }
 
@@ -111,7 +116,7 @@ function bibdk_webservice_loginRequest($request) {
 
   if ($security = bibdk_webservice_security_code_error((string) $request->loginRequest->securityCode)) {
     $response = $security;
-  } 
+  }
   elseif ($username && $password) {
     if ($userId = _bibdk_webservice_lookup_user($username, $password)) {
       $response = "<userId>$userId</userId>";
