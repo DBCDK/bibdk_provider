@@ -11,16 +11,16 @@ function bibdk_provider_user_authenticate($name, $pass) {
     'success' => FALSE,
   );
 
-  if( BibdkUser::instance()->login($name,$pass) ) {
-    $return['creds'] = 
+  if (BibdkUser::instance()->login($name, $pass)) {
+    $return['creds'] =
       array(
 	    'name' => $name,
 	    'pass' => $pass,
 	    );
 
-    $return['user'] = 
+    $return['user'] =
       array(
-	    'data' => array('display_name' => 'HEST'),		  
+	    'data' => array('display_name' => 'HEST'),
 	    'mail' => $name,
 	    );
     $return['success'] = TRUE;
@@ -29,7 +29,28 @@ function bibdk_provider_user_authenticate($name, $pass) {
 
     // @TODO; set a proper authname - some hash of mail
     // $return['authname'] = 'HEST';
-    
+
+  }
+  else {
+    /* advanced regex to match e-mail addresses including obscure usernames and
+       at server which only has an IPv4 address */
+    $is_email = !preg_match("/[a-z0-9!#$%&'*+\/=?^_`\{|\}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`\{|\}~-]+)*@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)/", strtolower($name));
+
+    /* if all characters in username or password is capitalized caps lock may be on */
+    $capslock_on = preg_match('/[[:alpha:]]/', $name) && $name == strtoupper($name) || preg_match('/[[:alpha:]]/', $pass) && $pass == strtoupper($pass);
+
+    /* if password is 4 or 5 digits */
+    $is_pincode = preg_match('/^[[:digit:]]{4,5}$/', $pass);
+
+    if ($is_email) {
+      $return['messages'][] = t('Your username is your email-address.');
+    }
+    if ($capslock_on) {
+      $return['messages'][] = t('Remember to turn off caps lock.');
+    }
+    if ($is_pincode) {
+      $return['messages'][] = t('Use your Bibliotek.dk password, not your PIN code for your local library.');
+    }
   }
   return $return;
 }
