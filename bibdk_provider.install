@@ -1,3 +1,18 @@
 <?php
 
 // Installation and update hooks for bibdk_provider.
+
+/**
+ * Implements hook_update_n()
+ *
+ * Do to the use of nanoSOAP module the URL pointing to the webservice must be
+ * provided instead of an URL for a WSDL describing the webservice.
+ */
+function bibdk_provider_update_7001() {
+  $bibdk_provider_wsdl_url = variable_get('bibdk_provider_wsdl_url');
+
+  if ($bibdk_provider_wsdl_url != NULL) {
+    variable_set('bibdk_provider_webservice_url', $bibdk_provider_wsdl_url);
+    variable_del('bibdk_provider_wsdl_url');
+  }
+}
