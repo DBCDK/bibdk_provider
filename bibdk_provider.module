@@ -528,8 +528,13 @@ function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map)
   if ($router_item['path'] == 'user/password') {
     drupal_goto('user/password_change');
   }
-  if ($router_item['path'] == 'user/reset') {
-    $options = $_SERVER['REQUEST_URI'];
-    drupal_goto('user/password_reset');
+  if ($router_item['path'] == 'user/reset/%/%/%') {
+    $destination = drupal_get_destination();
+    $destination = $destination['destination'];
+
+    if (substr($destination, strrpos($destination, '/')) != '/login') {
+      list($uid, $timestamp, $hash) = sscanf($destination, 'user/reset/%u/%u/%s');
+      drupal_goto("user/password_reset/$uid/$timestamp/$hash");
+    }
   }
 }
