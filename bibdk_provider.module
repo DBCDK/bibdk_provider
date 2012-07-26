@@ -517,3 +517,19 @@ function bibdk_provider_settings_form() {
 
   return system_settings_form($form);
 }
+
+/**
+ * Implements hook_menu_get_item_alter() to make pages panelized.
+ */
+function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map) {
+  if ($router_item['path'] == 'user/register') {
+    drupal_goto('user/create_login');
+  }
+  if ($router_item['path'] == 'user/password') {
+    drupal_goto('user/password_change');
+  }
+  if ($router_item['path'] == 'user/reset') {
+    $options = $_SERVER['REQUEST_URI'];
+    drupal_goto('user/password_reset');
+  }
+}
