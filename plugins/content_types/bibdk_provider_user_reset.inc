@@ -17,6 +17,7 @@ $plugin = array(
  * Use form_load_include to ensure the form is included also if it is cached
  */
 function _bibdk_provider_get_drupal_user_pass_reset_form($form, &$form_state) {
+  $block = new stdClass();
   // get arguments
   $args = func_get_args();
   // real arguments are in [2]

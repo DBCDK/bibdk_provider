@@ -17,6 +17,7 @@ $plugin = array(
  * Use form_load_include to ensure the form is included also if it is cached
  */
 function _bibdk_provider_drupal_user_pass_form($form, &$form_state) {
+  $block = new stdClass();
   
   if( !isset($form_state) ) {
     $form_state = array();
