@@ -2,11 +2,11 @@
 require_once('bibdk_provider.user.inc');
 include_once('bibdk_provider.features.inc');
 
-/*
-* Implements hook_ctools_plugin_directory -
-* This lets ctools know to scan my module for a content_type plugin file
-* Detailed docks in ctools/ctools.api.php
-*/
+/**
+ * Implements hook_ctools_plugin_directory -
+ * This lets ctools know to scan my module for a content_type plugin file
+ * Detailed docks in ctools/ctools.api.php
+ */
 function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
   // we'll be nice and limit scandir() calls
   if ($owner == 'ctools' && $plugin_type == 'content_types') {
@@ -72,7 +72,8 @@ function bibdk_provider_username_alter(&$name, $account) {
 
 
 
-/** Implements hook_form_FORM_ID_alter ( user_register_form )
+/**
+ * Implements hook_form_FORM_ID_alter ( user_register_form )
  * we use mail for username - set username=mail
  * add a submit handler for verifiying new user against bibdk - they might already be registred
  */
@@ -89,7 +90,7 @@ function bibdk_provider_form_user_register_form_alter( &$form, &$form_state) {
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 }
 
-/*
+/**
  * custom submit method ('user_register_form')
  * set name =  email - we use  email for username
  */
@@ -389,7 +390,7 @@ function bibdk_provider_user_register_form_validate( &$form,&$form_state ) {
   // other cases are handled drupal standard way
 }
 
-/*
+/**
  * custom method
  * if users are not registred in drupal, but already are registred in bibdk, but forgot their passwords...
  * create a drupal user to have an email to confirm against
