@@ -508,14 +508,6 @@ function bibdk_provider_settings_form() {
     '#default_value' => variable_get('bibdk_provider_security_code', ''),
   );
 
-  //no need for an agencyid
-  /*  $form['bibdk_provider']['bibdk_provider_agency_id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Agency Id'),
-    '#default_value' => variable_get('bibdk_provider_agency_id', ''),
-    '#description' => t('The Bibdk provider agency id of the library.'),
-    );*/
-
   $form['bibdk_provider']['bibdk_provider_enable_logging'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable logging'),
