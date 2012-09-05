@@ -1,0 +1,38 @@
+<?php
+
+function bibdk_test_provider_ding_provider() {
+  return array(
+    'title' => 'Bibliotek.dk test provider',
+    'settings' => 'bibdk_test_provider_settings_form',
+    'provides' => array(
+        'user' => array(
+        'prefix' => 'user',
+      ),
+    ),
+  );
+}
+
+function bibdk_test_provider_settings_form() {
+return array();
+}
+
+
+/**
+ * fake a successful login
+ **/
+function bibdk_test_provider_user_authenticate($name, $pass) {
+  $return['creds'] =
+    array(
+      'name' => $name,
+      'pass' => $pass,
+    );
+  $return['user'] =
+    array(
+      'data' => array('display_name' => 'HEST'),
+      'mail' => $name,
+    );
+  $return['success'] = TRUE;
+  $return['messages']=array('HEJ','notice');
+
+return $return;
+}
