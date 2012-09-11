@@ -53,10 +53,7 @@ function bibdk_provider_user_verify($name) {
 }
 
 function bibdk_provider_user_create($name, $pass) {
-  if (BibdkUser::instance()->create($name, $pass)) {
-    return TRUE;
-  }
-  return FALSE;
+  return BibdkUser::instance()->create($name, $pass);
 }
 
 function bibdk_provider_user_update_password($name, $pass) {
