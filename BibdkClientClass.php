@@ -187,7 +187,7 @@ class BibdkUser {
       'userId' => $name,
       'outputType' => 'xml',
     );
-    $response =  $this->requestHelper('verifyUserRequest', $params, '//verified');
+    return $this->requestHelper('verifyUserRequest', $params, '//verified');
   }
 
   /**
