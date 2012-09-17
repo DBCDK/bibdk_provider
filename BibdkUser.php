@@ -16,12 +16,16 @@ class BibdkClient {
     self::$security_code = variable_get('bibdk_provider_security_code', '');
 
     if (empty(self::$service_url)) {
-      watchdog('bibdk_provider', t('Provider url is not set'), array(), WATCHDOG_ERROR, l(t('Set provider url'), 'admin/config/ding/provider/bibdk_provider'));
+      if (variable_get('bibdk_provider_enable_logging')) {
+        watchdog('bibdk_provider', t('Provider url is not set'), array(), WATCHDOG_ERROR, l(t('Set provider url'), 'admin/config/ding/provider/bibdk_provider'));
+      }
     }
 
     if (empty(self::$security_code)) {
       // somehow bibdk_provider security code is not set - FATAL
-      watchdog('bibdk_provider', t('Security code is not set'), array(), WATCHDOG_ERROR, l(t('Set securitycode'), 'admin/config/ding/provider/bibdk_provider'));
+      if (variable_get('bibdk_provider_enable_logging')) {
+        watchdog('bibdk_provider', t('Security code is not set'), array(), WATCHDOG_ERROR, l(t('Set securitycode'), 'admin/config/ding/provider/bibdk_provider'));
+      }
     }
   }
 
@@ -101,7 +105,10 @@ class BibdkUser {
   private function set_xpath($xml) {
     $dom = new DomDocument();
     if (!@$dom->loadXML($xml)) {
-      watchdog('bibdk_provider', t('BIBDK client could not load response: %xml', array('%xml' => var_export($xml, TRUE))), array(), WATCHDOG_ERROR);
+      if (variable_get('bibdk_provider_enable_logging')) {
+        watchdog('bibdk_provider', t('BIBDK client could not load response: %xml', array('%xml' => var_export($xml, TRUE))), array(), WATCHDOG_ERROR);
+      }
+
       return FALSE;
     }
     $this->xpath = new DomXPATH($dom);
@@ -109,28 +116,38 @@ class BibdkUser {
   }
 
   /**
-   * Function which hands the request to the BibdkClient and parses the response.
+   * Function which hands the request to the BibdkClient.
    *
    * @param $action
    *   The request type as a string.
    * @param $params
    *   An array structure representing the request parameters.
-   * @param $verifyPresence
-   *   Which XPath element should be present in the response and neither be
-   *   empty nor has a string value of '0' or 'false'.
+   * @return
+   *   Response from BibdkClient as xml string.
+   */
+  private function makeRequest($action, $params) {
+    return BibdkClient::request($action, $params);
+  }
+
+  /**
+   * Function which parses the response.
+   *
+   * @param $xmlstring
+   *   The reponse as a xml string.
+   * @param $xmltag
+   *   Which XPath element should extracted from the response.
    *
    * @return
-   *   Boolean telling if request was a success and return a positive response.
+   *   FALSE if the xpath can't be set otherwise value of the xmltag to be
+   *   extracted.
    */
-  private function requestHelper($action, $params, $verifyPresence) {
-    $response =  BibdkClient::request($action, $params);
-
-    if (!$this->set_xpath($response)) {
+  private function responseExtractor($xmlstring, $xmltag) {
+    if (!$this->set_xpath($xmlstring)) {
       return FALSE;
     }
 
-    $status = $this->xpath->query($verifyPresence);
-    return !empty($status->item(0)->nodeValue);
+    $tagcontent = $this->xpath->query('//' . $xmltag);
+    return $tagcontent->item(0)->firstChild;
   }
 
   /**
@@ -150,7 +167,15 @@ class BibdkUser {
       'userPinCode' => $pass,
       'outputType' => 'xml',
     );
-    return $this->requestHelper('loginRequest', $params, '//userId');
+    $response = $this->makeRequest('loginRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'loginResponse');
+
+    if ($xmlmessage->nodeName == 'userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**
@@ -170,7 +195,15 @@ class BibdkUser {
       'userPinCode' => $pass,
       'outputType' => 'xml',
     );
-    return $this->requestHelper('createUserRequest', $params, '//userId');
+    $response = $this->makeRequest('createUserRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'createUserResponse');
+
+    if ($xmlmessage->nodeName == 'userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**
@@ -187,7 +220,15 @@ class BibdkUser {
       'userId' => $name,
       'outputType' => 'xml',
     );
-    return $this->requestHelper('verifyUserRequest', $params, '//verified');
+    $response = $this->makeRequest('verifyUserRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'verifyUserResponse');
+
+    if ($xmlmessage->nodeName == 'verified') {
+      return preg_match('/true/i', $xmlmessage->nodeValue);
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**
@@ -207,7 +248,15 @@ class BibdkUser {
       'userPinCode' => $pass,
       'outputType' => 'xml',
     );
-    return $this->requestHelper('updatePasswordRequest', $params, '//userId');
+    $response = $this->makeRequest('updatePasswordRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'updatePasswordResponse');
+
+    if ($xmlmessage->nodeName == 'userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**
@@ -221,12 +270,19 @@ class BibdkUser {
    * @return
    *   Boolean telling if the deletion was successful.
    */
-  public function delete($name, $password) {
+  public function delete($name) {
     $params = array(
       'userId' => $name,
-      'userPinCode' => $pass,
       'outputType' => 'xml',
     );
-    return $this->requestHelper('deleteUserRequest', $params, '//userId');
+    $response = $this->makeRequest('deleteUserRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'deleteUserResponse');
+
+    if ($xmlmessage->nodeName == 'userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 }

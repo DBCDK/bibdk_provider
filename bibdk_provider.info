@@ -8,6 +8,7 @@ dependencies[] = ctools
 dependencies[] = panels
 dependencies[] = page_manager
 dependencies[] = nanosoap
+dependencies[] = features
 
 features[ctools][] = "page_manager:pages_default:1"
 features[page_manager_pages][] = "create_login"
@@ -16,8 +17,9 @@ features[page_manager_pages][] = "user_password_change"
 
 files[] = bibdk_provider.test
 files[] = bibdk_provider.user.inc
-files[] = BibdkClientClass.php
+files[] = BibdkUser.php
 files[] = tests/bibdk_webservice.test
+files[] = tests/BibdkUser.test
 php = 5.2.4
 ;no version yet
 ;version = 7.x-0.0
