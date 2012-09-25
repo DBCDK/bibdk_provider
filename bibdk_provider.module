@@ -420,17 +420,9 @@ function bibdk_provider_cron() {
  * @TODO theming here?? maybe overlay??
  */
 function _bibdk_provider_set_confirm_message($form_state) {
-  drupal_set_message(check_plain(_bibdk_provider_already_registred_message($form_state['values']['mail'])));
-}
-
-/**
- * custom method
- * set a message to display if user is already registred in bibdk
- */
-function _bibdk_provider_already_registred_message($email) {
-  $message = t('You are already a registred user. Please log in with your usual username and password.');
-  $message .= l(t('Have you forgotten your password?'), 'user/password');
-  return $message;
+  $message = t('You are already a registred user. Please log in with your usual username and password.')
+      . ' ' . l(t('Have you forgotten your password?'), 'user/password');
+  drupal_set_message($message);
 }
 
 /**
@@ -505,14 +497,5 @@ function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map)
       list($uid, $timestamp, $hash) = sscanf($destination, 'user/reset/%u/%u/%s');
       drupal_goto("user/password_reset/$uid/$timestamp/$hash");
     }
-  }
-}
-
-/**
- * Implements hook_user_login().
- */
-function bibdk_provider_user_login(&$edit, $account) {
-  if (preg_match('/user\/reset/', request_uri())) {
-    $account->data['password'] = 'reset';
   }
 }
