@@ -507,3 +507,12 @@ function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map)
     }
   }
 }
+
+/**
+ * Implements hook_user_login().
+ */
+function bibdk_provider_user_login(&$edit, $account) {
+  if (preg_match('/user\/reset/', request_uri())) {
+    $account->data['password'] = 'reset';
+  }
+}

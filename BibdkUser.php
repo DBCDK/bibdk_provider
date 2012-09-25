@@ -170,7 +170,7 @@ class BibdkUser {
     $response = $this->makeRequest('loginRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'loginResponse');
 
-    if ($xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
       return TRUE;
     }
     else {
@@ -198,7 +198,7 @@ class BibdkUser {
     $response = $this->makeRequest('createUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'createUserResponse');
 
-    if ($xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
       return TRUE;
     }
     else {
@@ -223,7 +223,7 @@ class BibdkUser {
     $response = $this->makeRequest('verifyUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'verifyUserResponse');
 
-    if ($xmlmessage->nodeName == 'verified') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'verified') {
       return preg_match('/true/i', $xmlmessage->nodeValue);
     }
     else {
@@ -251,7 +251,7 @@ class BibdkUser {
     $response = $this->makeRequest('updatePasswordRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'updatePasswordResponse');
 
-    if ($xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
       return TRUE;
     }
     else {
@@ -278,7 +278,7 @@ class BibdkUser {
     $response = $this->makeRequest('deleteUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'deleteUserResponse');
 
-    if ($xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
       return TRUE;
     }
     else {

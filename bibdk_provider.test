@@ -26,7 +26,7 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
   }
 
   function getGoodUser() {
-    return array('name' => 'dummy@dbc.dk', 'pass'=>'secretPassword');
+    return array('name' => 'dummy@dbc.dk', 'pass' => 'secretPassword');
   }
 
   /**
@@ -47,16 +47,17 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
   private function validateLoginMessages($credentials) {
     foreach ($credentials as $c) {
       $msgs = $c['msgs'];
-      unset($c['msgs']);
+      $caller = array('file' => __FILE__, 'function' => __CLASS__ . '->' . $c['function'] . '()', 'line' => $c['line']);
+      unset($c['msgs'], $c['function'], $c['line']);
       $this->drupalPost('user', $c, t('Log in'));
 
+			// Taken from DrupalWebTestCase->assertText()
+			if ($this->plainTextContent === FALSE) {
+				$this->plainTextContent = filter_xss($this->drupalGetContent(), array());
+			}
+
       foreach ($msgs as $msg => $positiveAssert) {
-        if ($positiveAssert) {
-          $this->assertText($msg, t('Found: !msg', array('!msg' => $msg)));
-        }
-        else {
-          $this->assertNoText($msg, t("Didn't find: !msg", array('!msg' => $msg)));
-        }
+        $this->assert($positiveAssert != (strpos($this->plainTextContent, $msg) === FALSE), t('Found: !msg', array('!msg' => $msg)), 'Other', $caller);
       }
     }
   }
@@ -73,21 +74,29 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
         'name' => 'dummy@dbc.dk',
         'pass' => 'test',
         'msgs' => array($missing_username => FALSE, $missing_password => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
         ),
       array( // username and password both empty
         'name' => '',
         'pass' => '',
         'msgs' => array($missing_username => TRUE, $missing_password => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
         ),
       array( // missing password
         'name' => 'dummy@dbc.dk',
         'pass' => '',
         'msgs' => array($missing_username => FALSE, $missing_password => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
         ),
       array( // missing username
         'name' => '',
         'pass' => 'test',
         'msgs' => array($missing_username => TRUE, $missing_password => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
         ),
     );
 
@@ -104,26 +113,36 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
         'name' => 'dummy@dbc.dk',
         'pass' => 'test',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // username capitalized
         'name' => 'DUMMY@DBC.DK',
         'pass' => 'test',
         'msgs' => array($warning => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // password capitalized
         'name' => 'dummy@dbc.dk',
         'pass' => 'TEST',
         'msgs' => array($warning => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // password not entirely capitalized
         'name' => 'dummy@dbc.dk',
         'pass' => 'TeST',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // password capitalized
         'name' => 'dummy@dbc.dk',
         'pass' => 'T3ST',
         'msgs' => array($warning => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
     );
 
@@ -140,51 +159,71 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
         'name' => 'dummy@dbc.dk',
         'pass' => 'test',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array(   // password is four digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => '1234',
         'msgs' => array($warning => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array(  // password looks like four digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => 'a1234',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array(  // password looks like four digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => '1234e',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array(  // password looks like four digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => '12x34',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array(  // password is five digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => '12345',
         'msgs' => array($warning => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // password looks like five digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => 'a12345',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // password looks like five digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => '12345f',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // password looks like five digit PIN code
         'name' => 'dummy@dbc.dk',
         'pass' => '1234x5',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // password is six digit password
         'name' => 'dummy@dbc.dk',
         'pass' => '123456',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
     );
 
@@ -201,36 +240,50 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
         'name' => 'dummy@dbc.dk',
         'pass' => 'test',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // username not email address
         'name' => 'dummy@dbc',
         'pass' => 'test',
         'msgs' => array($warning => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // username not email address
         'name' => 'dummy@dbc.',
         'pass' => 'test',
         'msgs' => array($warning => TRUE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // username is email address with FQDN
         'name' => 'dummy@dbc.dk.',
         'pass' => 'test',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // username is email address subdomain
         'name' => 'dummy@test.dbc.dk.',
         'pass' => 'test',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // username is email at IP address
         'name' => 'dummy@127.1.3.4',
         'pass' => 'test',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
       array( // username is email at IPv4 address
         'name' => 'dummy@127.1.3.4',
         'pass' => 'test',
         'msgs' => array($warning => FALSE, ),
+				'line' => __LINE__ - 1,
+				'function' => __FUNCTION__,
       ),
     );
 
