@@ -232,7 +232,7 @@ class BibdkUser {
   }
 
   /**
-   * Function to check if the username already exists.
+   * Function to update password.
    *
    * @param $name
    *   Username for which the password is changed.
