@@ -4,6 +4,7 @@
  * Singleton class for querying the Bibdk provider webservice.
  */
 class BibdkClient {
+
   private static $instance;
   private static $service_url;
   private static $security_code;
@@ -63,6 +64,7 @@ class BibdkClient {
     $nano = new NanoSOAPClient(self::$service_url);
     return $nano->call($action, $request);
   }
+
 }
 
 /**
@@ -71,6 +73,7 @@ class BibdkClient {
  * This is a singleton class.
  */
 class BibdkUser {
+
   private static $instance;
   private $xpath;
 
@@ -216,7 +219,7 @@ class BibdkUser {
    *   Boolean telling if the user already exists.
    */
   public function verify($name) {
-    $params =  array(
+    $params = array(
       'userId' => $name,
       'outputType' => 'xml',
     );
@@ -285,4 +288,107 @@ class BibdkUser {
       return FALSE;
     }
   }
+
+  /**
+   * Login using WAYF.
+   *
+   * Throws an exception if an error is return from the web service.
+   *
+   * @param $name
+   *   Email address of the user.
+   * @param $wayfId
+   *   Unique id return by WAYF
+   * @return boolean
+   *   Indicates if operation was successful.
+   * @throws Exception
+   *   If web service returns an error.
+   */
+  public function loginWayf($name, $wayfId) {
+    $params = array(
+      'userId' => $name,
+      'wayfId' => $wayfId,
+      'outputType' => 'xml',
+    );
+    $response = $this->makeRequest('loginWayfRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'loginWayfResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+      return TRUE;
+    }
+    else {
+      if ($xmlmessage->nodeName == 'error') {
+        throw new Exception($xmlmessage->nodeValue);
+      }
+      else {
+        return FALSE;
+      }
+    }
+  }
+
+  /**
+   * Binds WAYF id to a user.
+   *
+   * Old WAYF id will be overwritten.
+   *
+   * @param $name
+   * @param $wayfId
+   *   WAYF id of user.
+   * @return boolean
+   *   Indicates if operation was successful.
+   * @throws Exception
+   *   If web service returns an error.
+   */
+  public function bindWayf($name, $wayfId) {
+    $params = array(
+      'userId' => $name,
+      'wayfId' => $wayfId,
+      'outputType' => 'xml',
+    );
+    $response = $this->makeRequest('bindWayfRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'bindWayfResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+      return TRUE;
+    }
+    else {
+      if ($xmlmessage->nodeName == 'error') {
+        throw new Exception($xmlmessage->nodeValue);
+      }
+      else {
+        return FALSE;
+      }
+    }
+  }
+
+  /**
+   * Deletes WAYF binding for a user.
+   *
+   * @param $name
+   *   User who should have removed binding.
+   * @return boolean
+   *   Indicates if operation was successful.
+   * @throws Exception
+   *   If web service returns an error.
+   */
+  public function deleteWayf($name) {
+    $params = array(
+      'userId' => $name,
+      'outputType' => 'xml',
+    );
+    $response = $this->makeRequest('deleteWayfRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'deleteWayfResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+      return TRUE;
+    }
+    else {
+      if ($xmlmessage->nodeName == 'error') {
+        throw new Exception($xmlmessage->nodeValue);
+      }
+      else {
+        return FALSE;
+      }
+    }
+  }
+
 }
