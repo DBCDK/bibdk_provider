@@ -9,6 +9,7 @@ dependencies[] = panels
 dependencies[] = page_manager
 dependencies[] = nanosoap
 dependencies[] = features
+dependencies[] = ding_user // ding_user_is_provider_user() in bibdk_provider.module on line 65
 
 features[ctools][] = "page_manager:pages_default:1"
 features[page_manager_pages][] = "create_login"
