@@ -14,7 +14,7 @@ function bibdk_provider_user_authenticate($name, $pass) {
 		  'pass' => $pass,
     );
 
-    $return['user'] = array(
+   $return['user'] = array(
 			'data' => array('display_name' => 'HEST'),
 			'mail' => $name,
     );
@@ -48,8 +48,43 @@ function bibdk_provider_user_authenticate($name, $pass) {
   return $return;
 }
 
+// @TODO this function should do something
+function bibdk_provider_is_authenticated(){
+  return TRUE;
+}
+
+function bibdk_provider_set_favourite($name, $agencyid){
+  return BibdkUser::instance()->setFavourite($name,$agencyid);
+}
+
+function bibdk_provider_add_favourite($name,$agencyid){
+  return BibdkUser::instance()->addFavourite($name, $agencyid);
+}
+
+function bibdk_provider_delete_favourite($name,$agencyid){
+  return BibdkUser::instance()->deleteFavourite($name,$agencyid);
+}
+
+/**
+ * \brief get favourite agencies for given user
+ * @param name; userId (email)
+ * return array (might be empty)
+ **/
+function bibdk_provider_get_favourites($name) {
+  static $response;
+  if( !isset($response) ) {
+    $response =  BibdkUser::instance()->getFavourites($name);    
+  }
+  return $response;
+}
+
 function bibdk_provider_user_verify($name) {
-  return BibdkUser::instance()->verify($name);
+  //$response = NULL;
+  static $response;
+  if( !isset($response) ) {
+    $response = BibdkUser::instance()->verify($name);
+  }
+  return $response;
 }
 
 function bibdk_provider_user_create($name, $pass) {
