@@ -123,4 +123,69 @@ class NanoSOAPClient {
 
     return $this->soapEnveloping('deleteUserResponse', $response);
   }
+
+  private function loginWayfRequest($request) {
+    $userId = $request['userId'];
+    $wayfId = $request['wayfId'];
+
+    if (empty($userId) || empty($wayfId)) {
+      $response = '<error>Missing</error>';
+    }
+    else {
+      if ($userId == 'validUser') {
+        if ($wayfId == 'wayfid12345') {
+          $response = "<userId>$userId</userId>";
+        }
+        else {
+          $response = '<error>no binding</error>';
+        }
+      }
+      elseif ($userId == 'noBindUser') {
+        $response = '<error>no binding</error>';
+      }
+      else {
+        $response = '<error>no such user</error>';
+      }
+    }
+
+    return $this->soapEnveloping('loginWayfResponse', $response);
+  }
+
+  private function bindWayfRequest($request) {
+    $userId = $request['userId'];
+    $wayfId = $request['wayfId'];
+
+    if (empty($userId) || empty($wayfId)) {
+      $response = '<error>Missing</error>';
+    }
+    else {
+      if ($userId == 'validUser') {
+        $response = "<userId>$userId</userId>";
+      }
+      else {
+        $response = '<error>no such user</error>';
+      }
+    }
+
+    return $this->soapEnveloping('bindWayfResponse', $response);
+  }
+
+  private function deleteWayfRequest($request) {
+    $userId = $request['userId'];
+
+    if (empty($userId)) {
+      $response = '<error>Missing</error>';
+    }
+    else {
+      if ($userId == 'validUser') {
+        $response = "<userId>$userId</userId>";
+      }
+      else {
+        $response = '<error>no such user</error>';
+      }
+    }
+
+    return $this->soapEnveloping('deleteWayfResponse', $response);
+  }
+
 }

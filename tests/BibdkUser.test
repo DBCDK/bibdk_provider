@@ -1,13 +1,14 @@
 <?php
 
 class BibdkUserTest extends DrupalUnitTestCase {
+
   private $enable_logging;
 
   public static function getInfo() {
     return array(
       'name' => 'bibdk user provider client',
-      'description' => 'Test bibdk user provider functionality.',
-      'group' => 'Bibliotek.dk',
+      'description' => 'Interface to web service',
+      'group' => 'bibliotek.dk - provider',
     );
   }
 
@@ -62,6 +63,75 @@ class BibdkUserTest extends DrupalUnitTestCase {
     $this->assertTrue($validUser, t('User deleted'));
     $invalidUser = $client->delete('');
     $this->assertFalse($invalidUser, t("Can't delete user"));
+  }
+
+  public function testLoginWayf() {
+    $client = BibdkUser::instance();
+    try {
+      $validUser = $client->loginWayf('validUser', 'wayfid12345');
+    }
+    catch (Exception $e) {
+      $validUser = FALSE;
+    }
+    $this->assertTrue($validUser, t('Logged in using WAYF'));
+
+    try {
+      $invalidUser = $client->loginWayf('invalidUser', 'wayfid54321');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no such user', t('Failed logging in using WAYF'));
+
+    try {
+      $noBindUser = $client->loginWayf('noBindUser', 'wayfid54321');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no binding', t('User has no WAYF bind'));
+  }
+
+  public function testBindWayf() {
+    $client = BibdkUser::instance();
+    try {
+      $validUser = $client->bindWayf('validUser', 'wayfid12345');
+    }
+    catch (Exception $e) {
+      $validUser = FALSE;
+    }
+    $this->assertTrue($validUser, t('Bound username with WAYF'));
+
+    try {
+      $invalidUser = $client->bindWayf('invalidUser', 'wayfid54321');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no such user', t('Failed to bind WAYF for nonexisting user.'));
+  }
+
+  public function testDeleteWayf() {
+    $client = BibdkUser::instance();
+    try {
+      $validUser = $client->deleteWayf('validUser');
+    }
+    catch (Exception $e) {
+      $validUser = FALSE;
+    }
+    $this->assertTrue($validUser, t('Deleted WAYF binding for user.'));
+
+    try {
+      $invalidUser = $client->deleteWayf('invalidUser');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no such user', t('Failed to delete WAYF for nonexisting user.'));
   }
 
 }

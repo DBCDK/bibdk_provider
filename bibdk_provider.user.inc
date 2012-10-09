@@ -10,13 +10,13 @@ function bibdk_provider_user_authenticate($name, $pass) {
 
   if (BibdkUser::instance()->login($name, $pass)) {
     $return['creds'] = array(
-		  'name' => $name,
-		  'pass' => $pass,
+      'name' => $name,
+      'pass' => $pass,
     );
 
-   $return['user'] = array(
-			'data' => array('display_name' => 'HEST'),
-			'mail' => $name,
+    $return['user'] = array(
+      'data' => array('display_name' => 'HEST'),
+      'mail' => $name,
     );
     $return['success'] = TRUE;
     $return['messages'] = array('HEJ', 'notice');
@@ -87,7 +87,7 @@ function bibdk_provider_user_verify($name) {
   return $response;
 }
 
-function bibdk_provider_user_create($name, $pass) {
+function bibdk_provider_user_create_account($name, $pass) {
   return BibdkUser::instance()->create($name, $pass);
 }
 
@@ -95,7 +95,7 @@ function bibdk_provider_user_update_password($name, $pass) {
   return BibdkUser::instance()->update_password($name, $pass);
 }
 
-function bibdk_provider_client_user_delete($name, $pass) {
-  return BibdkUser::instance()->delete($name, $pass);
+function bibdk_provider_user_delete_account($name) {
+  return BibdkUser::instance()->delete($name);
 }
 
