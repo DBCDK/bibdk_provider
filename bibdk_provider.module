@@ -166,7 +166,7 @@ function _bibdk_provider_profile_form_login($form, &$form_state) {
       if ($enable_logging) {
         watchdog('BIBDK_PROVIDER', 'ERROR LOGIN : %name : %pass;', array('%name' => $name, '%pass' => $pass), WATCHDOG_ERROR);
       }
-      form_set_error('submit', t('HORSE'));
+      form_set_error('submit', t('BIBDK_CREATE_USER_ERROR_MESSAGE'));
       return FALSE;
     }
   } catch (Exception $e) {
