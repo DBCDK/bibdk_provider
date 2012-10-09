@@ -112,6 +112,7 @@ class BibdkUser {
       return FALSE;
     }
     $this->xpath = new DomXPATH($dom);
+    $this->xpath->registerNamespace('oui', 'http://oss.dbc.dk/ns/openuserinfo');
     return TRUE;
   }
 
@@ -145,10 +146,68 @@ class BibdkUser {
     if (!$this->set_xpath($xmlstring)) {
       return FALSE;
     }
+    $pos = strpos($xmltag, 'oui:');
+    if( $pos === FALSE ) {
+      $xmltag = 'oui:'.$xmltag;
+    }
 
-    $tagcontent = $this->xpath->query('//' . $xmltag);
-    return $tagcontent->item(0)->firstChild;
+    $query = '//' . $xmltag;
+    $tagcontent = $this->xpath->query($query);
+    $ret = $tagcontent->item(0)->firstChild;
+   
+    return $ret;
   }
+
+
+  /****************  FAVOURITES ***************/
+  
+  public function setFavourite($username,$agencyid) {
+    $params = array('userId'=>$username, 'agencyId'=>$agencyid);
+    $response = $this->makeRequest('setFavouriteRequest', $params);
+    
+    return $response;
+  }
+  
+  /** \brief get all favourite agencies for a given user
+   * @staticvar type $response
+   * @param type $username
+   * @return type xml
+   */
+  public function getFavourites($username) {
+    static $response;
+    $params = array('userId'=>$username);
+    $response = $this->makeRequest('getFavouritesRequest', $params);
+    
+    return $response;
+  }
+  
+  /**
+   * \brief add an agency to favourites for given user
+   * @param type $username
+   * @param type $agencyid
+   * @return type xml
+   */
+  public function addFavourite($username,$agencyid){
+    $params = array('userId'=>$username,'agencyId'=>$agencyid);
+    $response = $this->makeRequest('addFavouriteRequest', $params);
+    
+    return $response;
+  }
+  
+  /**
+   * \brief delete an agency on a given user
+   * @param type $username
+   * @param type $agencyid
+   * @return type xml
+   */
+  public function deleteFavourite($username,$agencyid){
+    $params = array('userId'=>$username,'agencyId'=>$agencyid);
+    $response = $this->makeRequest('deleteFavouriteRequest', $params);
+    
+    return $response;
+  }
+  
+
 
   /**
    * Function to logging in a user.
@@ -170,7 +229,7 @@ class BibdkUser {
     $response = $this->makeRequest('loginRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'loginResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
@@ -223,7 +282,7 @@ class BibdkUser {
     $response = $this->makeRequest('verifyUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'verifyUserResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'verified') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:verified') {
       return preg_match('/true/i', $xmlmessage->nodeValue);
     }
     else {
