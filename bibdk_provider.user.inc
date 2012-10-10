@@ -48,6 +48,17 @@ function bibdk_provider_user_authenticate($name, $pass) {
   return $return;
 }
 
+
+/**
+* pjo testing
+* Implements hook_user_view
+* NOTE; this skips the userview page and redirects to user edit page.
+**/
+function bibdk_provider_user_view($account, $view_mode, $langcode){
+drupal_goto('user/'.$account->uid.'/edit');
+}
+
+
 // @TODO this function should do something
 function bibdk_provider_is_authenticated(){
   return TRUE;
