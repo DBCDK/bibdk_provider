@@ -210,6 +210,13 @@ class BibdkUser {
     return $response;
   }
   
+  public function saveFavouriteData($name,$agencyid,$data) {
+    $params = array('userId'=>$name, 'agencyId'=>$agencyid, 'favouriteData'=>$data);
+    $response = $this->makeRequest('setFavouriteDataRequest', $params);
+    
+    return $response;  
+  }
+  
 
 
   /**

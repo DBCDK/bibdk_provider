@@ -110,3 +110,8 @@ function bibdk_provider_user_delete_account($name) {
   return BibdkUser::instance()->delete($name);
 }
 
+
+function bibdk_provider_user_save_favourite_data($name,$agencyid,$data) {
+  return BibdkUser::instance()->saveFavouriteData($name,$agencyid,$data);
+}
+
