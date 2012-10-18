@@ -33,7 +33,9 @@ function bibdk_provider_form_user_login_alter(&$form, &$form_state) {
 
   unset($form['name']);
   unset($form['pass']);
-
+  
+  //Re-setting $form['pass'] to enable persistent login to give same weight to persistent_login checkbox as password field
+  $form['pass']['#weight'] = $form['inputs']['#weight']; 
   $form['actions']['#weight'] = 2;
 
   unset($form['links']);
