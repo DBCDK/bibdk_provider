@@ -20,7 +20,7 @@ function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
  * add a link to create user and forgot password
  * wrap input and links in div's for easier styling
  */
-function bibdk_provider_form_user_login_block_alter(&$form, &$form_state) {
+function bibdk_provider_form_user_login_alter(&$form, &$form_state) {
   $form['inputs']['#weight'] = 1;
   $form['inputs']['name'] = $form['name'];
   $form['inputs']['name']['#attributes']['placeholder'] = t('Username');
