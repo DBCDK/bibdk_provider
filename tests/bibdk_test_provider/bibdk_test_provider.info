@@ -1,0 +1,5 @@
+name = Bibliotek.dk provider mockup
+description = A mockup provider
+core = 7.x
+package = DBCDK
+;hidden = TRUE

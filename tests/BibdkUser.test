@@ -1,0 +1,137 @@
+<?php
+
+class BibdkUserTest extends DrupalUnitTestCase {
+
+  private $enable_logging;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'bibdk user provider client',
+      'description' => 'Interface to web service',
+      'group' => 'bibliotek.dk - provider',
+    );
+  }
+
+  public function setUp() {
+    $this->enable_logging = variable_get('bibdk_provider_enable_logging');
+    variable_set('bibdk_provider_enable_logging', 0);
+    module_load_include('php', 'bibdk_provider', 'tests/nanosoapmock');
+    module_load_include('php', 'bibdk_provider', 'BibdkUser');
+    parent::setUp();
+  }
+
+  public function tearDown() {
+    variable_get('bibdk_provider_enable_logging', $this->enable_logging);
+    parent::tearDown();
+  }
+
+  public function testVerify() {
+    $client = BibdkUser::instance();
+    $validUser = $client->verify('validUser');
+    $this->assertTrue($validUser, t('Got valid user'));
+    $invalidUser = $client->verify('invalidUser');
+    $this->assertFalse($invalidUser, t('Got invalid user'));
+  }
+
+  public function testCreateUser() {
+    $client = BibdkUser::instance();
+    $validUser = $client->create('createUser', '123456');
+    $this->assertTrue($validUser, t('User created'));
+    $invalidUser = $client->create('invalidUser', '123456');
+    $this->assertFalse($invalidUser, t("Can't create user"));
+  }
+
+  public function testLogin() {
+    $client = BibdkUser::instance();
+    $validUser = $client->login('validUser', '123456');
+    $this->assertTrue($validUser, t('User logged in'));
+    $invalidUser = $client->login('invalidUser', '123456');
+    $this->assertFalse($invalidUser, t("Can't login"));
+  }
+
+  public function testUpdateUser() {
+    $client = BibdkUser::instance();
+    $validUser = $client->update_password('updateUser', '123456');
+    $this->assertTrue($validUser, t('User updated'));
+    $invalidUser = $client->update_password('invalidUser', '123456');
+    $this->assertFalse($invalidUser, t("Can't update user"));
+  }
+
+  public function testDeleteUser() {
+    $client = BibdkUser::instance();
+    $validUser = $client->delete('deleteUser');
+    $this->assertTrue($validUser, t('User deleted'));
+    $invalidUser = $client->delete('');
+    $this->assertFalse($invalidUser, t("Can't delete user"));
+  }
+
+  public function testLoginWayf() {
+    $client = BibdkUser::instance();
+    try {
+      $validUser = $client->loginWayf('validUser', 'wayfid12345');
+    }
+    catch (Exception $e) {
+      $validUser = FALSE;
+    }
+    $this->assertTrue($validUser, t('Logged in using WAYF'));
+
+    try {
+      $invalidUser = $client->loginWayf('invalidUser', 'wayfid54321');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no such user', t('Failed logging in using WAYF'));
+
+    try {
+      $noBindUser = $client->loginWayf('noBindUser', 'wayfid54321');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no binding', t('User has no WAYF bind'));
+  }
+
+  public function testBindWayf() {
+    $client = BibdkUser::instance();
+    try {
+      $validUser = $client->bindWayf('validUser', 'wayfid12345');
+    }
+    catch (Exception $e) {
+      $validUser = FALSE;
+    }
+    $this->assertTrue($validUser, t('Bound username with WAYF'));
+
+    try {
+      $invalidUser = $client->bindWayf('invalidUser', 'wayfid54321');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no such user', t('Failed to bind WAYF for nonexisting user.'));
+  }
+
+  public function testDeleteWayf() {
+    $client = BibdkUser::instance();
+    try {
+      $validUser = $client->deleteWayf('validUser');
+    }
+    catch (Exception $e) {
+      $validUser = FALSE;
+    }
+    $this->assertTrue($validUser, t('Deleted WAYF binding for user.'));
+
+    try {
+      $invalidUser = $client->deleteWayf('invalidUser');
+      $error = '';
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEqual($error, 'no such user', t('Failed to delete WAYF for nonexisting user.'));
+  }
+
+}
