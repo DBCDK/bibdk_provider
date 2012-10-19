@@ -2,7 +2,8 @@ name = Bibdk provider
 description = Implementation of bibdk provider API.
 package = DBCDK
 configure = admin/config/ding/provider/bibdk_provider
-core = "7.x"
+core = 7.x
+version = 0.1
 
 dependencies[] = ctools
 dependencies[] = panels
@@ -22,5 +23,3 @@ files[] = BibdkUser.php
 files[] = tests/bibdk_webservice.test
 files[] = tests/BibdkUser.test
 php = 5.2.4
-;no version yet
-;version = 7.x-0.0
