@@ -320,7 +320,7 @@ class BibdkUser {
     $response = $this->makeRequest('updatePasswordRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'updatePasswordResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
