@@ -35,24 +35,10 @@ function bibdk_provider_form_user_login_alter(&$form, &$form_state) {
   unset($form['pass']);
   
   //Re-setting $form['pass'] to enable persistent login to give same weight to persistent_login checkbox as password field
-  $form['pass']['#weight'] = $form['inputs']['#weight']; 
+  $form['pass']['#weight'] = 100;
   $form['actions']['#weight'] = 2;
 
   unset($form['links']);
-  // Forgot password link.
-  $form['links']['request_password'] = array(
-    '#markup' => l(t('Forgot password'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.')))),
-  );
-
-  // Sign up link
-  if (variable_get('user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)) {
-    $form['links']['signup'] = array(
-      '#markup' => l(t('New user'), 'user/register', array('attributes' => array('id' => 'create-new-account', 'title' => t('Create a new user account.')))),
-    );
-  }
-  $form['links']['#weight'] = 3;
-  $form['links']['#prefix'] = '<div class="' . drupal_html_class('bibdk_provider_form_links') . '">';
-  $form['links']['#suffix'] = '</div>';
 }
 
 /**
