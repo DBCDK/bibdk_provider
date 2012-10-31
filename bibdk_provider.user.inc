@@ -48,43 +48,42 @@ function bibdk_provider_user_authenticate($name, $pass) {
   return $return;
 }
 
-
 /**
-* pjo testing
-* Implements hook_user_view
-* NOTE; this skips the userview page and redirects to user edit page.
-**/
-function bibdk_provider_user_view($account, $view_mode, $langcode){
-drupal_goto('user/'.$account->uid.'/edit');
+ * pjo testing
+ * Implements hook_user_view
+ * NOTE; this skips the userview page and redirects to user edit page.
+ * what do we need the userview page for anyway ..
+ * */
+function bibdk_provider_user_view($account, $view_mode, $langcode) {
+  drupal_goto('user/' . $account->uid . '/edit');
 }
 
-
 // @TODO this function should do something
-function bibdk_provider_is_authenticated(){
+function bibdk_provider_is_authenticated() {
   return TRUE;
 }
 
-function bibdk_provider_set_favourite($name, $agencyid){
-  return BibdkUser::instance()->setFavourite($name,$agencyid);
+function bibdk_provider_set_favourite($name, $agencyid) {
+  return BibdkUser::instance()->setFavourite($name, $agencyid);
 }
 
-function bibdk_provider_add_favourite($name,$agencyid){
+function bibdk_provider_add_favourite($name, $agencyid) {
   return BibdkUser::instance()->addFavourite($name, $agencyid);
 }
 
-function bibdk_provider_delete_favourite($name,$agencyid){
-  return BibdkUser::instance()->deleteFavourite($name,$agencyid);
+function bibdk_provider_delete_favourite($name, $agencyid) {
+  return BibdkUser::instance()->deleteFavourite($name, $agencyid);
 }
 
 /**
  * \brief get favourite agencies for given user
  * @param name; userId (email)
  * return array (might be empty)
- **/
+ * */
 function bibdk_provider_get_favourites($name) {
   static $response;
-  if( !isset($response) ) {
-    $response =  BibdkUser::instance()->getFavourites($name);    
+  if (!isset($response)) {
+    $response = BibdkUser::instance()->getFavourites($name);
   }
   return $response;
 }
@@ -92,7 +91,7 @@ function bibdk_provider_get_favourites($name) {
 function bibdk_provider_user_verify($name) {
   //$response = NULL;
   static $response;
-  if( !isset($response) ) {
+  if (!isset($response)) {
     $response = BibdkUser::instance()->verify($name);
   }
   return $response;
@@ -110,8 +109,6 @@ function bibdk_provider_user_delete_account($name) {
   return BibdkUser::instance()->delete($name);
 }
 
-
-function bibdk_provider_user_save_favourite_data($name,$agencyid,$data) {
-  return BibdkUser::instance()->saveFavouriteData($name,$agencyid,$data);
+function bibdk_provider_user_save_favourite_data($name, $agencyid, $data) {
+  return BibdkUser::instance()->saveFavouriteData($name, $agencyid, $data);
 }
-
