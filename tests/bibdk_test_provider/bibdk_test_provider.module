@@ -5,34 +5,46 @@ function bibdk_test_provider_ding_provider() {
     'title' => 'Bibliotek.dk test provider',
     'settings' => 'bibdk_test_provider_settings_form',
     'provides' => array(
-        'user' => array(
-        'prefix' => 'user',
+      'user' => array(
+        'prefix' => 'user',        
+      ),
+      'favourites' => array(
+        'prefix' => 'favourite',
       ),
     ),
   );
 }
 
 function bibdk_test_provider_settings_form() {
-return array();
+  return array();
 }
 
+// @TODO this function should do something
+function bibdk_test_provider_is_authenticated() {
+  return TRUE;
+}
 
 /**
  * fake a successful login
- **/
+ * */
 function bibdk_test_provider_user_authenticate($name, $pass) {
   $return['creds'] =
-    array(
-      'name' => $name,
-      'pass' => $pass,
-    );
+      array(
+        'name' => $name,
+        'pass' => $pass,
+  );
   $return['user'] =
-    array(
-      'data' => array('display_name' => 'HEST'),
-      'mail' => $name,
-    );
+      array(
+        'data' => array('display_name' => 'HEST'),
+        'mail' => $name,
+  );
   $return['success'] = TRUE;
-  $return['messages']=array('HEJ','notice');
+  $return['messages'] = array('HEJ', 'notice');
 
-return $return;
+  drupal_set_message('HEST');
+  return $return;
+}
+
+function bibdk_test_provider_get_favourites($name) {
+ 
 }

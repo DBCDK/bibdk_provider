@@ -402,7 +402,7 @@ function bibdk_provider_ding_provider() {
       'user' => array(
         'prefix' => 'user',
         'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.user.inc',
-      ),
+      ),      
     ),
   );
 }

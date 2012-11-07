@@ -63,15 +63,38 @@ function bibdk_provider_is_authenticated() {
   return TRUE;
 }
 
-function bibdk_provider_set_favourite($name, $agencyid) {
+/** \brief check if user is logged in and if so if user is provider user
+ * 
+ * @global type $user
+ * @return boolean 
+ */
+function _bibdk_provider_user_check() {
+  global $user;
+  if ($user->uid) {
+    if (ding_user_is_provider_user($user)) {      
+      // user is logged in and is provider user
+      return TRUE;
+    }
+    // user is not provider user    
+    return FALSE;
+  }
+  // user is not logged in  
+  return FALSE;
+}
+
+function bibdk_provider_user_set_favourite($name, $agencyid) {
+  dpm(func_get_args());
+  if( !(_bibdk_provider_user_check()) ) {
+    return FALSE;
+  }
   return BibdkUser::instance()->setFavourite($name, $agencyid);
 }
 
-function bibdk_provider_add_favourite($name, $agencyid) {
+function bibdk_provider_user_add_favourite($name, $agencyid) {
   return BibdkUser::instance()->addFavourite($name, $agencyid);
 }
 
-function bibdk_provider_delete_favourite($name, $agencyid) {
+function bibdk_provider_user_delete_favourite($name, $agencyid) {
   return BibdkUser::instance()->deleteFavourite($name, $agencyid);
 }
 
@@ -80,7 +103,7 @@ function bibdk_provider_delete_favourite($name, $agencyid) {
  * @param name; userId (email)
  * return array (might be empty)
  * */
-function bibdk_provider_get_favourites($name) {
+function bibdk_provider_user_get_favourites($name) {
   static $response;
   if (!isset($response)) {
     $response = BibdkUser::instance()->getFavourites($name);
