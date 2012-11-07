@@ -83,7 +83,6 @@ function _bibdk_provider_user_check() {
 }
 
 function bibdk_provider_user_set_favourite($name, $agencyid) {
-  dpm(func_get_args());
   if( !(_bibdk_provider_user_check()) ) {
     return FALSE;
   }
