@@ -8,7 +8,7 @@
  * Implements hook_default_page_manager_pages().
  */
 function bibdk_provider_default_page_manager_pages() {
-  $page = new stdClass();
+  $page = new stdClass;
   $page->disabled = FALSE; /* Edit this to true to make a default page disabled initially */
   $page->api_version = 1;
   $page->name = 'create_login';
@@ -16,14 +16,17 @@ function bibdk_provider_default_page_manager_pages() {
   $page->admin_title = 'Create login';
   $page->admin_description = 'create login for new user';
   $page->path = 'user/create_login';
-  $page->access = array();
+  $page->access = array(
+    'type' => 'none',
+    'settings' => NULL,
+  );
   $page->menu = array();
   $page->arguments = array();
   $page->conf = array(
     'admin_paths' => FALSE,
   );
   $page->default_handlers = array();
-  $handler = new stdClass();
+  $handler = new stdClass;
   $handler->disabled = FALSE; /* Edit this to true to make a default handler disabled initially */
   $handler->api_version = 1;
   $handler->name = 'page_create_login_panel_context';
@@ -40,7 +43,7 @@ function bibdk_provider_default_page_manager_pages() {
     'contexts' => array(),
     'relationships' => array(),
   );
-  $display = new panels_display();
+  $display = new panels_display;
   $display->layout = 'bibdk_100';
   $display->layout_settings = array();
   $display->panel_settings = array(
@@ -57,7 +60,7 @@ function bibdk_provider_default_page_manager_pages() {
   $display->title = '';
   $display->content = array();
   $display->panels = array();
-    $pane = new stdClass();
+    $pane = new stdClass;
     $pane->pid = 'new-1';
     $pane->panel = 'middle';
     $pane->type = 'bibdk_provider_register';
@@ -81,7 +84,7 @@ function bibdk_provider_default_page_manager_pages() {
   $page->default_handlers[$handler->name] = $handler;
   $pages['create_login'] = $page;
 
-  $page = new stdClass();
+  $page = new stdClass;
   $page->disabled = FALSE; /* Edit this to true to make a default page disabled initially */
   $page->api_version = 1;
   $page->name = 'reset_password';
@@ -89,14 +92,17 @@ function bibdk_provider_default_page_manager_pages() {
   $page->admin_title = 'Reset password';
   $page->admin_description = 'user forgot password - reset';
   $page->path = 'user/password_reset';
-  $page->access = array();
+  $page->access = array(
+    'type' => 'none',
+    'settings' => NULL,
+  );
   $page->menu = array();
   $page->arguments = array();
   $page->conf = array(
     'admin_paths' => FALSE,
   );
   $page->default_handlers = array();
-  $handler = new stdClass();
+  $handler = new stdClass;
   $handler->disabled = FALSE; /* Edit this to true to make a default handler disabled initially */
   $handler->api_version = 1;
   $handler->name = 'page_reset_password_panel_context';
@@ -113,7 +119,7 @@ function bibdk_provider_default_page_manager_pages() {
     'contexts' => array(),
     'relationships' => array(),
   );
-  $display = new panels_display();
+  $display = new panels_display;
   $display->layout = 'bibdk_100';
   $display->layout_settings = array();
   $display->panel_settings = array(
@@ -130,7 +136,7 @@ function bibdk_provider_default_page_manager_pages() {
   $display->title = '';
   $display->content = array();
   $display->panels = array();
-    $pane = new stdClass();
+    $pane = new stdClass;
     $pane->pid = 'new-2';
     $pane->panel = 'middle';
     $pane->type = 'bibdk_provider_user_reset';
@@ -154,7 +160,7 @@ function bibdk_provider_default_page_manager_pages() {
   $page->default_handlers[$handler->name] = $handler;
   $pages['reset_password'] = $page;
 
-  $page = new stdClass();
+  $page = new stdClass;
   $page->disabled = FALSE; /* Edit this to true to make a default page disabled initially */
   $page->api_version = 1;
   $page->name = 'user_password_change';
@@ -169,7 +175,7 @@ function bibdk_provider_default_page_manager_pages() {
     'admin_paths' => FALSE,
   );
   $page->default_handlers = array();
-  $handler = new stdClass();
+  $handler = new stdClass;
   $handler->disabled = FALSE; /* Edit this to true to make a default handler disabled initially */
   $handler->api_version = 1;
   $handler->name = 'page_user_password_change_panel_context';
@@ -186,8 +192,8 @@ function bibdk_provider_default_page_manager_pages() {
     'contexts' => array(),
     'relationships' => array(),
   );
-  $display = new panels_display();
-  $display->layout = 'bibdk_100';
+  $display = new panels_display;
+  $display->layout = 'bibdk_33_66';
   $display->layout_settings = array();
   $display->panel_settings = array(
     'style_settings' => array(
@@ -203,7 +209,7 @@ function bibdk_provider_default_page_manager_pages() {
   $display->title = '';
   $display->content = array();
   $display->panels = array();
-    $pane = new stdClass();
+    $pane = new stdClass;
     $pane->pid = 'new-3';
     $pane->panel = 'middle';
     $pane->type = 'bibdk_provider_password_change';
@@ -227,6 +233,6 @@ function bibdk_provider_default_page_manager_pages() {
   $page->default_handlers[$handler->name] = $handler;
   $pages['user_password_change'] = $page;
 
-  return $pages;
+ return $pages;
 
 }
