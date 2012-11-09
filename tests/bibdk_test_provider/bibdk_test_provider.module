@@ -6,7 +6,7 @@ function bibdk_test_provider_ding_provider() {
     'settings' => 'bibdk_test_provider_settings_form',
     'provides' => array(
       'user' => array(
-        'prefix' => 'user',        
+        'prefix' => 'user',
       ),
       'favourites' => array(
         'prefix' => 'favourite',
@@ -20,7 +20,7 @@ function bibdk_test_provider_settings_form() {
 }
 
 // @TODO this function should do something
-function bibdk_test_provider_is_authenticated() {
+function bibdk_test_provider_user_is_authenticated() {
   return TRUE;
 }
 
@@ -28,6 +28,9 @@ function bibdk_test_provider_is_authenticated() {
  * fake a successful login
  * */
 function bibdk_test_provider_user_authenticate($name, $pass) {
+  
+  
+  
   $return['creds'] =
       array(
         'name' => $name,
@@ -40,11 +43,23 @@ function bibdk_test_provider_user_authenticate($name, $pass) {
   );
   $return['success'] = TRUE;
   $return['messages'] = array('HEJ', 'notice');
-
-  drupal_set_message('HEST');
+ 
+  //dpm($return);
+  
   return $return;
 }
 
-function bibdk_test_provider_get_favourites($name) {
- 
+function bibdk_test_provider_user_get_favourites($name) {
+  $path = drupal_get_path('module', 'bibdk_test_provider');
+
+  $ret = file_get_contents($path . '/responses/getFavourites.xml');
+  return $ret;
+}
+
+function bibdk_test_provider_user_add_favourite($name,$agencyId) {
+  return true;
+}
+
+function bibdk_test_provider_user_set_favourite($name,$agencyId) {
+  return true;
 }
