@@ -90,10 +90,17 @@ function bibdk_provider_user_set_favourite($name, $agencyid) {
 }
 
 function bibdk_provider_user_add_favourite($name, $agencyid) {
+  if( !(_bibdk_provider_user_check()) ) {
+    return FALSE;
+  }
+  
   return BibdkUser::instance()->addFavourite($name, $agencyid);
 }
 
 function bibdk_provider_user_delete_favourite($name, $agencyid) {
+  if( !(_bibdk_provider_user_check()) ) {
+    return FALSE;
+  }
   return BibdkUser::instance()->deleteFavourite($name, $agencyid);
 }
 
