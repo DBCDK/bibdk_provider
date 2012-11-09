@@ -168,7 +168,7 @@ class BibdkUser {
   public function setFavourite($username, $agencyid) {
     $params = array('userId' => $username, 'agencyId' => $agencyid);
     $response = $this->makeRequest('setFavouriteRequest', $params);
-    
+
     $xmlmessage = $this->responseExtractor($response, 'setFavouriteResponse');
 
     if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
@@ -176,7 +176,7 @@ class BibdkUser {
     }
     else {
       return FALSE;
-    }    
+    }
   }
 
   /** \brief get all favourite agencies for a given user
@@ -202,7 +202,14 @@ class BibdkUser {
     $params = array('userId' => $username, 'agencyId' => $agencyid);
     $response = $this->makeRequest('addFavouriteRequest', $params);
 
-    return $response;
+    $xmlmessage = $this->responseExtractor($response, 'addFavouriteResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**
