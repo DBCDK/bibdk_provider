@@ -1,6 +1,5 @@
 drop table bibdk_favourite;
-create table bibdk_favourite( favourite_id serial, username character varying(64) not null, agencyid character varying(16) not null, userdata text, orderagency boolean not null default FALSE);
-alter table bibdk_favourite add constraint PK_favourite_id primary key(favourite_id);
+create table bibdk_favourite( username character varying(64) not null, agencyid character varying(16) not null, userdata text, orderagency boolean not null default FALSE);
 alter table bibdk_favourite add constraint FK_username foreign key(username) references ddbuser(username) on delete cascade;
 alter table bibdk_favourite add constraint UN_username_agencyid UNIQUE(username,agencyid);
 create index bibdk_favourite_agencyid_idx on bibdk_favourite (agencyid);
