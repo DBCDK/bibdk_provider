@@ -80,7 +80,9 @@ class BibdkUser {
   /**
    * Private constructor so a static function must be call to create an instance of the class.
    */
-  private function __construct() {}
+  private function __construct() {
+    
+  }
 
   /**
    * Function to get a BibdkUser object.
@@ -150,27 +152,33 @@ class BibdkUser {
       return FALSE;
     }
     $pos = strpos($xmltag, 'oui:');
-    if( $pos === FALSE ) {
-      $xmltag = 'oui:'.$xmltag;
+    if ($pos === FALSE) {
+      $xmltag = 'oui:' . $xmltag;
     }
 
     $query = '//' . $xmltag;
     $tagcontent = $this->xpath->query($query);
     $ret = $tagcontent->item(0)->firstChild;
-   
+
     return $ret;
   }
 
+  /*   * **************  FAVOURITES ************** */
 
-  /****************  FAVOURITES ***************/
-  
-  public function setFavourite($username,$agencyid) {
-    $params = array('userId'=>$username, 'agencyId'=>$agencyid);
+  public function setFavourite($username, $agencyid) {
+    $params = array('userId' => $username, 'agencyId' => $agencyid);
     $response = $this->makeRequest('setFavouriteRequest', $params);
-    
-    return $response;
+
+    $xmlmessage = $this->responseExtractor($response, 'setFavouriteResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
-  
+
   /** \brief get all favourite agencies for a given user
    * @staticvar type $response
    * @param type $username
@@ -178,46 +186,58 @@ class BibdkUser {
    */
   public function getFavourites($username) {
     static $response;
-    $params = array('userId'=>$username);
+    $params = array('userId' => $username);
     $response = $this->makeRequest('getFavouritesRequest', $params);
-    
+
     return $response;
   }
-  
+
   /**
    * \brief add an agency to favourites for given user
    * @param type $username
    * @param type $agencyid
    * @return type xml
    */
-  public function addFavourite($username,$agencyid){
-    $params = array('userId'=>$username,'agencyId'=>$agencyid);
+  public function addFavourite($username, $agencyid) {
+    $params = array('userId' => $username, 'agencyId' => $agencyid);
     $response = $this->makeRequest('addFavouriteRequest', $params);
-    
-    return $response;
+
+    $xmlmessage = $this->responseExtractor($response, 'addFavouriteResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
-  
+
   /**
    * \brief delete an agency on a given user
    * @param type $username
    * @param type $agencyid
    * @return type xml
    */
-  public function deleteFavourite($username,$agencyid){
-    $params = array('userId'=>$username,'agencyId'=>$agencyid);
+  public function deleteFavourite($username, $agencyid) {
+    $params = array('userId' => $username, 'agencyId' => $agencyid);
     $response = $this->makeRequest('deleteFavouriteRequest', $params);
-    
+
+    $xmlmessage = $this->responseExtractor($response, 'deleteFavouriteResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  public function saveFavouriteData($name, $agencyid, $data) {
+    $params = array('userId' => $name, 'agencyId' => $agencyid, 'favouriteData' => $data);
+    $response = $this->makeRequest('setFavouriteDataRequest', $params);
+
     return $response;
   }
-  
-  public function saveFavouriteData($name,$agencyid,$data) {
-    $params = array('userId'=>$name, 'agencyId'=>$agencyid, 'favouriteData'=>$data);
-    $response = $this->makeRequest('setFavouriteDataRequest', $params);
-    
-    return $response;  
-  }
-  
-
 
   /**
    * Function to logging in a user.
@@ -320,7 +340,7 @@ class BibdkUser {
     $response = $this->makeRequest('updatePasswordRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'updatePasswordResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
