@@ -15,14 +15,11 @@ function bibdk_provider_user_authenticate($name, $pass) {
     );
 
     $return['user'] = array(
-      'data' => array('display_name' => 'HEST'),
+      'data' => array('display_name' => $name),
       'mail' => $name,
     );
     $return['success'] = TRUE;
     $return['messages'] = array('HEJ', 'notice');
-
-    // @TODO; set a proper authname - some hash of mail
-    // $return['authname'] = 'HEST';
   }
   else {
     /* advanced regex to match e-mail addresses including obscure usernames and

@@ -33,7 +33,7 @@ function bibdk_provider_form_user_login_alter(&$form, &$form_state) {
 
   unset($form['name']);
   unset($form['pass']);
-  
+
   //Re-setting $form['pass'] to enable persistent login to give same weight to persistent_login checkbox as password field
   $form['pass']['#weight'] = 100;
   $form['actions']['#weight'] = 2;
@@ -175,7 +175,7 @@ function _bibdk_provider_profile_form_login($form, &$form_state) {
 }
 
 function _bibdk_provider_welcome_message() {
-  return t('Welcome');
+  return t('Welcome', array(), array('context' => 'bibdk_provider'));
 }
 
 /**
@@ -208,7 +208,7 @@ function _bibdk_provider_user_profile_form_save($form, &$form_state) {
 }
 
 function _bibdk_provider_first_time_message() {
-  $message = t('You have just used your one-time login link, and have been assigned a temporary account. Change your password to retain a permanent login. If you do not change your password your login will not be valid');
+  $message = t('You have just used your one-time login link, and have been assigned a temporary account. Change your password to retain a permanent login. If you do not change your password your login will not be valid', array(), array('context' => 'bibdk_provider'));
   return $message;
 }
 
@@ -226,10 +226,10 @@ function _bibdk_provider_user_profile_form_validate_email($form, &$form_state) {
     elseif ((bool) db_select('users')->fields('users', array('uid'))->condition('uid', $account->uid, '<>')->condition('mail', db_like($form_state['values']['mail']), 'LIKE')->range(0, 1)->execute()->fetchField()) {
       // Format error message dependent on whether the user is logged in or not.
       if ($GLOBALS['user']->uid) {
-        form_set_error('mail', t('The e-mail address %email is already taken.', array('%email' => $form_state['values']['mail'])));
+        form_set_error('mail', t('The e-mail address %email is already taken.', array('%email' => $form_state['values']['mail']), array('context' => 'bibdk_provider')));
       }
       else {
-        form_set_error('mail', t('The e-mail address %email is already registered. <a href="@password">Have you forgotten your password?</a>', array('%email' => $form_state['values']['mail'], '@password' => url('user/password'))));
+        form_set_error('mail', t('The e-mail address %email is already registered. <a href="@password">Have you forgotten your password?</a>', array('%email' => $form_state['values']['mail'], '@password' => url('user/password')), array('context' => 'bibdk_provider')));
       }
     }
   }
@@ -247,7 +247,7 @@ function bibdk_provider_mail_alter(&$message) {
     $message['body'][0] = t('Your account at bibliotek.dk has been deleted.');
 
     user_delete($message['params']['account']->uid);
-    drupal_set_message(t('Your account has been deleted'));
+    drupal_set_message(t('Your account has been deleted', array(), array('context' => 'bibdk_provider')));
   }
 }
 
@@ -264,7 +264,7 @@ function bibdk_provider_user_delete($account) {
       if ($enable_logging) {
         watchdog('BIBDK user_delete', $creds['name'] . $creds['pass']);
       }
-      drupal_set_message(t('Your account has been deleted'));
+      drupal_set_message(t('Your account has been deleted', array(), array('context' => 'bibdk_provider')));
     }
     catch (Exception $e) {
       //do nothing
@@ -329,7 +329,7 @@ function bibdk_provider_user_account_update($account, $changes) {
       watchdog('BIBDK', '%user , %pass user_account_update', array('%user' => $account->mail, '%pass' => $changes['pass']));
     }
     if (!bibdk_provider_user_update_password($account->mail, $changes['pass'])) {
-      drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available'));
+      drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available', array(), array('context' => 'bibdk_provider')));
     }
   }
 
@@ -360,8 +360,8 @@ function bibdk_provider_user_register_form_validate(&$form, &$form_state) {
   if ($bib_ok && !$drupal_ok) {
     // remove drupal error-messages
     drupal_get_messages('error');
-    drupal_set_message(t('You are already a registred user. Please log in with your usual username and password.'), 'error');
-    drupal_set_message(l(t('Have you forgotten your password?'), 'user/password'), 'error');
+    drupal_set_message(t('You are already a registred user. Please log in with your usual username and password.', array(), array('context' => 'bibdk_provider')), 'error');
+    drupal_set_message(l(t('Have you forgotten your password?', array(), array('context' => 'bibdk_provider')), 'user/password'), 'error');
 
     // stop form submit
     form_set_error('submit');
@@ -387,7 +387,7 @@ function _bibdk_provider_create_random_user($mail) {
   $account = user_save('', $userinfo);
 
   if (!$account) {
-    drupal_set_message(t('Error saving user'), 'error');
+    drupal_set_message(t('Error saving user', array(), array('context' => 'bibdk_provider')), 'error');
   }
 }
 
@@ -402,7 +402,7 @@ function bibdk_provider_ding_provider() {
       'user' => array(
         'prefix' => 'user',
         'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.user.inc',
-      ),      
+      ),
     ),
   );
 }
