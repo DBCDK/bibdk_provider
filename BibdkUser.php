@@ -204,12 +204,16 @@ class BibdkUser {
 
     $xmlmessage = $this->responseExtractor($response, 'addFavouriteResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
-      return TRUE;
+    $ret = array('status' => 'error', 'response' => '');
+
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
     }
     else {
-      return FALSE;
+      $ret['response'] = $xmlmessage->nodeValue;
     }
+    return $ret;
   }
 
   /**
@@ -305,11 +309,17 @@ class BibdkUser {
    *   Boolean telling if the user already exists.
    */
   public function verify($name) {
-    $params = array(
-      'userId' => $name,
-      'outputType' => 'xml',
-    );
-    $response = $this->makeRequest('verifyUserRequest', $params);
+// only verify once - that should be enough
+    static $response;
+
+    if (empty($response)) {
+      $params = array(
+        'userId' => $name,
+        'outputType' => 'xml',
+      );
+      $response = $this->makeRequest('verifyUserRequest', $params);
+    }
+    
     $xmlmessage = $this->responseExtractor($response, 'verifyUserResponse');
 
     if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:verified') {
