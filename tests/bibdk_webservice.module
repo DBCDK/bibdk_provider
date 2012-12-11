@@ -24,7 +24,7 @@ function bibdk_webservice_request() {
   if (isset($_POST['xml'])) {
     $data = rawurldecode($_POST['xml']);
   }
-  else {
+ else {
     $data = file_get_contents('php://input');
   }
 
@@ -55,7 +55,7 @@ function bibdk_webservice_request() {
  */
 function bibdk_webservice_security_code_error($securityCode) {
   if ($securityCode != 'securityCode') {
-    return '<error>authentication error</error>';
+    return '<oui:error>authentication error</oui:error>';
   }
   else {
     return FALSE;
@@ -119,17 +119,16 @@ function bibdk_webservice_loginRequest($request) {
   }
   elseif ($username && $password) {
     if ($userId = _bibdk_webservice_lookup_user($username, $password)) {
-      $response = "<userId>$userId</userId>";
+      $response = "<oui:userId>$userId</oui:userId>";
     }
     else {
-      $response = '<error>Wrong username or password</error>';
+      $response = '<oui:error>Wrong username or password</oui:error>';
     }
   }
   else {
-    $response = '<error>No userid or no password given</error>';
+    $response = '<oui:error>No userid or no password given</oui:error>';
   }
-
-  return "<loginResponse>$response</loginResponse>";
+  return "<oui:loginResponse>$response</oui:loginResponse>";
 }
 
 /**

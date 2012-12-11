@@ -6,14 +6,15 @@ class NanoSOAPClient {
   private $requestType;
 
   public function __construct($url) {
+    
   }
 
   private function soapEnveloping($bodyTag, $message) {
     return '<?xml version="1.0" encoding="utf-8"?>'
-        . '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body>'
-        . "<$bodyTag>"
+        . '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body>'
+        . '<oui:' . $bodyTag . '>'
         . $message
-        . "</$bodyTag>"
+        . '</oui:' . $bodyTag . '>'
         . '</SOAP-ENV:Body></SOAP-ENV:Envelope>';
   }
 
@@ -38,16 +39,15 @@ class NanoSOAPClient {
 
   private function verifyUserRequest($request) {
     $userId = $request['userId'];
-
     if (empty($userId)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
       if ($userId == 'validUser') {
-        $response = '<verified>true</verified>';
+        $response = '<oui:verified>true</oui:verified>';
       }
       else {
-        $response = '<verified>false</verified>';
+        $response = '<oui:verified>false</oui:verified>';
       }
     }
 
@@ -59,14 +59,14 @@ class NanoSOAPClient {
     $password = $request['userPinCode'];
 
     if (empty($userId) || empty($password)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
       if ($userId == 'validUser' && $password == '123456') {
-        $response = "<userId>$userId</userId>";
+        $response = "<oui:userId>$userId</oui:userId>";
       }
       else {
-        $response = '<error>Wrong userid or password</error>';
+        $response = '<oui:error>Wrong userid or password</oui:error>';
       }
     }
 
@@ -78,14 +78,14 @@ class NanoSOAPClient {
     $password = $request['userPinCode'];
 
     if (empty($userId) || empty($password)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
       if ($userId == 'createUser' && $password == '123456') {
-        $response = "<userId>$userId</userId>";
+        $response = "<oui:userId>$userId</oui:userId>";
       }
       else {
-        $response = '<error>user already exists</error>';
+        $response = '<oui:error>user already exists</oui:error>';
       }
     }
 
@@ -97,14 +97,14 @@ class NanoSOAPClient {
     $password = $request['userPinCode'];
 
     if (empty($userId) || empty($password)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
       if ($userId == 'updateUser') {
-        $response = "<userId>$userId</userId>";
+        $response = "<oui:userId>$userId</oui:userId>";
       }
       else {
-        $response = '<error>can\'t update user</error>';
+        $response = '<oui:error>can\'t update user</oui:error>';
       }
     }
 
@@ -115,10 +115,10 @@ class NanoSOAPClient {
     $userId = $request['userId'];
 
     if (empty($userId)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
-      $response = "<userId>$userId</userId>";
+      $response = "<oui:userId>$userId</oui:userId>";
     }
 
     return $this->soapEnveloping('deleteUserResponse', $response);
@@ -129,22 +129,22 @@ class NanoSOAPClient {
     $wayfId = $request['wayfId'];
 
     if (empty($userId) || empty($wayfId)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
       if ($userId == 'validUser') {
         if ($wayfId == 'wayfid12345') {
-          $response = "<userId>$userId</userId>";
+          $response = "<oui:userId>$userId</oui:userId>";
         }
         else {
-          $response = '<error>no binding</error>';
+          $response = '<oui:error>no binding</oui:error>';
         }
       }
       elseif ($userId == 'noBindUser') {
-        $response = '<error>no binding</error>';
+        $response = '<oui:error>no binding</oui:error>';
       }
       else {
-        $response = '<error>no such user</error>';
+        $response = '<oui:error>no such user</oui:error>';
       }
     }
 
@@ -156,14 +156,14 @@ class NanoSOAPClient {
     $wayfId = $request['wayfId'];
 
     if (empty($userId) || empty($wayfId)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
       if ($userId == 'validUser') {
-        $response = "<userId>$userId</userId>";
+        $response = "<oui:userId>$userId</oui:userId>";
       }
       else {
-        $response = '<error>no such user</error>';
+        $response = '<oui:error>no such user</oui:error>';
       }
     }
 
@@ -174,14 +174,14 @@ class NanoSOAPClient {
     $userId = $request['userId'];
 
     if (empty($userId)) {
-      $response = '<error>Missing</error>';
+      $response = '<oui:error>Missing</oui:error>';
     }
     else {
       if ($userId == 'validUser') {
-        $response = "<userId>$userId</userId>";
+        $response = "<oui:userId>$userId</oui:userId>";
       }
       else {
-        $response = '<error>no such user</error>';
+        $response = '<oui:error>no such user</oui:error>';
       }
     }
 
