@@ -53,16 +53,21 @@ class BibdkClient {
     $request = array();
 
     foreach ($params as $key => $value) {
-      $request[$key] = htmlspecialchars($value);
+      $request['oui:' . $key] = htmlspecialchars($value);
     }
 
     // add securitycode
     if (isset(self::$security_code)) {
-      $request['securityCode'] = htmlspecialchars(self::$security_code);
+      $request['oui:' . 'securityCode'] = htmlspecialchars(self::$security_code);
     }
 
-    $nano = new NanoSOAPClient(self::$service_url);
-    return $nano->call($action, $request);
+    $nano = new NanoSOAPClient(self::$service_url, array('namespaces' => array('oui' => 'http://oss.dbc.dk/ns/openuserinfo')));
+
+    if ($simpletest_prefix = drupal_valid_test_ua()) {
+      NanoSOAPClient::setUserAgent(drupal_generate_test_ua($simpletest_prefix));
+    }
+
+    return $nano->call('oui:' . $action, $request);
   }
 
 }
@@ -80,8 +85,8 @@ class BibdkUser {
   /**
    * Private constructor so a static function must be call to create an instance of the class.
    */
-  private function __construct() {}  
- 
+  private function __construct() {}
+
   /**
    * Function to get a BibdkUser object.
    *
@@ -155,9 +160,13 @@ class BibdkUser {
     $query = '//' . $xmltag;
 
     $tagcontent = $this->xpath->query($query);
-    $ret = $tagcontent->item(0)->firstChild;
 
-    return $ret;
+    if ($tagcontent->item(0)) {
+      return $tagcontent->item(0)->firstChild;
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /*   * **************  FAVOURITES ************** */
