@@ -80,10 +80,8 @@ class BibdkUser {
   /**
    * Private constructor so a static function must be call to create an instance of the class.
    */
-  private function __construct() {
-    
-  }
-
+  private function __construct() {}  
+ 
   /**
    * Function to get a BibdkUser object.
    *
@@ -113,7 +111,6 @@ class BibdkUser {
       if (variable_get('bibdk_provider_enable_logging')) {
         watchdog('bibdk_provider', t('BIBDK client could not load response: %xml', array('%xml' => var_export($xml, TRUE))), array(), WATCHDOG_ERROR);
       }
-
       return FALSE;
     }
     $this->xpath = new DomXPATH($dom);
@@ -148,15 +145,15 @@ class BibdkUser {
    *   extracted.
    */
   private function responseExtractor($xmlstring, $xmltag) {
-    if (!$this->set_xpath($xmlstring)) {
+    if (!@$this->set_xpath($xmlstring)) {
       return FALSE;
     }
     $pos = strpos($xmltag, 'oui:');
     if ($pos === FALSE) {
       $xmltag = 'oui:' . $xmltag;
     }
-
     $query = '//' . $xmltag;
+
     $tagcontent = $this->xpath->query($query);
     $ret = $tagcontent->item(0)->firstChild;
 
@@ -291,7 +288,7 @@ class BibdkUser {
     $response = $this->makeRequest('createUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'createUserResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
@@ -319,7 +316,7 @@ class BibdkUser {
       );
       $response = $this->makeRequest('verifyUserRequest', $params);
     }
-    
+
     $xmlmessage = $this->responseExtractor($response, 'verifyUserResponse');
 
     if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:verified') {
@@ -377,7 +374,7 @@ class BibdkUser {
     $response = $this->makeRequest('deleteUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'deleteUserResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
@@ -408,11 +405,11 @@ class BibdkUser {
     $response = $this->makeRequest('loginWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'loginWayfResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
-      if ($xmlmessage->nodeName == 'error') {
+      if ($xmlmessage->nodeName == 'oui:error') {
         throw new Exception($xmlmessage->nodeValue);
       }
       else {
@@ -443,11 +440,11 @@ class BibdkUser {
     $response = $this->makeRequest('bindWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'bindWayfResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
-      if ($xmlmessage->nodeName == 'error') {
+      if ($xmlmessage->nodeName == 'oui:error') {
         throw new Exception($xmlmessage->nodeValue);
       }
       else {
@@ -474,11 +471,11 @@ class BibdkUser {
     $response = $this->makeRequest('deleteWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'deleteWayfResponse');
 
-    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'userId') {
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
       return TRUE;
     }
     else {
-      if ($xmlmessage->nodeName == 'error') {
+      if ($xmlmessage->nodeName == 'oui:error') {
         throw new Exception($xmlmessage->nodeValue);
       }
       else {

@@ -74,11 +74,11 @@ XML;
 <?xml version="1.0" encoding="utf-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
   <SOAP-ENV:Body>
-    <loginRequest>
-      <userId>dummy@dbc.dk</userId>
-      <userPinCode>secretPassword</userPinCode>
-      <securityCode>securityCode</securityCode>
-    </loginRequest>
+    <oui:loginRequest>
+      <oui:userId>dummy@dbc.dk</oui:userId>
+      <oui:userPinCode>secretPassword</oui:userPinCode>
+      <oui:securityCode>securityCode</oui:securityCode>
+    </oui:loginRequest>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 XML;
@@ -104,11 +104,11 @@ XML;
 <?xml version="1.0" encoding="utf-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
   <SOAP-ENV:Body>
-    <loginRequest>
-      <userId>dummy@dbc.dk</userId>
-      <userPinCode>wrong</userPinCode>
-      <securityCode>securityCode</securityCode>
-    </loginRequest>
+    <oui:loginRequest>
+      <oui:userId>dummy@dbc.dk</oui:userId>
+      <oui:userPinCode>wrong</oui:userPinCode>
+      <oui:securityCode>securityCode</oui:securityCode>
+    </oui:loginRequest>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 XML;
@@ -134,11 +134,11 @@ XML;
 <?xml version="1.0" encoding="utf-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
   <SOAP-ENV:Body>
-    <loginRequest>
-      <userId></userId>
-      <userPinCode>secretpassword</userPinCode>
-      <securityCode>securityCode</securityCode>
-    </loginRequest>
+    <oui:loginRequest>
+      <oui:userId></oui:userId>
+      <oui:userPinCode>secretpassword</oui:userPinCode>
+      <oui:securityCode>securityCode</oui:securityCode>
+    </oui:loginRequest>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 XML;
@@ -164,11 +164,11 @@ XML;
 <?xml version="1.0" encoding="utf-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
   <SOAP-ENV:Body>
-    <loginRequest>
-      <userId>dummy@dbc.dk</userId>
-      <userPinCode></userPinCode>
-      <securityCode>securityCode</securityCode>
-    </loginRequest>
+    <oui:loginRequest>
+      <oui:userId>dummy@dbc.dk</oui:userId>
+      <oui:userPinCode></oui:userPinCode>
+      <oui:securityCode>securityCode</oui:securityCode>
+    </oui:loginRequest>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 XML;
@@ -194,11 +194,11 @@ XML;
 <?xml version="1.0" encoding="utf-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
   <SOAP-ENV:Body>
-    <loginRequest>
-      <userId>dummy@dbc.dk</userId>
-      <userPinCode>secretpassword</userPinCode>
-      <securityCode></securityCode>
-    </loginRequest>
+    <oui:loginRequest>
+      <oui:userId>dummy@dbc.dk</oui:userId>
+      <oui:userPinCode>secretpassword</oui:userPinCode>
+      <oui:securityCode></oui:ecurityCode>
+    </oui:loginRequest>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 XML;
@@ -224,11 +224,11 @@ XML;
 <?xml version="1.0" encoding="utf-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
   <SOAP-ENV:Body>
-    <loginRequest>
-      <userId>dummy@dbc.dk</userId>
-      <userPinCode>secretpassword</userPinCode>
-      <securityCode>CodeSecurity</securityCode>
-    </loginRequest>
+    <oui:loginRequest>
+      <oui:userId>dummy@dbc.dk</oui:userId>
+      <oui:userPinCode>secretpassword</oui:userPinCode>
+      <oui:securityCode>CodeSecurity</oui:securityCode>
+    </oui:loginRequest>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 XML;
