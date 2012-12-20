@@ -46,7 +46,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
   function _testWebserviceUnsupportedRequest() {
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
   <SOAP-ENV:Body>
     <invalidRequest/>
   </SOAP-ENV:Body>
@@ -72,7 +72,7 @@ XML;
   function _testWebserviceLoginSuccessful() {
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
   <SOAP-ENV:Body>
     <oui:loginRequest>
       <oui:userId>dummy@dbc.dk</oui:userId>
@@ -91,7 +91,7 @@ XML;
                                             CURLOPT_POSTFIELDS => $post,
                                             CURLOPT_HTTPHEADER => $headers));
     $this->verbose(htmlentities($response));
-    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><userId>dummy@dbc.dk</userId></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:userId>dummy@dbc.dk</oui:userId></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
     $this->assertTrue($expected_soap == $response, t('Succeful login.')); 
   }
@@ -102,7 +102,7 @@ XML;
   function _testWebserviceLoginCredentials() {
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
   <SOAP-ENV:Body>
     <oui:loginRequest>
       <oui:userId>dummy@dbc.dk</oui:userId>
@@ -121,7 +121,7 @@ XML;
                                             CURLOPT_POSTFIELDS => $post,
                                             CURLOPT_HTTPHEADER => $headers));
     $this->verbose(htmlentities($response));
-    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>Wrong username or password</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>Wrong username or password</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
     $this->assertTrue($expected_soap == $response, t('Failed login.')); 
   }
@@ -132,7 +132,7 @@ XML;
   function _testWebserviceLoginMissingUsername() {
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
   <SOAP-ENV:Body>
     <oui:loginRequest>
       <oui:userId></oui:userId>
@@ -151,7 +151,7 @@ XML;
                                             CURLOPT_POSTFIELDS => $post,
                                             CURLOPT_HTTPHEADER => $headers));
     $this->verbose(htmlentities($response));
-    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>No userid or no password given</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>No userid or no password given</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
     $this->assertTrue($expected_soap == $response, t('Missing username.')); 
   }
@@ -162,7 +162,7 @@ XML;
   function _testWebserviceLoginMissingPassword() {
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
   <SOAP-ENV:Body>
     <oui:loginRequest>
       <oui:userId>dummy@dbc.dk</oui:userId>
@@ -181,7 +181,7 @@ XML;
                                             CURLOPT_POSTFIELDS => $post,
                                             CURLOPT_HTTPHEADER => $headers));
     $this->verbose(htmlentities($response));
-    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>No userid or no password given</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>No userid or no password given</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
     $this->assertTrue($expected_soap == $response, t('Missing password.')); 
   }
@@ -192,12 +192,12 @@ XML;
   function _testWebserviceLoginMissingSecurityCode() {
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
   <SOAP-ENV:Body>
     <oui:loginRequest>
       <oui:userId>dummy@dbc.dk</oui:userId>
       <oui:userPinCode>secretpassword</oui:userPinCode>
-      <oui:securityCode></oui:ecurityCode>
+      <oui:securityCode></oui:securityCode>
     </oui:loginRequest>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
@@ -211,7 +211,7 @@ XML;
                                             CURLOPT_POSTFIELDS => $post,
                                             CURLOPT_HTTPHEADER => $headers));
     $this->verbose(htmlentities($response));
-    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>authentication error</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>authentication error</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
     $this->assertTrue($expected_soap == $response, t('Missing security code')); 
   }
@@ -222,7 +222,7 @@ XML;
   function _testWebserviceLoginWrongSecurityCode() {
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
   <SOAP-ENV:Body>
     <oui:loginRequest>
       <oui:userId>dummy@dbc.dk</oui:userId>
@@ -241,7 +241,7 @@ XML;
                                             CURLOPT_POSTFIELDS => $post,
                                             CURLOPT_HTTPHEADER => $headers));
     $this->verbose(htmlentities($response));
-    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body><loginResponse><error>authentication error</error></loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>authentication error</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
     $this->assertTrue($expected_soap == $response, t('Wrong security code')); 
   }

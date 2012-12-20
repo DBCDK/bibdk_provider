@@ -28,13 +28,10 @@ function bibdk_webservice_request() {
     $data = file_get_contents('php://input');
   }
 
-  $pattern = "/:?SOAP-ENV:?/";
-  $replace = '';
-  $data = preg_replace($pattern, $replace, $data);
-
   try {
     $envelope = new SimpleXMLElement($data);
-    $request = $envelope->Body->children();
+    $body = $envelope->children('SOAP-ENV', TRUE);
+    $request = $body->Body->children('oui', TRUE);
 
     switch ($request->getName()) {
       case 'loginRequest':
@@ -91,7 +88,7 @@ function bibdk_webservice_delivery($page_callback_result) {
     $soap_body = var_export($page_callback_result, TRUE);
   }
 
-  print '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><SOAP-ENV:Body>'
+  print '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body>'
     . $soap_body
     . '</SOAP-ENV:Body></SOAP-ENV:Envelope>';
 }

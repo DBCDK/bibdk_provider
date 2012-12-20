@@ -22,7 +22,7 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
   function setUp() {
     parent::setup(array('bibdk_provider', 'ding_user', 'profile2', 'ding_provider', 'bibdk_webservice'));
     variable_set('bibdk_provider_webservice_url', $this->getAbsoluteUrl('bibdk_webservice'));
-    variable_set('securityCode', 'securityCode');
+    variable_set('bibdk_provider_security_code', 'securityCode');
   }
 
   function getGoodUser() {
@@ -35,10 +35,17 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
    * Methods called here must be private otherwise they will run twice if name start with 'test'
    */
   function testRunner() {
+    $this->testCorrectLogin();
     $this->testMissingPartOfUserCredentials();
     $this->testCapsLockMaybeOn();
     $this->testPasswordIsPINCode();
     $this->testUsernameNotEmailAddress();
+  }
+
+  private function testCorrectLogin() {
+    $this->drupalPost('user', array('name' => 'dummy@dbc.dk', 'pass' => 'secretPassword'), t('Log in'));
+    $this->assertNoText('Log in');
+    $this->drupalLogout();
   }
 
   /**
@@ -51,13 +58,15 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
       unset($c['msgs'], $c['function'], $c['line']);
       $this->drupalPost('user', $c, t('Log in'));
 
-			// Taken from DrupalWebTestCase->assertText()
-			if ($this->plainTextContent === FALSE) {
-				$this->plainTextContent = filter_xss($this->drupalGetContent(), array());
-			}
+      // Taken from DrupalWebTestCase->assertText()
+      if ($this->plainTextContent === FALSE) {
+        $this->plainTextContent = filter_xss($this->drupalGetContent(), array());
+      }
+
+      $this->assertText('Log in');
 
       foreach ($msgs as $msg => $positiveAssert) {
-        $this->assert($positiveAssert != (strpos($this->plainTextContent, $msg) === FALSE), t('Found: !msg', array('!msg' => $msg)), 'Other', $caller);
+        $this->assert($positiveAssert != (strpos($this->plainTextContent, $msg) === FALSE), t('!found: !msg', array('!msg' => $msg, '!found' => ($positiveAssert ? t('Found') : t('Not found')))), 'Other', $caller);
       }
     }
   }
