@@ -102,7 +102,7 @@ function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
   $form['account']['pincode']['#size'] = 16;
   $form['account']['pincode']['#maxlength'] = 64;
 
-
+  $form['actions']['cancel']['#limit_validation_errors'] = array();
 
   // add a handler for creating bibdk password
   $form['#validate'][] = '_bibdk_provider_user_profile_form_save';
@@ -157,8 +157,7 @@ function _bibdk_provider_profile_form_login($form, &$form_state) {
       form_set_error('submit', t('BIBDK_CREATE_USER_ERROR_MESSAGE', array(), array('context' => 'bibdk_provider:error')));
       return FALSE;
     }
-  }
-  catch (Exception $e) {
+  } catch (Exception $e) {
     // TODO log
     //throw $e;
     return FALSE;
@@ -265,8 +264,7 @@ function bibdk_provider_user_delete($account) {
         watchdog('BIBDK user_delete', $creds['name'] . $creds['pass']);
       }
       drupal_set_message(t('Your account has been deleted', array(), array('context' => 'bibdk_provider')));
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
       //do nothing
     }
   }
