@@ -1,19 +1,19 @@
 <?php
 
 require_once('bibdk_provider.user.inc');
-include_once('bibdk_provider.features.inc');
+//include_once('bibdk_provider.features.inc');
 
 /**
  * Implements hook_ctools_plugin_directory -
  * This lets ctools know to scan my module for a content_type plugin file
  * Detailed docks in ctools/ctools.api.php
  */
-function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
+/*function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
   // we'll be nice and limit scandir() calls
   if ($owner == 'ctools' && $plugin_type == 'content_types') {
     return 'plugins/content_types';
   }
-}
+}*/
 
 /**
  * Implements hook_form_FORM_ID_alter (user_login)
