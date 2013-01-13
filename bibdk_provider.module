@@ -448,7 +448,7 @@ function bibdk_provider_settings_form() {
  *
  * Making pages panelized.
  */
-function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map) {
+/*function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map) {
   if ($router_item['path'] == 'user/register') {
     drupal_goto('user/create_login');
   }
@@ -464,7 +464,7 @@ function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map)
       drupal_goto("user/password_reset/$uid/$timestamp/$hash");
     }
   }
-}
+}*/
 
 /**
  * Implements hook_ding_wayf_attributes().
