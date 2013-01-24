@@ -388,6 +388,10 @@ function bibdk_provider_ding_provider() {
         'prefix' => 'user',
         'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.user.inc',
       ),
+      'wayf' => array(
+        'prefix' => 'wayf',
+        'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.wayf.inc',
+      ),
     ),
   );
 }
