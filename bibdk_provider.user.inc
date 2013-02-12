@@ -61,21 +61,21 @@ function bibdk_provider_is_authenticated() {
 }
 
 /** \brief check if user is logged in and if so if user is provider user
- * 
+ *
  * @global type $user
- * @return boolean 
+ * @return boolean
  */
 function _bibdk_provider_user_check() {
   global $user;
   if ($user->uid) {
-    if (ding_user_is_provider_user($user)) {      
+    if (ding_user_is_provider_user($user)) {
       // user is logged in and is provider user
       return TRUE;
     }
-    // user is not provider user    
+    // user is not provider user
     return FALSE;
   }
-  // user is not logged in  
+  // user is not logged in
   return FALSE;
 }
 
@@ -90,7 +90,7 @@ function bibdk_provider_user_add_favourite($name, $agencyid) {
   if( !(_bibdk_provider_user_check()) ) {
     return FALSE;
   }
-  
+
   return BibdkUser::instance()->addFavourite($name, $agencyid);
 }
 
@@ -112,6 +112,43 @@ function bibdk_provider_user_get_favourites($name) {
     $response = BibdkUser::instance()->getFavourites($name);
   }
   return $response;
+}
+
+/**
+ * Get cart content from provider
+ * @param $name
+ * @return array|bool
+ */
+function bibdk_provider_user_get_cart($name){
+  if( !(_bibdk_provider_user_check()) ) {
+    return FALSE;
+  }
+  return BibdkUser::instance()->getCart($name);
+}
+/**
+ * add Content to cart
+ * @param $name
+ * @param $content string|array
+ * @return array|bool
+ */
+function bibdk_provider_user_add_cart_content($name, $content){
+  if( !(_bibdk_provider_user_check()) ) {
+    return FALSE;
+  }
+  return BibdkUser::instance()->addCartContent($name, $content);
+}
+
+/**
+ * Remove content from cart
+ * @param $name
+ * @param $content string|array
+ * @return array|bool
+ */
+function bibdk_provider_user_remove_cart_content($name, $content){
+  if( !(_bibdk_provider_user_check()) ) {
+    return FALSE;
+  }
+  return BibdkUser::instance()->removeCartContent($name, $content);
 }
 
 function bibdk_provider_user_verify($name) {

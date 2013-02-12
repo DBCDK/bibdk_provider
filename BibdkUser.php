@@ -67,7 +67,7 @@ class BibdkClient {
       NanoSOAPClient::setUserAgent(drupal_generate_test_ua($simpletest_prefix));
     }
 
-    return $nano->call('oui:' . $action, $request);
+    return $nano->call('oui:' . $action, $params);
   }
 
 }
@@ -196,6 +196,73 @@ class BibdkUser {
     $response = $this->makeRequest('getFavouritesRequest', $params);
 
     return $response;
+  }
+
+  public function getCart($username){
+    static $response;
+    $params = array('userId' => $username);
+    $response = $this->makeRequest('getCartRequest', $params);
+
+    $xmlmessage = $this->responseExtractor($response, 'getCartResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+    return $ret;
+  }
+
+  public function addCartContent($username, $content){
+    static $response;
+    $params = array(
+      'userId' => $username,
+      'cartContent' => array(
+        'cartContentElement' => $content,
+      )
+    );
+    $response = $this->makeRequest('addCartContentRequest', $params);
+
+    $xmlmessage = $this->responseExtractor($response, 'addCartContentResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+    return $ret;
+  }
+
+  public function removeCartContent($username, $content){
+    static $response;
+    $params = array(
+      'userId' => $username,
+      'cartContent' => array(
+        'cartContentElement' => $content,
+      )
+    );
+    $response = $this->makeRequest('removeCartContentRequest', $params);
+
+    $xmlmessage = $this->responseExtractor($response, 'removeCartContentResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+    return $ret;
   }
 
   /**
