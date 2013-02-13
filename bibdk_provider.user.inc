@@ -120,9 +120,6 @@ function bibdk_provider_user_get_favourites($name) {
  * @return array|bool
  */
 function bibdk_provider_user_get_cart($name){
-  if( !(_bibdk_provider_user_check()) ) {
-    return FALSE;
-  }
   return BibdkUser::instance()->getCart($name);
 }
 /**
@@ -132,9 +129,6 @@ function bibdk_provider_user_get_cart($name){
  * @return array|bool
  */
 function bibdk_provider_user_add_cart_content($name, $content){
-  if( !(_bibdk_provider_user_check()) ) {
-    return FALSE;
-  }
   return BibdkUser::instance()->addCartContent($name, $content);
 }
 
@@ -145,9 +139,6 @@ function bibdk_provider_user_add_cart_content($name, $content){
  * @return array|bool
  */
 function bibdk_provider_user_remove_cart_content($name, $content){
-  if( !(_bibdk_provider_user_check()) ) {
-    return FALSE;
-  }
   return BibdkUser::instance()->removeCartContent($name, $content);
 }
 
