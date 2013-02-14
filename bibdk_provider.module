@@ -1,6 +1,7 @@
 <?php
 
 require_once('bibdk_provider.user.inc');
+require_once('bibdk_provider.wayf.inc');
 
 /**
  * Implements hook_form_FORM_ID_alter (user_login)
