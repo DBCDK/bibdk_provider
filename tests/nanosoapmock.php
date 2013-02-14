@@ -4,9 +4,11 @@ class NanoSOAPClient {
 
   private $request;
   private $requestType;
+  public static $cart = 0;
+  public static $cart_response_path;
 
   public function __construct($url) {
-    
+
   }
 
   public function setUserAgent($useragent) {
@@ -43,7 +45,7 @@ class NanoSOAPClient {
   }
 
   private function verifyUserRequest($request) {
-    $userId = $request['oui:userId'];
+    $userId = $request['userId'];
     if (empty($userId)) {
       $response = '<oui:error>Missing</oui:error>';
     }
@@ -60,8 +62,8 @@ class NanoSOAPClient {
   }
 
   private function loginRequest($request) {
-    $userId = $request['oui:userId'];
-    $password = $request['oui:userPinCode'];
+    $userId = $request['userId'];
+    $password = $request['userPinCode'];
 
     if (empty($userId) || empty($password)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -79,8 +81,8 @@ class NanoSOAPClient {
   }
 
   private function createUserRequest($request) {
-    $userId = $request['oui:userId'];
-    $password = $request['oui:userPinCode'];
+    $userId = $request['userId'];
+    $password = $request['userPinCode'];
 
     if (empty($userId) || empty($password)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -98,8 +100,8 @@ class NanoSOAPClient {
   }
 
   private function updatePasswordRequest($request) {
-    $userId = $request['oui:userId'];
-    $password = $request['oui:userPinCode'];
+    $userId = $request['userId'];
+    $password = $request['userPinCode'];
 
     if (empty($userId) || empty($password)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -117,7 +119,7 @@ class NanoSOAPClient {
   }
 
   private function deleteUserRequest($request) {
-    $userId = $request['oui:userId'];
+    $userId = $request['userId'];
 
     if (empty($userId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -130,8 +132,8 @@ class NanoSOAPClient {
   }
 
   private function loginWayfRequest($request) {
-    $userId = $request['oui:userId'];
-    $wayfId = $request['oui:wayfId'];
+    $userId = $request['userId'];
+    $wayfId = $request['wayfId'];
 
     if (empty($userId) || empty($wayfId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -157,8 +159,8 @@ class NanoSOAPClient {
   }
 
   private function bindWayfRequest($request) {
-    $userId = $request['oui:userId'];
-    $wayfId = $request['oui:wayfId'];
+    $userId = $request['userId'];
+    $wayfId = $request['wayfId'];
 
     if (empty($userId) || empty($wayfId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -176,7 +178,7 @@ class NanoSOAPClient {
   }
 
   private function deleteWayfRequest($request) {
-    $userId = $request['oui:userId'];
+    $userId = $request['userId'];
 
     if (empty($userId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -191,6 +193,29 @@ class NanoSOAPClient {
     }
 
     return $this->soapEnveloping('deleteWayfResponse', $response);
+  }
+
+  private function getCartRequest(){
+    $path = self::$cart_response_path;
+    if (self::$cart == 0)
+      $response = file_get_contents($path.'/xml/get_cart_no_results.xml');
+    else
+      $response = file_get_contents($path.'/xml/get_cart_one_result.xml');
+    return $this->soapEnveloping('getCartResponse', $response);
+  }
+
+  private function addCartContentRequest(){
+    self::$cart++;
+    $path = self::$cart_response_path;
+    $response = file_get_contents($path.'/xml/add_cart_content_result.xml');
+    return $this->soapEnveloping('addCartContentResponse', $response);
+  }
+
+  private function removeCartContentRequest(){
+    self::$cart--;
+    $path = self::$cart_response_path;
+    $response = file_get_contents($path.'/xml/add_cart_content_result.xml');
+    return $this->soapEnveloping('removeCartContentResponse', $response);
   }
 
 }

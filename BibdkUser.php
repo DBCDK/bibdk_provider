@@ -52,9 +52,9 @@ class BibdkClient {
 
     $request = array();
 
-    foreach ($params as $key => $value) {
+    /*foreach ($params as $key => $value) {
       $request['oui:' . $key] = htmlspecialchars($value);
-    }
+    }*/
 
     // add securitycode
     if (isset(self::$security_code)) {
@@ -206,7 +206,6 @@ class BibdkUser {
     $xmlmessage = $this->responseExtractor($response, 'getCartResponse');
 
     $ret = array('status' => 'error', 'response' => '');
-
     if ($xmlmessage->nodeName != 'oui:error') {
       $ret['status'] = 'success';
       $ret['response'] = $response;
@@ -226,7 +225,6 @@ class BibdkUser {
       )
     );
     $response = $this->makeRequest('addCartContentRequest', $params);
-
     $xmlmessage = $this->responseExtractor($response, 'addCartContentResponse');
 
     $ret = array('status' => 'error', 'response' => '');
