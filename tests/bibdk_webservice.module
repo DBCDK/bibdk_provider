@@ -21,6 +21,7 @@ function bibdk_webservice_test() {
 }
 
 function bibdk_webservice_request() {
+  static $cart;
   if (isset($_POST['xml'])) {
     $data = rawurldecode($_POST['xml']);
   }
@@ -37,6 +38,17 @@ function bibdk_webservice_request() {
       case 'loginRequest':
         return bibdk_webservice_loginRequest($request);
       break;
+      case 'getCartRequest':
+        return bibdk_webservice_get_cart($request, $cart);
+        break;
+      case 'addCartContentRequest':
+        $cart = 'content';
+        return bibdk_webservice_add_cart_content($request);
+        break;
+      case 'removeCartContentRequest':
+        $cart = 'no_content';
+        return bibdk_webservice_remove_cart_content($request);
+        break;
 
       default:
         return SOAP_FAULT;
@@ -46,6 +58,44 @@ function bibdk_webservice_request() {
     return SOAP_FAULT;
   }
 }
+
+function bibdk_webservice_get_cart($request, $cart = null){
+  $path = drupal_get_path('module', 'bibdk_webservice');
+  $username = (string) $request->getCartRequest->userId;
+  if ($username == 'good_user'){
+    if ($cart == 'no_content')
+      return file_get_contents($path.'/xml/get_cart_no_results.xml');
+    else if ($cart == 'content')
+      return file_get_contents($path.'/xml/get_cart_one_result.xml');
+    else
+      return file_get_contents($path.'/xml/get_cart_results.xml');
+  } else {
+    return file_get_contents($path.'/xml/get_cart_no_results.xml');
+  }
+}
+
+function bibdk_webservice_add_cart_content($request){
+  $path = drupal_get_path('module', 'bibdk_webservice');
+  $username = (string) $request->addCartContentRequest->userId;
+  $content = $request->addCartContentRequest->cartContent->cartContentElement;
+  if ($username == 'good_user' && $content = '123456789'){
+    return file_get_contents($path.'/xml/add_cart_content_result.xml');
+  } else {
+    return file_get_contents($path.'/xml/add_cart_content_fail.xml');
+  }
+}
+
+function bibdk_webservice_remove_cart_content($request){
+  $path = drupal_get_path('module', 'bibdk_webservice');
+  $username = (string) $request->removeCartContentRequest->userId;
+  $content = $request->removeCartContentRequest->cartContent->cartContentElement;
+  if ($username == 'good_user' && $content = '123456789'){
+    return file_get_contents($path.'/xml/remove_cart_content_result.xml');
+  } else {
+    return file_get_contents($path.'/xml/add_cart_content_fail.xml');
+  }
+}
+
 
 /**
  * Detect wrong or missing security code
