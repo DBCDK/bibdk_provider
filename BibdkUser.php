@@ -200,7 +200,7 @@ class BibdkUser {
 
   public function getCart($username){
     static $response;
-    $params = array('userId' => $username);
+    $params = array('oui:userId' => $username);
     $response = $this->makeRequest('getCartRequest', $params);
 
     $xmlmessage = $this->responseExtractor($response, 'getCartResponse');
@@ -219,9 +219,9 @@ class BibdkUser {
   public function addCartContent($username, $content){
     static $response;
     $params = array(
-      'userId' => $username,
-      'cartContent' => array(
-        'cartContentElement' => $content,
+      'oui:userId' => $username,
+      'oui:cartContent' => array(
+        'oui:cartContentElement' => $content,
       )
     );
     $response = $this->makeRequest('addCartContentRequest', $params);
@@ -242,9 +242,9 @@ class BibdkUser {
   public function removeCartContent($username, $content){
     static $response;
     $params = array(
-      'userId' => $username,
-      'cartContent' => array(
-        'cartContentElement' => $content,
+      'oui:userId' => $username,
+      'oui:cartContent' => array(
+        'oui:cartContentElement' => $content,
       )
     );
     $response = $this->makeRequest('removeCartContentRequest', $params);

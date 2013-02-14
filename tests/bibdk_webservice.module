@@ -20,8 +20,11 @@ function bibdk_webservice_test() {
   return '<form name="test" action="bibdk_webservice" method="POST" target="_blank"><textarea name="xml"></textarea><input type="submit" name="sub" value="submit"/></form>';
 }
 
-function bibdk_webservice_request() {
+function bibdk_webservice_request($reset = false) {
   static $cart;
+  if ($reset)
+    $cart = 0;
+
   if (isset($_POST['xml'])) {
     $data = rawurldecode($_POST['xml']);
   }
