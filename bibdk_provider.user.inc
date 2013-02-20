@@ -48,7 +48,7 @@ function bibdk_provider_user_authenticate($name, $pass) {
 function bibdk_provider_user_mail_me($mail_me, $account) {
   $params['account'] = $account;
   //drupal_mail('bibdk_test_provider', $key, $account->mail, user_preferred_language($account), $params, $from);
-  drupal_mail('bibdk_test_provider', $mail_me->key, 'pjo@dbc.dk', user_preferred_language($account), $params, 'no_reply@dbc.dk');
+  drupal_mail('bibdk_test_provider', $mail_me->key, $account->mail, user_preferred_language($account), $params, 'no_reply@dbc.dk');
 }
 
 /** \brief Implements hook_mail
