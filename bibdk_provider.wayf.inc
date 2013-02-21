@@ -10,7 +10,7 @@
  *
  * @param type $name
  * @param type $wayfid
- * @return type
+ * @return array; an array as expected by ding_user (@see ding_user_user_login_validate)
  */
 function bibdk_provider_wayf_authenticate($name, $wayfid) {
   $return = array(
@@ -43,10 +43,11 @@ function bibdk_provider_wayf_authenticate($name, $wayfid) {
 
 /* \brief custom validator for user_login form (@see ding_wayf.module)
  * 
- * 
+ * PRE: user is authenticated with WAYF
  */
 
 function bibdk_provider_wayf_validate(&$form, &$form_state) {
+  // check if validation comes from wayf
   if ($form_state['values']['authentication_provider'] != 'wayf') {
     return;
   }
@@ -61,6 +62,9 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
   if ($url !== FALSE) {
     drupal_goto($url);
   }
+  
+  // if we come this far something is wrong. return to user page
+  drupal_goto('user');
 }
 
 /** \brief validation handler for existing bibdk_users logging on with wayf
