@@ -62,9 +62,6 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
   if ($url !== FALSE) {
     drupal_goto($url);
   }
-  
-  // if we come this far something is wrong. return to user page
-  drupal_goto('user');
 }
 
 /** \brief validation handler for existing bibdk_users logging on with wayf
