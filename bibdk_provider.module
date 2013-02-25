@@ -1,19 +1,7 @@
 <?php
 
 require_once('bibdk_provider.user.inc');
-//include_once('bibdk_provider.features.inc');
-
-/**
- * Implements hook_ctools_plugin_directory -
- * This lets ctools know to scan my module for a content_type plugin file
- * Detailed docks in ctools/ctools.api.php
- */
-/*function bibdk_provider_ctools_plugin_directory($owner, $plugin_type) {
-  // we'll be nice and limit scandir() calls
-  if ($owner == 'ctools' && $plugin_type == 'content_types') {
-    return 'plugins/content_types';
-  }
-}*/
+require_once('bibdk_provider.wayf.inc');
 
 /**
  * Implements hook_form_FORM_ID_alter (user_login)
@@ -401,6 +389,10 @@ function bibdk_provider_ding_provider() {
         'prefix' => 'user',
         'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.user.inc',
       ),
+      'wayf' => array(
+        'prefix' => 'wayf',
+        'file' => drupal_get_path('module', 'bibdk_provider') . '/bibdk_provider.wayf.inc',
+      ),
     ),
   );
 }
@@ -442,29 +434,6 @@ function bibdk_provider_settings_form() {
 
   return system_settings_form($form);
 }
-
-/**
- * Implements hook_menu_get_item_alter().
- *
- * Making pages panelized.
- */
-/*function bibdk_provider_menu_get_item_alter(&$router_item, $path, $original_map) {
-  if ($router_item['path'] == 'user/register') {
-    drupal_goto('user/create_login');
-  }
-  if ($router_item['path'] == 'user/password') {
-    drupal_goto('user/password_change');
-  }
-  if ($router_item['path'] == 'user/reset/%/%/%') {
-    $destination = drupal_get_destination();
-    $destination = $destination['destination'];
-
-    if (drupal_substr($destination, strrpos($destination, '/')) != '/login') {
-      list($uid, $timestamp, $hash) = sscanf($destination, 'user/reset/%u/%u/%s');
-      drupal_goto("user/password_reset/$uid/$timestamp/$hash");
-    }
-  }
-}*/
 
 /**
  * Implements hook_ding_wayf_attributes().

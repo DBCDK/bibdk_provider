@@ -45,6 +45,52 @@ function bibdk_provider_user_authenticate($name, $pass) {
   return $return;
 }
 
+function bibdk_provider_user_mail_me($mail_me, $account) {
+  $params['account'] = $account;
+  //drupal_mail('bibdk_test_provider', $key, $account->mail, user_preferred_language($account), $params, $from);
+  drupal_mail('bibdk_test_provider', $mail_me->key, $account->mail, user_preferred_language($account), $params, 'no_reply@dbc.dk');
+}
+
+/** \brief Implements hook_mail
+
+ * @param type $key
+ * @param type $message
+ * @param type $params 
+ */
+function bibdk_provider_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'wayf_new_user' :
+      $langcode = $message['language']->language;
+      $message['subject'] = t('Notification from !site', array('!site' => 'bibliotek.dk'), array('langcode' => $langcode));
+      $message['body'][] = _bibdk_test_provider_wayf_new_user_message($params['account'], $langcode);
+      break;
+  }
+}
+
+function _bibdk_provider_wayf_new_user_message($account, $langcode) {
+  return t("Dear !username\n\n wayf_account_created.", array('!username' => $account->mail), array('langcode' => $langcode, 'context' => 'ding_wayf'));
+}
+
+
+function bibdk_provider_mail_me($key, $account){
+  dpm(func_get_args());
+}
+
+/** Implements hook_mail
+ * 
+ */
+function ding_wayf_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'notify_new_user' :
+      $langcode = $message['language']->language;
+      $message['subject'] = t('Notification from !site', array('!site' => 'HEST'), array('langcode' => $langcode));
+      $message['body'][] = t("Dear !username\n\nThere is new content available on the site.", array('!username' => 'HEST'), array('langcode' => $langcode));
+      break;
+  }
+  dpm(func_get_args());
+}
+
+
 /**
  * pjo testing
  * Implements hook_user_view
@@ -61,21 +107,21 @@ function bibdk_provider_is_authenticated() {
 }
 
 /** \brief check if user is logged in and if so if user is provider user
- * 
+ *
  * @global type $user
- * @return boolean 
+ * @return boolean
  */
 function _bibdk_provider_user_check() {
   global $user;
   if ($user->uid) {
-    if (ding_user_is_provider_user($user)) {      
+    if (ding_user_is_provider_user($user)) {
       // user is logged in and is provider user
       return TRUE;
     }
-    // user is not provider user    
+    // user is not provider user
     return FALSE;
   }
-  // user is not logged in  
+  // user is not logged in
   return FALSE;
 }
 
@@ -90,7 +136,7 @@ function bibdk_provider_user_add_favourite($name, $agencyid) {
   if( !(_bibdk_provider_user_check()) ) {
     return FALSE;
   }
-  
+
   return BibdkUser::instance()->addFavourite($name, $agencyid);
 }
 
@@ -112,6 +158,34 @@ function bibdk_provider_user_get_favourites($name) {
     $response = BibdkUser::instance()->getFavourites($name);
   }
   return $response;
+}
+
+/**
+ * Get cart content from provider
+ * @param $name
+ * @return array|bool
+ */
+function bibdk_provider_user_get_cart($name){
+  return BibdkUser::instance()->getCart($name);
+}
+/**
+ * add Content to cart
+ * @param $name
+ * @param $content string|array
+ * @return array|bool
+ */
+function bibdk_provider_user_add_cart_content($name, $content){
+  return BibdkUser::instance()->addCartContent($name, $content);
+}
+
+/**
+ * Remove content from cart
+ * @param $name
+ * @param $content string|array
+ * @return array|bool
+ */
+function bibdk_provider_user_remove_cart_content($name, $content){
+  return BibdkUser::instance()->removeCartContent($name, $content);
 }
 
 function bibdk_provider_user_verify($name) {

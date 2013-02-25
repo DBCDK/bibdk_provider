@@ -38,6 +38,10 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
     $this->_testWebserviceLoginMissingPassword();
     $this->_testWebserviceLoginMissingSecurityCode();
     $this->_testWebserviceLoginWrongSecurityCode();
+    $this->_testWebserviceCartGooduser();
+    $this->_testWebserviceCartBaduser();
+    $this->_testWebserviceAddCartContent();
+    $this->_testWebserviceRemoveCartContent();
   }
 
   /**
@@ -53,7 +57,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
 </SOAP-ENV:Envelope>
 XML;
 
-    $post = array('xml' => $xml,); 
+    $post = array('xml' => $xml,);
     $action = $this->getAbsoluteUrl('bibdk_webservice');
     $headers = array();
     $response = $this->curlExec(array(CURLOPT_URL => $action,
@@ -63,7 +67,7 @@ XML;
     $this->verbose(htmlentities($response));
     $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Fault xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope"><faultcode>SOAP-ENV:Server</faultcode><faultstring>Incorrect SOAP envelope or wrong/unsupported request</faultstring></SOAP-ENV:Fault>';
 
-    $this->assertTrue($expected_soap == $response, t('Unsupported request')); 
+    $this->assertTrue($expected_soap == $response, t('Unsupported request'));
   }
 
   /**
@@ -83,7 +87,7 @@ XML;
 </SOAP-ENV:Envelope>
 XML;
 
-    $post = array('xml' => $xml,); 
+    $post = array('xml' => $xml,);
     $action = $this->getAbsoluteUrl('bibdk_webservice');
     $headers = array();
     $response = $this->curlExec(array(CURLOPT_URL => $action,
@@ -93,7 +97,7 @@ XML;
     $this->verbose(htmlentities($response));
     $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:userId>dummy@dbc.dk</oui:userId></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
-    $this->assertTrue($expected_soap == $response, t('Succeful login.')); 
+    $this->assertTrue($expected_soap == $response, t('Succeful login.'));
   }
 
   /**
@@ -113,7 +117,7 @@ XML;
 </SOAP-ENV:Envelope>
 XML;
 
-    $post = array('xml' => $xml,); 
+    $post = array('xml' => $xml,);
     $action = $this->getAbsoluteUrl('bibdk_webservice');
     $headers = array();
     $response = $this->curlExec(array(CURLOPT_URL => $action,
@@ -123,7 +127,7 @@ XML;
     $this->verbose(htmlentities($response));
     $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>Wrong username or password</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
-    $this->assertTrue($expected_soap == $response, t('Failed login.')); 
+    $this->assertTrue($expected_soap == $response, t('Failed login.'));
   }
 
   /**
@@ -143,7 +147,7 @@ XML;
 </SOAP-ENV:Envelope>
 XML;
 
-    $post = array('xml' => $xml,); 
+    $post = array('xml' => $xml,);
     $action = $this->getAbsoluteUrl('bibdk_webservice');
     $headers = array();
     $response = $this->curlExec(array(CURLOPT_URL => $action,
@@ -153,7 +157,7 @@ XML;
     $this->verbose(htmlentities($response));
     $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>No userid or no password given</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
-    $this->assertTrue($expected_soap == $response, t('Missing username.')); 
+    $this->assertTrue($expected_soap == $response, t('Missing username.'));
   }
 
   /**
@@ -173,7 +177,7 @@ XML;
 </SOAP-ENV:Envelope>
 XML;
 
-    $post = array('xml' => $xml,); 
+    $post = array('xml' => $xml,);
     $action = $this->getAbsoluteUrl('bibdk_webservice');
     $headers = array();
     $response = $this->curlExec(array(CURLOPT_URL => $action,
@@ -183,7 +187,7 @@ XML;
     $this->verbose(htmlentities($response));
     $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>No userid or no password given</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
-    $this->assertTrue($expected_soap == $response, t('Missing password.')); 
+    $this->assertTrue($expected_soap == $response, t('Missing password.'));
   }
 
   /**
@@ -203,7 +207,7 @@ XML;
 </SOAP-ENV:Envelope>
 XML;
 
-    $post = array('xml' => $xml,); 
+    $post = array('xml' => $xml,);
     $action = $this->getAbsoluteUrl('bibdk_webservice');
     $headers = array();
     $response = $this->curlExec(array(CURLOPT_URL => $action,
@@ -213,10 +217,10 @@ XML;
     $this->verbose(htmlentities($response));
     $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>authentication error</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
-    $this->assertTrue($expected_soap == $response, t('Missing security code')); 
+    $this->assertTrue($expected_soap == $response, t('Missing security code'));
   }
 
-  /** 
+  /**
    * Wrong security code
    */
   function _testWebserviceLoginWrongSecurityCode() {
@@ -233,7 +237,7 @@ XML;
 </SOAP-ENV:Envelope>
 XML;
 
-    $post = array('xml' => $xml,); 
+    $post = array('xml' => $xml,);
     $action = $this->getAbsoluteUrl('bibdk_webservice');
     $headers = array();
     $response = $this->curlExec(array(CURLOPT_URL => $action,
@@ -243,6 +247,127 @@ XML;
     $this->verbose(htmlentities($response));
     $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:loginResponse><oui:error>authentication error</oui:error></oui:loginResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
-    $this->assertTrue($expected_soap == $response, t('Wrong security code')); 
+    $this->assertTrue($expected_soap == $response, t('Wrong security code'));
   }
+
+  function _testWebserviceCartGooduser(){
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
+  <SOAP-ENV:Body>
+    <oui:getCartRequest>
+      <oui:userId>good_user</oui:userId>
+      <oui:securityCode>CodeSecurity</oui:securityCode>
+    </oui:getCartRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,);
+
+    $post = array('xml' => $xml,);
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:getCartResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:cartContent><oui:cartContentElement>870970-basis:06343570</oui:cartContentElement><oui:cartContentElement>820010-katalog:5025393</oui:cartContentElement><oui:cartContentElement>820010-katalog:3674811</oui:cartContentElement><oui:cartContentElement>820010-katalog:2266809</oui:cartContentElement><oui:cartContentElement>830370-katalog:AH9900827</oui:cartContentElement><oui:cartContentElement>820030-katalog:804671</oui:cartContentElement><oui:cartContentElement>870970-basis:06042457</oui:cartContentElement><oui:cartContentElement>870970-basis:07121377</oui:cartContentElement><oui:cartContentElement>870970-basis:29317038,870970-basis:25194853,870970-basis:22441671,870970-basis:22629344,870970-basis:22252852,870970-basis:26178533</oui:cartContentElement></oui:cartContent><oui:userId>good_user</oui:userId></oui:getCartResponse>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Cart returned'));
+  }
+
+  function _testWebserviceCartBaduser(){
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
+  <SOAP-ENV:Body>
+    <oui:getCartRequest>
+      <oui:userId>bad_user</oui:userId>
+      <oui:securityCode>CodeSecurity</oui:securityCode>
+    </oui:getCartRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,);
+
+    $post = array('xml' => $xml,);
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:getCartResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:cartContent></oui:cartContent><oui:userId>good_user</oui:userId></oui:getCartResponse>
+
+</SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Cart returned'));
+  }
+ function _testWebserviceAddCartContent(){
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
+  <SOAP-ENV:Body>
+    <oui:addCartContentRequest>
+      <oui:userId>good_user</oui:userId>
+      <oui:cartContent>
+        <oui:cartContentElement>123456789</oui:cartContentElement>
+      </oui:cartContent>
+    </oui:addCartContentRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,);
+
+    $post = array('xml' => $xml,);
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><?xml version="1.0" encoding="UTF-8"?><oui:addCartContentResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>good_user</oui:userId></oui:addCartContentResponse>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Cart returned'));
+  }
+
+ function _testWebserviceRemoveCartContent(){
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
+  <SOAP-ENV:Body>
+    <oui:removeCartContentRequest>
+      <oui:userId>good_user</oui:userId>
+      <oui:cartContent>
+        <oui:cartContentElement>123456789</oui:cartContentElement>
+      </oui:cartContent>
+    </oui:removeCartContentRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,);
+
+    $post = array('xml' => $xml,);
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+   $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><?xml version="1.0" encoding="UTF-8"?><oui:removeCartContentResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>good_user</oui:userId></oui:removeCartContentResponse>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Cart returned'));
+  }
+
 }

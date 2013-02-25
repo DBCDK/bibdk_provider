@@ -8,9 +8,6 @@ function bibdk_test_provider_ding_provider() {
       'user' => array(
         'prefix' => 'user',
       ),
-      'favourites' => array(
-        'prefix' => 'favourite',
-      ),
     ),
   );
 }
@@ -28,9 +25,6 @@ function bibdk_test_provider_user_is_authenticated() {
  * fake a successful login
  * */
 function bibdk_test_provider_user_authenticate($name, $pass) {
-  
-  
-  
   $return['creds'] =
       array(
         'name' => $name,
@@ -43,10 +37,30 @@ function bibdk_test_provider_user_authenticate($name, $pass) {
   );
   $return['success'] = TRUE;
   $return['messages'] = array('HEJ', 'notice');
- 
-  //dpm($return);
-  
+
   return $return;
+}
+
+function bibdk_test_provider_user_verify($name) {
+  //return BibdkUser::instance()->verify($name);
+  // static $response;
+  $response = NULL;
+  if (!isset($response)) {
+    $response = BibdkUser::instance()->verify($name);
+  }
+  return $response;
+}
+
+function bibdk_test_provider_user_create_account($name, $pass) {
+  return BibdkUser::instance()->create($name, $pass);
+}
+
+function bibdk_test_provider_user_update_password($name, $pass) {
+  return BibdkUser::instance()->update_password($name, $pass);
+}
+
+function bibdk_test_provider_user_delete_account($name) {
+  return BibdkUser::instance()->delete($name);
 }
 
 function bibdk_test_provider_user_get_favourites($name) {
@@ -56,10 +70,69 @@ function bibdk_test_provider_user_get_favourites($name) {
   return $ret;
 }
 
-function bibdk_test_provider_user_add_favourite($name,$agencyId) {
+function bibdk_test_provider_user_add_favourite($name, $agencyId) {
   return true;
 }
 
-function bibdk_test_provider_user_set_favourite($name,$agencyId) {
+function bibdk_test_provider_user_set_favourite($name, $agencyId) {
   return true;
+}
+
+function bibdk_test_provider_user_mail_me($mail_me, $account) {
+  $params['account'] = $account;
+  //drupal_mail('bibdk_test_provider', $key, $account->mail, user_preferred_language($account), $params, $from);
+  drupal_mail('bibdk_test_provider', $mail_me->key, 'pjo@dbc.dk', user_preferred_language($account), $params, 'no_reply@dbc.dk');
+}
+
+/** \brief Implements hook_mail
+
+ * @param type $key
+ * @param type $message
+ * @param type $params 
+ */
+function bibdk_test_provider_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'wayf_new_user' :
+      $langcode = $message['language']->language;
+      $message['subject'] = t('Notification from !site', array('!site' => 'bibliotek.dk'), array('langcode' => $langcode));
+      $message['body'][] = _bibdk_test_provider_wayf_new_user_message($params['account'], $langcode);
+      break;
+  }
+}
+
+function _bibdk_test_provider_wayf_new_user_message($account, $langcode) {
+  return t("Dear !username\n\n wayf_account_created.", array('!username' => $account->mail), array('langcode' => $langcode, 'context' => 'ding_wayf'));
+}
+
+class BibdkUser {
+
+  private static $instance;
+  protected $test_users = array();
+
+  private function __construct() {
+    $this->test_users = variable_get('bibdk_test_users', array());
+  }
+
+  public static function instance() {
+    if (!isset(self::$instance)) {
+      self::$instance = new BibdkUser();
+    }
+    return self::$instance;
+  }
+
+  public function create($name, $pass) {
+    $this->test_users[$name] = $pass;
+    variable_set('bibdk_test_users', $this->test_users);
+    return TRUE;
+  }
+
+  public function verify($name) {
+    return isset($this->test_users[$name]);
+  }
+
+  public function update_password($name, $pass) {
+    $this->test_users[$name] = $pass;
+    variable_set('bibdk_test_users', $this->test_users);
+  }
+
 }

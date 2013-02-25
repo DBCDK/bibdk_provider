@@ -14,6 +14,7 @@ class BibdkUserTest extends DrupalUnitTestCase {
 
   public function setUp() {
     $this->enable_logging = variable_get('bibdk_provider_enable_logging');
+    $this->cart_response_path = drupal_get_path('module', 'bibdk_webservice');
     variable_set('bibdk_provider_enable_logging', 0);
     module_load_include('php', 'bibdk_provider', 'tests/nanosoapmock');
     module_load_include('php', 'bibdk_provider', 'BibdkUser');
@@ -25,13 +26,27 @@ class BibdkUserTest extends DrupalUnitTestCase {
     parent::tearDown();
   }
 
-  public function testVerify() {    
+  public function testCart() {
+      NanoSOAPClient::$cart_response_path = $this->cart_response_path;
+
+      $result = BibdkUser::instance()->getCart('good_user');
+      $this->assertFalse(preg_match('@cartContentElement@', $result['response']), 'Cart is empty');
+      $result = BibdkUser::instance()->addCartContent('good_user', '123456789');
+
+      $result = BibdkUser::instance()->getCart('good_user');
+      $this->assertTrue(preg_match('@cartContentElement@', $result['response']), 'Cart element has been added');
+      $result = BibdkUser::instance()->removeCartContent('good_user', '123456789');
+      $result = BibdkUser::instance()->getCart('good_user');
+      $this->assertFalse(preg_match('@cartContentElement@', $result['response']), 'Cart element has been removed');
+  }
+
+  public function testVerify() {
     $client = BibdkUser::instance();
     $validUser = $client->verify('validUser');
     $this->assertTrue($validUser, 'Got valid user');
   }
 
-  /*public function testVerifyInvalid() {    
+  /*public function testVerifyInvalid() {
     $client = BibdkUser::instance();
     $invalidUser = $client->verify('invalidUser');
     $this->assertFalse($invalidUser, 'Got invalid user');
@@ -42,7 +57,7 @@ class BibdkUserTest extends DrupalUnitTestCase {
     $validUser = $client->create('createUser', '123456');
     $this->assertTrue($validUser, 'User created');
   }
-  
+
   public function testCreateInvalidUser() {
     $client = BibdkUser::instance();
     $invalidUser = $client->create('invalidUser', '123456');
