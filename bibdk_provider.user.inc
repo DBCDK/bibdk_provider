@@ -133,6 +133,16 @@ function bibdk_provider_user_add_cart_content($name, $content){
 }
 
 /**
+ * update Content to cart
+ * @param $name
+ * @param $content string|array
+ * @return array|bool
+ */
+function bibdk_provider_user_update_cart_content($name, $content){
+  return BibdkUser::instance()->updateCartContent($name, $content);
+}
+
+/**
  * Remove content from cart
  * @param $name
  * @param $content string|array

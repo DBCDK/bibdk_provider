@@ -237,6 +237,27 @@ class BibdkUser {
     return $ret;
   }
 
+  public function updateCartContent($username, $content){
+    static $response;
+    $params = array(
+      'oui:userId' => $username,
+      'oui:cartContent' => $content
+    );
+    $response = $this->makeRequest('updateCartContentRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'updateCartContentResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+    return $ret;
+  }
+
   public function removeCartContent($username, $content){
     static $response;
     $params = array(

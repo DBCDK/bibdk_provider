@@ -42,6 +42,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
     $this->_testWebserviceCartBaduser();
     $this->_testWebserviceAddCartContent();
     $this->_testWebserviceRemoveCartContent();
+    $this->_testWebserviceUpdateCartContent();
   }
 
   /**
@@ -368,6 +369,38 @@ XML;
 </SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
     $this->assertTrue($expected_soap == $response, t('Cart returned'));
+  }
+
+function _testWebserviceUpdateCartContent(){
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
+  <SOAP-ENV:Body>
+    <oui:updateCartContentRequest>
+      <oui:userId>good_user</oui:userId>
+      <oui:cartContent>
+        <oui:cartContentElement>123456789</oui:cartContentElement>
+        <oui:cartContentStatus>reservation_complete</oui:cartContentStatus>
+      </oui:cartContent>
+    </oui:updateCartContentRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,);
+
+    $post = array('xml' => $xml,);
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+                                            CURLOPT_POST => TRUE,
+                                            CURLOPT_POSTFIELDS => $post,
+                                            CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+   $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:updateCartContentResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>good_user</oui:userId></oui:updateCartContentResponse>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>';
+
+    $this->assertTrue($expected_soap == $response, t('Cart updated'));
   }
 
 }
