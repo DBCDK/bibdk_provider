@@ -58,7 +58,7 @@ class BibdkClient {
 
     // add securitycode
     if (isset(self::$security_code)) {
-      $request['oui:' . 'securityCode'] = htmlspecialchars(self::$security_code);
+      $params['oui:' . 'securityCode'] = htmlspecialchars(self::$security_code);
     }
 
     $nano = new NanoSOAPClient(self::$service_url, array('namespaces' => array('oui' => 'http://oss.dbc.dk/ns/openuserinfo')));
@@ -172,7 +172,7 @@ class BibdkUser {
   /*   * **************  FAVOURITES ************** */
 
   public function setFavourite($username, $agencyid) {
-    $params = array('userId' => $username, 'agencyId' => $agencyid);
+    $params = array('oui:userId' => $username, 'oui:agencyId' => $agencyid);
     $response = $this->makeRequest('setFavouriteRequest', $params);
 
     $xmlmessage = $this->responseExtractor($response, 'setFavouriteResponse');
@@ -192,7 +192,7 @@ class BibdkUser {
    */
   public function getFavourites($username) {
     static $response;
-    $params = array('userId' => $username);
+    $params = array('oui:userId' => $username);
     $response = $this->makeRequest('getFavouritesRequest', $params);
 
     return $response;
@@ -289,7 +289,7 @@ class BibdkUser {
    * @return type xml
    */
   public function addFavourite($username, $agencyid) {
-    $params = array('userId' => $username, 'agencyId' => $agencyid);
+    $params = array('oui:userId' => $username, 'oui:agencyId' => $agencyid);
     $response = $this->makeRequest('addFavouriteRequest', $params);
 
     $xmlmessage = $this->responseExtractor($response, 'addFavouriteResponse');
@@ -313,7 +313,7 @@ class BibdkUser {
    * @return type xml
    */
   public function deleteFavourite($username, $agencyid) {
-    $params = array('userId' => $username, 'agencyId' => $agencyid);
+    $params = array('oui:userId' => $username, 'oui:agencyId' => $agencyid);
     $response = $this->makeRequest('deleteFavouriteRequest', $params);
 
     $xmlmessage = $this->responseExtractor($response, 'deleteFavouriteResponse');
@@ -327,7 +327,7 @@ class BibdkUser {
   }
 
   public function saveFavouriteData($name, $agencyid, $data) {
-    $params = array('userId' => $name, 'agencyId' => $agencyid, 'favouriteData' => $data);
+    $params = array('oui:userId' => $name, 'oui:agencyId' => $agencyid, 'oui:favouriteData' => $data);
     $response = $this->makeRequest('setFavouriteDataRequest', $params);
 
     return $response;
@@ -346,9 +346,9 @@ class BibdkUser {
    */
   public function login($name, $pass) {
     $params = array(
-      'userId' => $name,
-      'userPinCode' => $pass,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:userPinCode' => $pass,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('loginRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'loginResponse');
@@ -374,9 +374,9 @@ class BibdkUser {
    */
   public function create($name, $pass) {
     $params = array(
-      'userId' => $name,
-      'userPinCode' => $pass,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:userPinCode' => $pass,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('createUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'createUserResponse');
@@ -404,8 +404,8 @@ class BibdkUser {
 
     if (empty($response)) {
       $params = array(
-        'userId' => $name,
-        'outputType' => 'xml',
+        'oui:userId' => $name,
+        'oui:outputType' => 'xml',
       );
       $response = $this->makeRequest('verifyUserRequest', $params);
     }
@@ -433,9 +433,9 @@ class BibdkUser {
    */
   public function update_password($name, $pass) {
     $params = array(
-      'userId' => $name,
-      'userPinCode' => $pass,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:userPinCode' => $pass,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('updatePasswordRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'updatePasswordResponse');
@@ -461,8 +461,8 @@ class BibdkUser {
    */
   public function delete($name) {
     $params = array(
-      'userId' => $name,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('deleteUserRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'deleteUserResponse');
@@ -491,9 +491,9 @@ class BibdkUser {
    */
   public function loginWayf($name, $wayfId) {
     $params = array(
-      'userId' => $name,
-      'wayfId' => $wayfId,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:wayfId' => $wayfId,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('loginWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'loginWayfResponse');
@@ -526,9 +526,9 @@ class BibdkUser {
    */
   public function bindWayf($name, $wayfId) {
     $params = array(
-      'userId' => $name,
-      'wayfId' => $wayfId,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:wayfId' => $wayfId,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('bindWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'bindWayfResponse');
@@ -558,8 +558,8 @@ class BibdkUser {
    */
   public function deleteWayf($name) {
     $params = array(
-      'userId' => $name,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('deleteWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'deleteWayfResponse');
