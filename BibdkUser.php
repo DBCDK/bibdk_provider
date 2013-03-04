@@ -262,9 +262,7 @@ class BibdkUser {
     static $response;
     $params = array(
       'oui:userId' => $username,
-      'oui:cartContent' => array(
-        'oui:cartContentElement' => $content,
-      )
+      'oui:cartContent' =>  $content,
     );
     $response = $this->makeRequest('removeCartContentRequest', $params);
 
