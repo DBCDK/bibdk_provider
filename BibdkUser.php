@@ -274,8 +274,7 @@ class BibdkUser {
     $xmlmessage = $this->responseExtractor($response, 'addFavouriteResponse');
 
     $ret = array('status' => 'error', 'response' => '');
-
-    if ($xmlmessage->nodeName != 'oui:error') {
+    if (!isset($xmlmessage->nodeName) || $xmlmessage->nodeName != 'oui:error') {
       $ret['status'] = 'success';
       $ret['response'] = $response;
     }
