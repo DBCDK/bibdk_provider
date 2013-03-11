@@ -467,11 +467,12 @@ class BibdkUser {
    * @throws Exception
    *   If web service returns an error.
    */
-  public function loginWayf($name, $wayfId) {
+  public function loginWayf($name, $loginId, $loginType = 'wayf_id') {
     $params = array(
-      'userId' => $name,
-      'wayfId' => $wayfId,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:loginType' => $loginType,
+      'oui:loginId' => $loginId,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('loginWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'loginWayfResponse');
@@ -502,11 +503,12 @@ class BibdkUser {
    * @throws Exception
    *   If web service returns an error.
    */
-  public function bindWayf($name, $wayfId) {
+  public function bindWayf($name, $loginId, $loginType = 'wayf_id') {
     $params = array(
-      'userId' => $name,
-      'wayfId' => $wayfId,
-      'outputType' => 'xml',
+      'oui:userId' => $name,
+      'oui:loginId' => $loginId,
+      'oui:loginType' => $loginType,
+      'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('bindWayfRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'bindWayfResponse');
