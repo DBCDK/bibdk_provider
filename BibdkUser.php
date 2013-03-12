@@ -52,9 +52,10 @@ class BibdkClient {
 
     $request = array();
 
-    foreach ($params as $key => $value) {
+    // Nanosoap does an htmlspecialchars + this function does not support deep arrays
+    /*foreach ($params as $key => $value) {
       $request['oui:' . $key] = htmlspecialchars($value);
-    }
+    }*/
 
     // add securitycode
     if (isset(self::$security_code)) {
@@ -67,7 +68,7 @@ class BibdkClient {
       NanoSOAPClient::setUserAgent(drupal_generate_test_ua($simpletest_prefix));
     }
 
-    return $nano->call('oui:' . $action, $request);
+    return $nano->call('oui:' . $action, $params);
   }
 
 }
