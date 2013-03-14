@@ -52,6 +52,9 @@ function bibdk_webservice_request($reset = false) {
         $cart = 'no_content';
         return bibdk_webservice_remove_cart_content($request);
         break;
+      case 'updateCartContentRequest':
+        return bibdk_webservice_update_cart_content($request);
+        break;
 
       default:
         return SOAP_FAULT;
@@ -96,6 +99,16 @@ function bibdk_webservice_remove_cart_content($request){
     return file_get_contents($path.'/xml/remove_cart_content_result.xml');
   } else {
     return file_get_contents($path.'/xml/add_cart_content_fail.xml');
+  }
+}
+
+function bibdk_webservice_update_cart_content($request){
+  $path = drupal_get_path('module', 'bibdk_webservice');
+  $username = (string) $request->updateCartContentRequest->userId;
+  $content = $request->updateCartContentRequest->cartContent->cartContentElement;
+  $status = $request->updateCartContentRequest->cartContent->cartContentStatus;
+  if ($username == 'good_user' && $content == '123456789' && $status == 'reservation_complete'){
+    return file_get_contents($path.'/xml/update_cart_content_result.xml');
   }
 }
 
