@@ -8,6 +8,7 @@ class BibdkClient {
   private static $instance;
   private static $service_url;
   private static $security_code;
+  public static $enable_logging;
 
   /**
    * Private constructor so a static function must be call to create an instance of the class.
@@ -15,16 +16,17 @@ class BibdkClient {
   private function __construct() {
     self::$service_url = variable_get('bibdk_provider_webservice_url', '');
     self::$security_code = variable_get('bibdk_provider_security_code', '');
-
+    self::$enable_logging = variable_get('bibdk_provider_enable_logging');
+    
     if (empty(self::$service_url)) {
-      if (variable_get('bibdk_provider_enable_logging')) {
+      if ( self::$enable_logging ) {
         watchdog('bibdk_provider', t('Provider url is not set'), array(), WATCHDOG_ERROR, l(t('Set provider url'), 'admin/config/ding/provider/bibdk_provider'));
       }
     }
 
     if (empty(self::$security_code)) {
       // somehow bibdk_provider security code is not set - FATAL
-      if (variable_get('bibdk_provider_enable_logging')) {
+      if ( self::$enable_logging ) {
         watchdog('bibdk_provider', t('Security code is not set'), array(), WATCHDOG_ERROR, l(t('Set securitycode'), 'admin/config/ding/provider/bibdk_provider'));
       }
     }
@@ -68,7 +70,11 @@ class BibdkClient {
       NanoSOAPClient::setUserAgent(drupal_generate_test_ua($simpletest_prefix));
     }
 
-    return $nano->call('oui:' . $action, $params);
+    $ret = $nano->call('oui:' . $action, $params);
+    if( self::$enable_logging  ) {      
+      watchdog('bibdk_provider', t('BIBDK client completed request: %xml', array('%xml' => $nano->requestBodyString)), array());
+    }
+    return $ret;
   }
 
 }
@@ -114,7 +120,7 @@ class BibdkUser {
   private function set_xpath($xml) {
     $dom = new DomDocument();
     if (!@$dom->loadXML($xml)) {
-      if (variable_get('bibdk_provider_enable_logging')) {
+      if ( BibdkClient::$enable_logging ) {
         watchdog('bibdk_provider', t('BIBDK client could not load response: %xml', array('%xml' => var_export($xml, TRUE))), array(), WATCHDOG_ERROR);
       }
       return FALSE;
