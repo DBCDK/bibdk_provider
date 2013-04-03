@@ -490,7 +490,8 @@ class BibdkUser {
   public function loginWayf($name, $wayfId) {
     $params = array(
       'oui:userId' => $name,
-      'oui:wayfId' => $wayfId,
+      'oui:loginId' => $wayfId,
+      'oui:loginType' => 'wayf_id',
       'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('loginWayfRequest', $params);
@@ -525,7 +526,8 @@ class BibdkUser {
   public function bindWayf($name, $wayfId) {
     $params = array(
       'oui:userId' => $name,
-      'oui:wayfId' => $wayfId,
+      'oui:loginId' => $wayfId,
+      'oui:loginType' => 'wayf_id',
       'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('bindWayfRequest', $params);
