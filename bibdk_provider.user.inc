@@ -55,7 +55,7 @@ function bibdk_provider_user_mail_me($mail_me, $account) {
 
  * @param type $key
  * @param type $message
- * @param type $params 
+ * @param type $params
  */
 function bibdk_provider_mail($key, &$message, $params) {
   switch ($key) {
@@ -176,6 +176,34 @@ function bibdk_provider_user_update_cart_content($name, $content){
  */
 function bibdk_provider_user_remove_cart_content($name, $content){
   return BibdkUser::instance()->removeCartContent($name, $content);
+}
+
+/**
+ * Get search history from provider
+ * @param $name
+ * @return array|bool
+ */
+function bibdk_provider_user_get_searchhistory($name){
+  return BibdkUser::instance()->getSearchHistory($name);
+}
+/**
+ * add Content to searchhistory
+ * @param $name
+ * @param $content string|array
+ * @return array|bool
+ */
+function bibdk_provider_user_add_searchhistory($name, $content){
+  return BibdkUser::instance()->addSearchHistory($name, $content);
+}
+
+/**
+ * Remove content from search history
+ * @param $name
+ * @param $content string|array
+ * @return array|bool
+ */
+function bibdk_provider_user_remove_searchhistory($name, $content){
+  return BibdkUser::instance()->removeSearchHistory($name, $content);
 }
 
 function bibdk_provider_user_verify($name) {

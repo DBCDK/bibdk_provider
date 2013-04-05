@@ -281,6 +281,81 @@ class BibdkUser {
     return $ret;
   }
 
+  /** Get searchhistory for user
+   * @param $username
+   * @return array
+   */
+  public function getSearchHistory($username){
+    static $response;
+    $params = array('oui:userId' => $username);
+    $response = $this->makeRequest('getSearchHistoryRequest', $params);
+
+    $xmlmessage = $this->responseExtractor($response, 'getSearchHistoryResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+    return $ret;
+  }
+
+  /**v Add search history element to user
+   * @param $username
+   * @param $content
+   * @return array
+   */
+  public function addSearchHistory($username, $content){
+    static $response;
+    $params = array(
+      'oui:userId' => $username,
+      'oui:searchHistory' => $content
+    );
+    $response = $this->makeRequest('addSearchHistoryRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'addSearchHistoryResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+    return $ret;
+  }
+
+  /** Remove Search History element
+   * @param $username
+   * @param $content
+   * @return array
+   */
+  public function removeSearchHistory($username, $content){
+    static $response;
+    $params = array(
+      'oui:userId' => $username,
+      'oui:cartContent' =>  $content,
+    );
+    $response = $this->makeRequest('removeSearchHistoryRequest', $params);
+
+    $xmlmessage = $this->responseExtractor($response, 'removeSearchHistoryResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+    return $ret;
+  }
+
   /**
    * \brief add an agency to favourites for given user
    * @param type $username
