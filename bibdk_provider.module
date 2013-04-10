@@ -341,11 +341,11 @@ function _bibdk_provider_create_random_user($mail) {
     'name' => $mail,
     'init' => $mail,
     'mail' => $mail,
-    'pass' => 'hest',
+    'pass' => hash('hest'.time().$mail),
     'status' => 1,
     'data' => array('temporary' => 1, 'timestamp' => time()),
   );
-
+  
   $account = user_save('', $userinfo);
 
   if (!$account) {
