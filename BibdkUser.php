@@ -487,10 +487,11 @@ class BibdkUser {
    * @throws Exception
    *   If web service returns an error.
    */
-  public function loginWayf($name, $wayfId) {
+  public function loginWayf($name, $loginId, $loginType = 'wayf_id') {
     $params = array(
       'oui:userId' => $name,
-      'oui:wayfId' => $wayfId,
+      'oui:loginType' => $loginType,
+      'oui:loginId' => $loginId,
       'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('loginWayfRequest', $params);
@@ -522,10 +523,11 @@ class BibdkUser {
    * @throws Exception
    *   If web service returns an error.
    */
-  public function bindWayf($name, $wayfId) {
+  public function bindWayf($name, $loginId, $loginType = 'wayf_id') {
     $params = array(
       'oui:userId' => $name,
-      'oui:wayfId' => $wayfId,
+      'oui:loginId' => $loginId,
+      'oui:loginType' => $loginType,
       'oui:outputType' => 'xml',
     );
     $response = $this->makeRequest('bindWayfRequest', $params);

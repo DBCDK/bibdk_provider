@@ -62,7 +62,7 @@ function bibdk_provider_mail($key, &$message, $params) {
     case 'wayf_new_user' :
       $langcode = $message['language']->language;
       $message['subject'] = t('Notification from !site', array('!site' => 'bibliotek.dk'), array('langcode' => $langcode));
-      $message['body'][] = _bibdk_test_provider_wayf_new_user_message($params['account'], $langcode);
+      $message['body'][] = _bibdk_provider_wayf_new_user_message($params['account'], $langcode);
       break;
   }
 }
