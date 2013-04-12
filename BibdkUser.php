@@ -289,7 +289,6 @@ class BibdkUser {
     static $response;
     $params = array('oui:userId' => $username);
     $response = $this->makeRequest('getSearchHistoryRequest', $params);
-
     $xmlmessage = $this->responseExtractor($response, 'getSearchHistoryResponse');
 
     $ret = array('status' => 'error', 'response' => '');
@@ -314,6 +313,7 @@ class BibdkUser {
       'oui:userId' => $username,
       'oui:searchHistory' => $content
     );
+
     $response = $this->makeRequest('addSearchHistoryRequest', $params);
     $xmlmessage = $this->responseExtractor($response, 'addSearchHistoryResponse');
 
@@ -338,10 +338,9 @@ class BibdkUser {
     static $response;
     $params = array(
       'oui:userId' => $username,
-      'oui:cartContent' =>  $content,
+      'oui:searchHistory' =>  $content,
     );
     $response = $this->makeRequest('removeSearchHistoryRequest', $params);
-
     $xmlmessage = $this->responseExtractor($response, 'removeSearchHistoryResponse');
 
     $ret = array('status' => 'error', 'response' => '');
