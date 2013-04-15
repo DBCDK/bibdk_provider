@@ -197,20 +197,39 @@ function _bibdk_provider_first_time_message() {
   return $message;
 }
 
+/** Implements hook_form_alter()
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ */
+function bibdk_provider_form_user_cancel_confirm_form_alter(&$form, &$form_state, $form_id){
+  // Create custom form submition, in order to be able to control the cancellation process
+  $form['#submit'] = array('bibdk_provider_user_cancel_form_submit');
+}
 
 /**
- * Implements hook_mail_alter (user_cancel_confirm)
- * Drupal WANTS the user to confirm deletion, but we don't
- * so -- change message body to not show confirmation link, and simply delete the user
- * @ TODO; this is probably not the right place to delete a user ...
+ * Submit handler for the account cancellation confirm form.
+ *
+ * @see user_cancel_confirm_form_submit in user.pages.inc
  */
-function bibdk_provider_mail_alter(&$message) {
-  if ($message['id'] == 'user_cancel_confirm') {
-    $message['subject'] = t('Account cancellation');
-    $message['body'][0] = t('Your account at bibliotek.dk has been deleted.');
+function bibdk_provider_user_cancel_form_submit($form, &$form_state) {
+  global $user;
+  $account = $form_state['values']['_account'];
 
-    user_delete($message['params']['account']->uid);
+  // Cancel account immediately, if the current user has administrative
+  // privileges, no confirmation mail shall be sent, and the user does not
+  // attempt to cancel the own account.
+  // @see user_cancel_confirm_form_submit in user.pages.inc
+  if (user_access('administer users') && empty($form_state['values']['user_cancel_confirm']) && $account->uid != $user->uid) {
+    user_cancel($form_state['values'], $account->uid, $form_state['values']['user_cancel_method']);
+
+    $form_state['redirect'] = 'admin/people';
+  }
+  // If user is not admin and user is trying to cancel own account, delete it emmediately
+  else if (!user_access('administer users') && $account->uid == $user->uid) {
+    user_delete($account->uid);
     drupal_set_message(t('Your account has been deleted', array(), array('context' => 'bibdk_provider')));
+    $form_state['redirect'] = "";
   }
 }
 
