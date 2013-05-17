@@ -12,7 +12,7 @@ require_once('bibdk_provider.wayf.inc');
  */
 function bibdk_provider_init() {
   $params = explode('/', $_GET['q']);
-  if ($params[0] == 'user' && $params['1'] == 'reset') {
+  if ($params[0] == 'user' && isset($params['1']) && $params['1'] == 'reset') {
     $users = user_load_multiple(array($params[2]), array('status' => '1'));
     if (empty($users)) {
       // user has been deleted. Do what drupal would have done (@see user.pages.inc::user_pass_reset)
