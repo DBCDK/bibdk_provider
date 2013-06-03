@@ -4,6 +4,25 @@ require_once('bibdk_provider.user.inc');
 require_once('bibdk_provider.wayf.inc');
 
 /**
+ * Implements hook_init 
+ * special case:
+ * if user has been created, logged in with one time link, saved new password
+ * and THEN clicks the one time link again ...
+ * User has been deleted (@see _bibdk_provider_profile_form_login)
+ */
+function bibdk_provider_init() {
+  $params = explode('/', $_GET['q']);
+  if ($params[0] == 'user' && isset($params['1']) && $params['1'] == 'reset') {
+    $users = user_load_multiple(array($params[2]), array('status' => '1'));
+    if (empty($users)) {
+      // user has been deleted. Do what drupal would have done (@see user.pages.inc::user_pass_reset)
+      drupal_set_message(t('You have tried to use a one-time login link that has either been used or is no longer valid. Please request a new one using the form below.'));
+      drupal_goto('user/password');
+    }
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter (user_login)
  * add a link to create user and forgot password
  * wrap input and links in div's for easier styling
@@ -58,7 +77,7 @@ function bibdk_provider_form_user_register_form_alter(&$form, &$form_state) {
   $form['account']['mail']['#title'] = t('Username');
   // add submit function to START of the array
   array_unshift($form['#submit'], 'bibdk_provider_form_user_register_form_submit');
- // add validation handler for bibdk
+  // add validation handler for bibdk
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 }
 
@@ -202,7 +221,7 @@ function _bibdk_provider_first_time_message() {
  * @param $form_state
  * @param $form_id
  */
-function bibdk_provider_form_user_cancel_confirm_form_alter(&$form, &$form_state, $form_id){
+function bibdk_provider_form_user_cancel_confirm_form_alter(&$form, &$form_state, $form_id) {
   // Create custom form submition, in order to be able to control the cancellation process
   $form['#submit'] = array('bibdk_provider_user_cancel_form_submit');
 }
@@ -360,11 +379,11 @@ function _bibdk_provider_create_random_user($mail) {
     'name' => $mail,
     'init' => $mail,
     'mail' => $mail,
-    'pass' => hash('hest'.time().$mail),
+    'pass' => hash('hest' . time() . $mail),
     'status' => 1,
     'data' => array('temporary' => 1, 'timestamp' => time()),
   );
-  
+
   $account = user_save('', $userinfo);
 
   if (!$account) {
