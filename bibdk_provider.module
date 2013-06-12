@@ -94,9 +94,11 @@ function bibdk_provider_form_user_register_form_submit($form, &$form_state) {
  * catch username and password (not encrypted) and save them using ding_user_creds_save
  */
 function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
-  //make email-address readonly for now
-  $form['account']['mail']['#attributes'][] = array('readonly' => 'readonly');
+//make email-address readonly for now
+  $form['account']['mail']['#attributes'] = array('readonly' => 'readonly');
 
+  unset($form['account']['pass']);
+  $form['account']['pincode']['#process'][] = 'user_form_process_password_confirm';
   // set length of pincode field
   $form['account']['pincode']['#size'] = 16;
   $form['account']['pincode']['#maxlength'] = 64;
