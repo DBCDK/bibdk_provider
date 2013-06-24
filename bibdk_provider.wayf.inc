@@ -64,6 +64,8 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
   }
 }
 
+
+
 /** \brief validation handler for existing bibdk_users logging on with wayf
  * for the first time.
  *
@@ -296,6 +298,25 @@ function bibdk_provider_set_session($name, $pass, $status = 'no_user') {
 function bibdk_provider_wayf_bind($name, $wayfid) {
   return BibdkUser::instance()->bindWayf($name, $wayfid);
 }
+
+/** Verify that a user with given $wayfid exists
+ *
+ * @param string $wayfId
+ * @return mixed; string(userid) if user exists; bool(FALSE) if not 
+ */
+function bibdk_provider_wayf_verify($wayfId) {
+  // accept_wayf is not set yet
+  if (!isset($_SESSION['wayf_login']['login_type'])) {
+    return FALSE;
+  }
+  try {
+    $ret = BibdkUser::instance()->verifyWayf($wayfId, $_SESSION['wayf_login']['login_type']);
+    return $ret;
+  } catch (Exception $e) {
+    return FALSE;
+  }
+}
+
 
 /**
  *
