@@ -105,9 +105,7 @@ function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
   if (!isset($_GET['pass-reset-token'])) {
       unset($form['account']['pass']);
   }
-
-
-  unset($form['account']['pass']);
+  
   $form['account']['pincode']['#process'][] = 'user_form_process_password_confirm';
   // set length of pincode field
   $form['account']['pincode']['#size'] = 16;
