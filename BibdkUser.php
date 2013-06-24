@@ -552,6 +552,48 @@ class BibdkUser {
       return FALSE;
     }
   }
+  
+     
+  /** Verify user with wayfid exists
+   *
+   * @param string $wayfId
+   * @param string $loginType
+   * @return mixed; userid(string) if user exists, FALSE if not
+   * @throws Exception 
+   */
+  public function verifyWayf($wayfId, $loginType) {
+
+    if ($loginType == 'wayf') {
+      $column = 'wayf_id';
+    }
+    elseif ($loginType == 'nemid') {
+      $column = 'nem_id';
+    }
+    else {
+      return FALSE;
+    }
+
+    $params = array(
+      'oui:loginType' => $column,
+      'oui:loginId' => $wayfId,
+      'oui:outputType' => 'xml',
+    );
+    $response = $this->makeRequest('verifyWayfRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'verifyWayfResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return $xmlmessage->nodeValue;
+    }
+    else {
+      if ($xmlmessage->nodeName == 'oui:error') {
+        throw new Exception($xmlmessage->nodeValue);
+      }
+      else {
+        return FALSE;
+      }
+    }
+  }
+
 
   /**
    * Login using WAYF.
