@@ -114,11 +114,8 @@ function _bibdk_provider_user_check() {
  * return array (might be empty)
  * */
 function bibdk_provider_user_get_setting($username, $settingtype) {
-  static $response;
-  if (!isset($response)) {
-    $response = BibdkUser::instance()->getUserSetting($username, $settingtype);
-  }
-  return $response;
+
+  return BibdkUser::instance()->getUserSetting($username, $settingtype);
 }
 
 /**
