@@ -230,9 +230,6 @@ function bibdk_provider_wayf_accept_form() {
  * @param type $form 
  */
 function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
-  
-  dpm($_SESSION);
-  
   // this belongs in bibdk_provider.wayf.inc
   if (module_exists('ding_wayf')) {
     if (isset($_SESSION['wayf_login']['login_type'])) {
