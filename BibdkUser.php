@@ -562,19 +562,8 @@ class BibdkUser {
    * @throws Exception 
    */
   public function verifyWayf($wayfId, $loginType) {
-
-    if ($loginType == 'wayf') {
-      $column = 'wayf_id';
-    }
-    elseif ($loginType == 'nemid') {
-      $column = 'nem_id';
-    }
-    else {
-      return FALSE;
-    }
-
     $params = array(
-      'oui:loginType' => $column,
+      'oui:loginType' => $loginType,
       'oui:loginId' => $wayfId,
       'oui:outputType' => 'xml',
     );
