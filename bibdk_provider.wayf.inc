@@ -400,9 +400,12 @@ function bibdk_provider_wayf_user_register_add_wayf_data($form, $form_state) {
  */
 function bibdk_provider_accept_form_bind_and_login() {
   $username = $_SESSION['accept_wayf']['name'];
+  // pass is wayf_id; user has been validated by wayf
   $wayf_id = $_SESSION['accept_wayf']['pass'];
   $login_type = isset($_SESSION['wayf_login']['login_type']) ? $_SESSION['wayf_login']['login_type'] : 'wayf_id';
   
+  // @TODO verify user password before binding
+    
   // bind wayf_id to user
   if (ding_provider_invoke('wayf', 'bind', $username, $wayf_id, $login_type)) {
     $attributes['eduPersonTargetedID'][0] = $wayf_id;
