@@ -171,7 +171,6 @@ function bibdk_provider_wayf_validate_wayf_user(&$form, &$form_state) {
  * @param type $element
  * @return type 
  */
-// @TODO unit test this method
 function bibdk_provider_wayf_clear_element_error($form, $errors, $element) {
   if (empty($errors)) {
     return;
@@ -265,6 +264,12 @@ function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
   }
 }
 
+/** Custom validator for accept_form
+ *
+ * @param type $form
+ * @param type $form_state
+ * @return type 
+ */
 function bibdk_provider_accept_form_validate($form, &$form_state) {
   // check if $_SESSION variables are set
   if (!isset($_SESSION['accept_wayf'])) {
@@ -323,14 +328,19 @@ function bibdk_provider_wayf_accept_validate_check_user($form_state) {
   return TRUE;
 }
 
+/** Process user register form. Validate and submitfunctions for wayf-login
+ * are stored in form_state['process_later']
+ *
+ * @param type $form
+ * @param type $form_state
+ * @return type 
+ */
 function bibdk_provider_wayf_process_user_register_form($form, &$form_state) {
   // check if $_SESSION variables are set
   if (!isset($_SESSION['accept_wayf'])) {    
     return;
   }
-
-  $status = $_SESSION['accept_wayf']['status'];
-  
+  $status = $_SESSION['accept_wayf']['status'];  
   if ($status == 'bibdk_user') {
     // this is a first time login with wayf. 
     $errors = form_get_errors();
@@ -346,7 +356,6 @@ function bibdk_provider_wayf_process_user_register_form($form, &$form_state) {
     bibdk_provider_wayf_accept_create_new_user($form, $form_state);
   }
 }
-
 
 /** Handle registration of users logged in via wayf (or nemlogin).
  *
