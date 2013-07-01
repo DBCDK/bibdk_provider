@@ -176,6 +176,61 @@ class BibdkUser {
     }
   }
 
+  /*   * **************  USERSETTING(S) ************** */
+  
+   /** \brief get usersetting(s) for a given user. Empty $settingType gives all setting(s) for user
+   * @staticvar type $response
+   * @param type $username, $settingType
+   * @return type xml
+   */
+  public function getUserSetting($username, $settingtype) {
+    static $response;
+    $params = array('oui:userId' => $username, 'oui:settingType' => $settingtype);
+    $response = $this->makeRequest('getSettingRequest', $params);
+    return $response;
+  }
+  
+  /** \brief set usersetting for a given user. If settingtype don't exist it will be created with data from settingtypeString  
+   * @staticvar type $response
+   * @param type $username, $settingtype, $settingString
+   * @return type xml
+   */
+  public function setUserSetting($username, $settingtype, $settingString ) {
+    //make setting info
+    $paramsSettings = array('oui:settingType' => $settingtype, 
+                            'oui:settingString' =>  $settingString);
+    //make user array with settings information 
+    $params = array('oui:userId' => $username, 
+                    'oui:setting' =>  $paramsSettings);
+    
+    $response = $this->makeRequest('addSettingRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'addSettingResponse');
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+    
+  /**
+   * \brief delete an settingtype for a given user
+   * @param type $username 
+   * @param type $settingType
+   * @return type xml
+   */
+  public function deleteSetting($username, $settingtype) {
+    $params = array('oui:userId' => $username, 'oui:settingType' => $settingtype);
+    $response = $this->makeRequest('removeSettingRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'removeSettingResponse');
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+    
   /*   * **************  FAVOURITES ************** */
 
   public function setFavourite($username, $agencyid) {

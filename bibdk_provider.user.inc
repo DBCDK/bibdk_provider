@@ -105,6 +105,50 @@ function _bibdk_provider_user_check() {
   return FALSE;
 }
 
+/************START SETTING(S)****************/
+
+/**
+ * \brief get setting for given users settingtype
+ * @param $username
+ * @param $settingtype
+ * return array (might be empty)
+ * */
+function bibdk_provider_user_get_setting($username, $settingtype) {
+
+  return BibdkUser::instance()->getUserSetting($username, $settingtype);
+}
+
+/**
+ * \brief set setting for given users settingtype and $settingString
+ * @param $username
+ * @param $settingtype
+ * @param $settingString
+ * return array 
+ * */
+function bibdk_provider_user_set_setting($username, $settingtype, $settingString) {
+  //if (!(_bibdk_provider_user_check())) {
+  //  return FALSE;
+  //}
+  
+  return BibdkUser::instance()->setUserSetting($username, $settingtype, $settingString);
+}
+
+/**
+ * \brief delete setting for given users settingtype 
+ * @param $username
+ * @param $settingtype
+ * return  
+ * */
+function bibdk_provider_user_delete_setting($username, $settingtype) {
+  //if (!(_bibdk_provider_user_check())) {
+  //  return FALSE;
+  //}
+  return BibdkUser::instance()->deleteSetting($username, $settingtype);
+}
+
+
+/************ END SETTING(S)****************/
+
 function bibdk_provider_user_set_favourite($name, $agencyid) {
   if (!(_bibdk_provider_user_check())) {
     return FALSE;
