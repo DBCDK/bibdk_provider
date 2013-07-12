@@ -1,7 +1,12 @@
 <?php
 
+
 /**
- * Implements provider user authenticate
+ * Implements hook_provider_user_authenticate().
+ *
+ * @param String $name
+ * @param String $pass
+ * @return array
  */
 function bibdk_provider_user_authenticate($name, $pass) {
   $return = array(
@@ -45,17 +50,21 @@ function bibdk_provider_user_authenticate($name, $pass) {
   return $return;
 }
 
+/**
+ * @param $mail_me
+ * @param $account
+ */
 function bibdk_provider_user_mail_me($mail_me, $account) {
   $params['account'] = $account;
-  //drupal_mail('bibdk_test_provider', $key, $account->mail, user_preferred_language($account), $params, $from);
   drupal_mail('bibdk_provider', $mail_me->key, $account->mail, user_preferred_language($account), $params, 'no_reply@dbc.dk');
 }
 
-/** \brief Implements hook_mail
-
- * @param type $key
- * @param type $message
- * @param type $params
+/**
+ * Implements hook_mail().
+ *
+ * @param String $key
+ * @param Array $message
+ * @param array $params
  */
 function bibdk_provider_mail($key, &$message, $params) {
   switch ($key) {
@@ -72,7 +81,7 @@ function _bibdk_provider_wayf_new_user_message($account, $langcode) {
 }
 
 /**
- * pjo testing
+ * pjo testing - should it be deleted?
  * Implements hook_user_view
  * NOTE; this skips the userview page and redirects to user edit page.
  * what do we need the userview page for anyway ..
@@ -81,14 +90,17 @@ function bibdk_provider_user_view($account, $view_mode, $langcode) {
   drupal_goto('user/' . $account->uid . '/edit');
 }
 
-// @TODO this function should do something
+//TODO this function should do something
+/**
+ * @return bool
+ */
 function bibdk_provider_is_authenticated() {
   return TRUE;
 }
 
 /** \brief check if user is logged in and if so if user is provider user
  *
- * @global type $user
+ * @global $user
  * @return boolean
  */
 function _bibdk_provider_user_check() {
@@ -108,47 +120,46 @@ function _bibdk_provider_user_check() {
 /************START SETTING(S)****************/
 
 /**
- * \brief get setting for given users settingtype
+ * Get setting for given users settingtype
+ *
  * @param $username
  * @param $settingtype
- * return array (might be empty)
- * */
+ * @return array (might be empty)
+ */
 function bibdk_provider_user_get_setting($username, $settingtype) {
-
   return BibdkUser::instance()->getUserSetting($username, $settingtype);
 }
 
 /**
- * \brief set setting for given users settingtype and $settingString
+ * Set setting for given users settingtype and $settingString
+ *
  * @param $username
  * @param $settingtype
  * @param $settingString
- * return array 
- * */
+ * @return array
+ */
 function bibdk_provider_user_set_setting($username, $settingtype, $settingString) {
-  //if (!(_bibdk_provider_user_check())) {
-  //  return FALSE;
-  //}
-  
   return BibdkUser::instance()->setUserSetting($username, $settingtype, $settingString);
 }
 
 /**
- * \brief delete setting for given users settingtype 
+ * Delete setting for given users settingtype
+ *
  * @param $username
  * @param $settingtype
- * return  
- * */
+ * @return \type
+ */
 function bibdk_provider_user_delete_setting($username, $settingtype) {
-  //if (!(_bibdk_provider_user_check())) {
-  //  return FALSE;
-  //}
   return BibdkUser::instance()->deleteSetting($username, $settingtype);
 }
 
+/************ END SETTING(S) ****************/
 
-/************ END SETTING(S)****************/
-
+/**
+ * @param $name
+ * @param $agencyid
+ * @return bool
+ */
 function bibdk_provider_user_set_favourite($name, $agencyid) {
   if (!(_bibdk_provider_user_check())) {
     return FALSE;
@@ -156,6 +167,11 @@ function bibdk_provider_user_set_favourite($name, $agencyid) {
   return BibdkUser::instance()->setFavourite($name, $agencyid);
 }
 
+/**
+ * @param $name
+ * @param $agencyid
+ * @return bool|array
+ */
 function bibdk_provider_user_add_favourite($name, $agencyid) {
   if (!(_bibdk_provider_user_check())) {
     return FALSE;
@@ -164,6 +180,11 @@ function bibdk_provider_user_add_favourite($name, $agencyid) {
   return BibdkUser::instance()->addFavourite($name, $agencyid);
 }
 
+/**
+ * @param $name
+ * @param $agencyid
+ * @return bool|array
+ */
 function bibdk_provider_user_delete_favourite($name, $agencyid) {
   if (!(_bibdk_provider_user_check())) {
     return FALSE;
@@ -172,10 +193,11 @@ function bibdk_provider_user_delete_favourite($name, $agencyid) {
 }
 
 /**
- * \brief get favourite agencies for given user
+ * Get favourite agencies for given user
  * @param name; userId (email)
- * return array (might be empty)
- * */
+ *
+ * @return array (might be empty)
+ */
 function bibdk_provider_user_get_favourites($name) {
   static $response;
   if (!isset($response)) {
@@ -186,67 +208,76 @@ function bibdk_provider_user_get_favourites($name) {
 
 /**
  * Get cart content from provider
+ *
  * @param $name
  * @return array|bool
  */
-function bibdk_provider_user_get_cart($name){
+function bibdk_provider_user_get_cart($name) {
   return BibdkUser::instance()->getCart($name);
 }
+
 /**
- * add Content to cart
+ * Add Content to cart
+ *
  * @param $name
  * @param $content string|array
  * @return array|bool
  */
-function bibdk_provider_user_add_cart_content($name, $content){
+function bibdk_provider_user_add_cart_content($name, $content) {
   return BibdkUser::instance()->addCartContent($name, $content);
 }
 
 /**
- * update Content to cart
+ * Update Content to cart
+ *
  * @param $name
  * @param $content string|array
  * @return array|bool
  */
-function bibdk_provider_user_update_cart_content($name, $content){
+function bibdk_provider_user_update_cart_content($name, $content) {
   return BibdkUser::instance()->updateCartContent($name, $content);
 }
 
 /**
  * Remove content from cart
+ *
  * @param $name
  * @param $content string|array
  * @return array|bool
  */
-function bibdk_provider_user_remove_cart_content($name, $content){
+function bibdk_provider_user_remove_cart_content($name, $content) {
   return BibdkUser::instance()->removeCartContent($name, $content);
 }
 
 /**
  * Get search history from provider
+ *
  * @param $name
  * @return array|bool
  */
-function bibdk_provider_user_get_searchhistory($name){
+function bibdk_provider_user_get_searchhistory($name) {
   return BibdkUser::instance()->getSearchHistory($name);
 }
+
 /**
- * add Content to searchhistory
+ * Add Content to searchhistory
+ *
  * @param $name
  * @param $content string|array
  * @return array|bool
  */
-function bibdk_provider_user_add_searchhistory($name, $content){
+function bibdk_provider_user_add_searchhistory($name, $content) {
   return BibdkUser::instance()->addSearchHistory($name, $content);
 }
 
 /**
  * Remove content from search history
+ *
  * @param $name
  * @param $content string|array
  * @return array|bool
  */
-function bibdk_provider_user_remove_searchhistory($name, $content){
+function bibdk_provider_user_remove_searchhistory($name, $content) {
   return BibdkUser::instance()->removeSearchHistory($name, $content);
 }
 
@@ -259,18 +290,38 @@ function bibdk_provider_user_verify($name) {
   return $response;
 }
 
+/**
+ * @param $name
+ * @param $pass
+ * @return bool
+ */
 function bibdk_provider_user_create_account($name, $pass) {
   return BibdkUser::instance()->create($name, $pass);
 }
 
+/**
+ * @param $name
+ * @param $pass
+ * @return bool|void
+ */
 function bibdk_provider_user_update_password($name, $pass) {
   return BibdkUser::instance()->update_password($name, $pass);
 }
 
+/**
+ * @param $name
+ * @return bool
+ */
 function bibdk_provider_user_delete_account($name) {
   return BibdkUser::instance()->delete($name);
 }
 
+/**
+ * @param $name
+ * @param $agencyid
+ * @param $data
+ * @return bool|string
+ */
 function bibdk_provider_user_save_favourite_data($name, $agencyid, $data) {
   return BibdkUser::instance()->saveFavouriteData($name, $agencyid, $data);
 }
