@@ -51,26 +51,6 @@ function bibdk_provider_user_mail_me($mail_me, $account) {
   drupal_mail('bibdk_provider', $mail_me->key, $account->mail, user_preferred_language($account), $params, 'no_reply@dbc.dk');
 }
 
-/** \brief Implements hook_mail
-
- * @param type $key
- * @param type $message
- * @param type $params
- */
-function bibdk_provider_mail($key, &$message, $params) {
-  switch ($key) {
-    case 'wayf_new_user' :
-      $langcode = $message['language']->language;
-      $message['subject'] = t('Notification from !site', array('!site' => 'bibliotek.dk'), array('langcode' => $langcode));
-      $message['body'][] = _bibdk_provider_wayf_new_user_message($params['account'], $langcode);
-      break;
-  }
-}
-
-function _bibdk_provider_wayf_new_user_message($account, $langcode) {
-  return t("Dear !username\n\n wayf_account_created.", array('!username' => $account->mail), array('langcode' => $langcode, 'context' => 'ding_wayf'));
-}
-
 /**
  * pjo testing
  * Implements hook_user_view

@@ -535,15 +535,15 @@ class BibdkUser {
 // only verify once - that should be enough
     static $response;
 
-    if (empty($response)) {
+    if (empty($response[$name])) {
       $params = array(
         'oui:userId' => $name,
         'oui:outputType' => 'xml',
       );
-      $response = $this->makeRequest('verifyUserRequest', $params);
+      $response[$name] = $this->makeRequest('verifyUserRequest', $params);
     }
 
-    $xmlmessage = $this->responseExtractor($response, 'verifyUserResponse');
+    $xmlmessage = $this->responseExtractor($response[$name], 'verifyUserResponse');
 
     if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:verified') {
       return preg_match('/true/i', $xmlmessage->nodeValue);

@@ -3,8 +3,32 @@
 require_once('bibdk_provider.user.inc');
 require_once('bibdk_provider.wayf.inc');
 
+
+function bibdk_provider_menu(){
+  $items['user/wayf/%/confirm/%/%'] = array(
+    'title' => 'Reset password',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bibdk_provider_wayf_confirm_form', 2, 4, 5),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'bibdk_provider.wayf.inc',
+  );
+
+  // TODO: remove
+  $items['user/wayf/test/%/%'] = array(
+    'title' => 'Reset password',
+    'page callback' => '_bibdk_provider_test',
+    'page arguments' => array(3, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'bibdk_provider.wayf.inc',
+  );
+
+  return $items;
+}
+
 /**
- * Implements hook_init 
+ * Implements hook_init
  * special case:
  * if user has been created, logged in with one time link, saved new password
  * and THEN clicks the one time link again ...
@@ -134,7 +158,7 @@ function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
     $form['firsttime'] = array('#type' => 'hidden');
     $form_state['values']['firsttime'] = 'true';
 
-    // don't submit-handle the form in this case (first time login) 
+    // don't submit-handle the form in this case (first time login)
     // - it will be redirected ( @see _bibdk_provider_profile_form_login() )
     $form['#submit'] = array();
   }
@@ -186,11 +210,11 @@ function _bibdk_provider_profile_form_login($form, &$form_state) {
       $form_state['values']['authentication_provider'] = 'wayf';
       } */
 
-    // this is where we login and create the drupal provider user; 
-    // we might get an exception from ding_user so.. try catch    
+    // this is where we login and create the drupal provider user;
+    // we might get an exception from ding_user so.. try catch
     drupal_form_submit('user_login_block', $form_state);
 
-    // NOTICE code below is only executed if login does NOT succeed due to 
+    // NOTICE code below is only executed if login does NOT succeed due to
     // hook_user_login in bibdk_frontend
     if ($errors = form_get_errors()) {
       // do something
@@ -501,6 +525,72 @@ function bibdk_provider_settings_form() {
   );
 
   return system_settings_form($form);
+}
+
+/** \brief Implements hook_mail
+
+ * @param type $key
+ * @param type $message
+ * @param type $params
+ */
+function bibdk_provider_mail($key, &$message, $params) {
+  $variables = array('user' => $params['account']);
+  $message['subject'] = _bibdk_provider_wayf_mail_text($key . '_subject', $language, $variables);
+  $message['body'][] = _bibdk_provider_wayf_mail_text($key .  '_body', $language, $variables);
+}
+
+/** Helper function to generate mail content
+ * @param $key
+ * @param null $langcode
+ * @param array $variables
+ * @param bool $replace
+ * @return mixed|null|string
+ */
+function _bibdk_provider_wayf_mail_text($key, $langcode = null, $variables = array(), $replace = true){
+  switch($key){
+    case 'wayf_new_user_subject' :
+      $text = t('Notification from [site:name]', array(), array('langcode' => $langcode));
+      break;
+    case 'wayf_new_user_body' :
+      $text = t("Dear ['user:name']\n\n wayf_account_created.", array(), array('langcode' => $langcode, 'context' => 'ding_wayf'));
+      break;
+
+    case 'wayf_confirm_user_subject' :
+      $text = t('confirm wayf binding for [user:name] at [site:name]', array(), array('langcode' => $langcode));
+      break;
+    case 'wayf_confirm_user_body' :
+      $text = t("Thank you for for using wayf at [site:name]. You may now confirm by clicking this link or copying and pasting it to your browser:
+
+[user:confirm_wayf_url]
+
+This link can only be used once to log in and will log you in, and make sure you can user wayf in the future", array(), array('langcode' => $langcode));
+      break;
+  }
+
+  if ($replace) {
+    // We do not sanitize the token replacement, since the output of this
+    // replacement is intended for an e-mail message, not a web browser.
+    return token_replace($text, $variables, array('language' => $language, 'callback' => 'bibdk_provider_mail_tokens', 'sanitize' => FALSE, 'clear' => TRUE));
+  }
+
+  return $text;
+}
+
+
+
+/**
+ * Token callback to add tokens for bibdk_provider mails.
+ */
+function bibdk_provider_mail_tokens(&$replacements, $data, $options) {
+  if (isset($data['user'])) {
+    $replacements['[user:confirm_wayf_url]'] = bibdk_provider_wayf_confirm_url($data['user']);
+  }
+}
+
+function bibdk_provider_wayf_confirm_url($account){
+  $timestamp = REQUEST_TIME;
+  $hash = user_pass_rehash($account->pass, $timestamp, $account->login);
+  return url("user/wayf/$account->uid/confirm/$timestamp/" . $hash, array('absolute' => TRUE));
 }
 
 /**
