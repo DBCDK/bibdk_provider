@@ -4,7 +4,7 @@ require_once('bibdk_provider.user.inc');
 require_once('bibdk_provider.wayf.inc');
 
 /**
- * Implements hook_init 
+ * Implements hook_init
  * special case:
  * if user has been created, logged in with one time link, saved new password
  * and THEN clicks the one time link again ...
@@ -81,8 +81,9 @@ function bibdk_provider_form_user_register_form_alter(&$form, &$form_state) {
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 
   $function = 'bibdk_provider_wayf_alter_user_register_form';
-  if (function_exists($function))
+  if (function_exists($function)) {
     $function($form, $form_state);
+  }
 }
 
 /**
@@ -99,11 +100,11 @@ function bibdk_provider_form_user_register_form_submit($form, &$form_state) {
  */
 function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
 
-  if(!isset($form['#user_category']) || $form['#user_category'] !== 'account'){
+  if (!isset($form['#user_category']) || $form['#user_category'] !== 'account') {
     return;
   }
 
-//make email-address readonly for now
+  //make email-address readonly for now
   $form['account']['mail']['#attributes']['readonly'] = 'readonly';
 
   /*if (!isset($_GET['pass-reset-token'])) {
@@ -113,7 +114,7 @@ function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
 
   global $user;
 
-  if(ding_user_is_provider_user($user)){
+  if (ding_user_is_provider_user($user)) {
     $form['account']['pass']['#process'][] = 'form_process_password_confirm';
   }
 
@@ -191,7 +192,8 @@ function _bibdk_provider_profile_form_login($form, &$form_state) {
       form_set_error('submit', t('BIBDK_CREATE_USER_ERROR_MESSAGE', array(), array('context' => 'bibdk_provider:error')));
       return FALSE;
     }
-  } catch (Exception $e) {
+  }
+  catch (Exception $e) {
     // TODO log
     //throw $e;
     return FALSE;
@@ -207,15 +209,15 @@ function _bibdk_provider_profile_form_login($form, &$form_state) {
  */
 function _bibdk_provider_user_profile_form_save($form, &$form_state) {
   $enable_logging = variable_get('bibdk_provider_enable_logging');
-  
+
   // on pass-reset $form_state['values']['pass'] is set. When editing
   // account $form_state['values']['pincode'] is set. What a mess ..
   // @TODO fix this and clean up
   // quickfix: make sure both are set
-  if (isset($form_state['values']['pass'])){
+  if (isset($form_state['values']['pass'])) {
     $form_state['values']['pincode'] = $form_state['values']['pass'];
   }
-  
+
   // check if password i min. 6 characters
   if (strlen($form_state['values']['pass']) < $form['account']['pass']['#minlength']) {
     form_set_error('pass', t('Password must be !length characters or more', array('!length' => $form['account']['pass']['#minlength']), array('context' => 'bibdk_provider')));
@@ -308,7 +310,8 @@ function bibdk_provider_user_delete($account) {
         watchdog('BIBDK user_delete', $creds['name'] . $creds['pass']);
       }
       drupal_set_message(t('Your account has been deleted', array(), array('context' => 'bibdk_provider')));
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       //do nothing
     }
   }
