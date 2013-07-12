@@ -46,11 +46,11 @@ class BibdkUserTest extends DrupalUnitTestCase {
     $this->assertTrue($validUser, 'Got valid user');
   }
 
-  /*public function testVerifyInvalid() {
+  public function testVerifyInvalid() {
     $client = BibdkUser::instance();
     $invalidUser = $client->verify('invalidUser');
     $this->assertFalse($invalidUser, 'Got invalid user');
-  }*/
+  }
 
   public function testCreateUser() {
     $client = BibdkUser::instance();
