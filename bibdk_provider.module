@@ -14,17 +14,6 @@ function bibdk_provider_menu(){
     'file' => 'bibdk_provider.wayf.inc',
   );
 
-  // TODO: remove
-  $items['user/wayf/test/%/%'] = array(
-    'title' => 'Reset password',
-    'page callback' => '_bibdk_provider_test',
-    'page arguments' => array(3, 4),
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-    'file' => 'bibdk_provider.wayf.inc',
-  );
-
-  return $items;
 }
 
 /**
