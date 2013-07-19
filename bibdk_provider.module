@@ -13,7 +13,7 @@ function bibdk_provider_menu(){
     'type' => MENU_CALLBACK,
     'file' => 'bibdk_provider.wayf.inc',
   );
-
+  return $items;
 }
 
 /**
@@ -523,6 +523,7 @@ function bibdk_provider_settings_form() {
  * @param type $params
  */
 function bibdk_provider_mail($key, &$message, $params) {
+  $language = $message['language'];
   $variables = array('user' => $params['account']);
   $message['subject'] = _bibdk_provider_wayf_mail_text($key . '_subject', $language, $variables);
   $message['body'][] = _bibdk_provider_wayf_mail_text($key .  '_body', $language, $variables);
@@ -535,7 +536,8 @@ function bibdk_provider_mail($key, &$message, $params) {
  * @param bool $replace
  * @return mixed|null|string
  */
-function _bibdk_provider_wayf_mail_text($key, $langcode = null, $variables = array(), $replace = true){
+function _bibdk_provider_wayf_mail_text($key, $language = null, $variables = array(), $replace = true){
+  $langcode = isset($language) ? $language->language : NULL;
   switch($key){
     case 'wayf_new_user_subject' :
       $text = t('Notification from [site:name]', array(), array('langcode' => $langcode));
