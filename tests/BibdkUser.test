@@ -6,7 +6,7 @@ class BibdkUserTest extends DrupalUnitTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'bibdk user provider client',
+      'name' => 'bibdk user provider client unittest',
       'description' => 'Interface to web service',
       'group' => 'bibliotek.dk - provider',
     );

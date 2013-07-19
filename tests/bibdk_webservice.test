@@ -13,9 +13,9 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'bibdk webservice mockup',
-      'description' => 'Test bibdk webservice mockup.',
-      'group' => 'Ding! - bibdk provider',
+      'name' => 'bibdk provider webservice test',
+      'description' => 'Test bibdk provider webservice mockup.',
+      'group' => 'bibliotek.dk - provider',
     );
   }
 
@@ -23,7 +23,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
    * Setting up webservice mockup.
    */
   function setUp() {
-    parent::setUp('bibdk_webservice');
+    parent::setUp('devel', 'bibdk_webservice');
     variable_set('securityCode', $this->securityCode);
   }
 
@@ -31,14 +31,13 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
    * Runner
    */
   function testRunTestSuite() {
-    dpm('fisk');
-    /*$this->_testWebserviceUnsupportedRequest();
+    $this->_testWebserviceUnsupportedRequest();
     $this->_testWebserviceLoginSuccessful();
     $this->_testWebserviceLoginCredentials();
     $this->_testWebserviceLoginMissingUsername();
-    $this->_testWebserviceLoginMissingPassword();
+    $this->_testWebserviceLoginMissingPassword(¡);
     $this->_testWebserviceLoginMissingSecurityCode();
-    $this->_testWebserviceLoginWrongSecurityCode();*/
+    $this->_testWebserviceLoginWrongSecurityCode();
     $this->_testWebserviceCartGooduser();
     $this->_testWebserviceCartBaduser();
     $this->_testWebserviceAddCartContent();

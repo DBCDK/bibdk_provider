@@ -21,9 +21,11 @@ features[page_manager_pages][] = create_login
 features[page_manager_pages][] = reset_password
 features[page_manager_pages][] = user_password_change
 
-files[] = bibdk_provider.test
+
 files[] = bibdk_provider.user.inc
 files[] = BibdkUser.php
+files[] = tests/bibdk_provider.test
 files[] = tests/bibdk_webservice.test
 files[] = tests/BibdkUser.test
+files[] = tests/bibdk_provider.wayf.test
 files[] = bibdk_provider.wayf.inc

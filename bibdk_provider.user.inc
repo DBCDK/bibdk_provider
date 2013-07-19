@@ -103,21 +103,21 @@ function bibdk_provider_user_get_setting($username, $settingtype) {
  * @param $username
  * @param $settingtype
  * @param $settingString
- * return array 
+ * return array
  * */
 function bibdk_provider_user_set_setting($username, $settingtype, $settingString) {
   //if (!(_bibdk_provider_user_check())) {
   //  return FALSE;
   //}
-  
+
   return BibdkUser::instance()->setUserSetting($username, $settingtype, $settingString);
 }
 
 /**
- * \brief delete setting for given users settingtype 
+ * \brief delete setting for given users settingtype
  * @param $username
  * @param $settingtype
- * return  
+ * return
  * */
 function bibdk_provider_user_delete_setting($username, $settingtype) {
   //if (!(_bibdk_provider_user_check())) {

@@ -19,6 +19,8 @@ function bibdk_provider_wayf_authenticate($name, $wayfid) {
   // loginWayf-method throws an exception if something (anything) goes wrong
   try {
     $loginType = isset($_SESSION['wayf_login']['login_type']) ? $_SESSION['wayf_login']['login_type'] : 'wayf_id';
+
+    // Hvorfor tjekker vi ikke resultatet af følgende? /svi
     BibdkUser::instance()->loginWayf($name, $wayfid, $loginType);
     $return['creds'] = array(
       'name' => $name,
@@ -30,7 +32,7 @@ function bibdk_provider_wayf_authenticate($name, $wayfid) {
       'mail' => $name,
     );
     $return['success'] = TRUE;
-    $return['messages'] = array('HEJ', 'notice');
+    $return['messages'] = array('HEJ', 'notice'); //???
   } catch (Exception $e) {
     $enable_logging = variable_get('bibdk_provider_enable_logging');
     if ($enable_logging) {
@@ -51,10 +53,11 @@ function bibdk_provider_user_login(&$edit, $account){
   if(isset($_SESSION['accept_wayf'])) {
     unset($_SESSION['accept_wayf']);
   }
+  // TODO remove wayf data from use
 }
 
 /* \brief custom validator for user_login form (@see ding_wayf.module)
- * 
+ *
  * PRE: user is authenticated with WAYF
  */
 
@@ -96,7 +99,7 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
  * @global string $base_url
  * @param array $form
  * @param array $form_state
- * @return string|boolean 
+ * @return string|boolean
  */
 function bibdk_provider_wayf_validate_no_binding(&$form, &$form_state) {
   $pass = isset($form_state['input']['pass']) ? $form_state['input']['pass'] : FALSE;
@@ -110,7 +113,7 @@ function bibdk_provider_wayf_validate_no_binding(&$form, &$form_state) {
   }
   // try to get username from provider
   $username = ding_provider_invoke('wayf', 'verify', $pass);
-  
+
   if ($username === FALSE) {
     // user does either not exist or has not accepted wayf binding
     bibdk_provider_wayf_set_session($username, $pass, 'no_user');
@@ -124,15 +127,16 @@ function bibdk_provider_wayf_validate_no_binding(&$form, &$form_state) {
   return FALSE;
 }
 
-/** 
+/**
  *
  * @global type $base_url
  * @param type $form
  * @param type $form_state
- * @return boolean|string 
+ * @return boolean|string
  */
 function bibdk_provider_wayf_validate_wayf_user(&$form, &$form_state) {
   $pass = isset($form_state['values']['pass']) ? $form_state['values']['pass'] : FALSE;
+
   if (!$pass) {
     return FALSE;
   }
@@ -141,7 +145,7 @@ function bibdk_provider_wayf_validate_wayf_user(&$form, &$form_state) {
   if ($username !== FALSE) {
     $errors = form_get_errors();
     // we got the username from webservice
-    // thus user is okay for logging in 
+    // thus user is okay for logging in
     bibdk_provider_wayf_set_session($username, $pass, 'bibdk_user');
     // set username in form_state
     if (isset($_SESSION['accept_wayf']['name'])) {
@@ -169,7 +173,7 @@ function bibdk_provider_wayf_validate_wayf_user(&$form, &$form_state) {
  * @param type $form
  * @param type $errors
  * @param type $element
- * @return type 
+ * @return type
  */
 function bibdk_provider_wayf_clear_element_error($form, $errors, $element) {
   if (empty($errors)) {
@@ -207,8 +211,8 @@ function bibdk_provider_wayf_login_creds($authentication_attributes, $notify_by_
   $form_state['values']['authentication_provider'] = 'wayf';
 
 // set name and password for login
-  $form_state['values']['name'] = $authentication_attributes['mail'][0];
-  $form_state['values']['mail'] = $authentication_attributes['mail'][0];
+  $form_state['values']['name'] = isset($authentication_attributes['mail'][0]) ? $authentication_attributes['mail'][0] : null;
+  $form_state['values']['mail'] = $form_state['values']['name'];
   $form_state['values']['pass'] = $authentication_attributes['eduPersonTargetedID'][0];
   if (isset($notify_by_mail)) {
     $form_state['mail_me'] = $notify_by_mail;
@@ -217,16 +221,15 @@ function bibdk_provider_wayf_login_creds($authentication_attributes, $notify_by_
 }
 
 /**
- * 
+ *
  */
 function bibdk_provider_wayf_accept_form() {
   return 'user_register_form';
-  //return '_bibdk_provider_wayf_accept_form';
 }
 
 /**
  * Custom form alter - called from bibdk_provider.module::bibdk_provider_form_user_register_form_alter
- * @param type $form 
+ * @param type $form
  */
 function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
   // this belongs in bibdk_provider.wayf.inc
@@ -240,7 +243,7 @@ function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
       $form_state['process_later']['validate'] = $form['#validate'];
       unset($form['#submit']);
       unset($form['#validate']);
-      // new text on submit button 
+      // new text on submit button
       $form['actions']['submit']['#value'] = t('Update/create account', array(), array('context' => 'bibdk_provider'));
       $form['account']['mail']['#default_value'] = !empty($_SESSION['wayf_login']['mail'][0]) ? $_SESSION['wayf_login']['mail'][0] : '';
       $form['wayf_accept'] = array(
@@ -268,7 +271,7 @@ function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
  *
  * @param type $form
  * @param type $form_state
- * @return type 
+ * @return type
  */
 function bibdk_provider_accept_form_validate($form, &$form_state) {
   // check if $_SESSION variables are set
@@ -276,17 +279,23 @@ function bibdk_provider_accept_form_validate($form, &$form_state) {
     // all of this is of no good if this variable is not set - redirect user to try again
     drupal_set_message('ding_wayf',t('Something went wrong. try logging in with wayf again', array(), array('context' => 'ding_wayf')));
     form_set_error('form', t('Something went wrong. try logging in with wayf again', array(), array('context' => 'ding_wayf')));
-    drupal_goto('user');
+    drupal_goto('user/login');
   }
 
   //validate that accept has been checked
   if (!$form_state['values']['accept']) {
-    form_set_error('accept', t('You must accept binding your 
-      bibliotek.dk username with wayf id', array(), array('context' => 'ding_wayf')));
-    return;
+    form_set_error('accept', t('You must accept binding your bibliotek.dk username with wayf id', array(), array('context' => 'ding_wayf')));
+    return FALSE;
   }
 
-  // check userstatus 
+  //validate mail field
+  if (!isset($form_state['values']['mail']) || !valid_email_address($form_state['values']['mail'])) {
+    form_set_error('mail', t('You need to provide a valid email address', array(), array('context' => 'ding_wayf')));
+    return FALSE;
+  }
+
+
+  // check userstatus
   if (!bibdk_provider_wayf_accept_validate_check_user($form_state)) {
     // double check. this should not happen since mail is required
     form_set_error('form', t('Something went wrong. try logging in with wayf again', array(), array('context' => 'ding_wayf')));
@@ -299,16 +308,10 @@ function bibdk_provider_accept_form_validate($form, &$form_state) {
 /** Check if given user $form_state ($form_state['values']['mail']) exists.
  * and update SESSION variables accordingly
  *
- * @param array 
- * @return boolean 
+ * @param array
+ * @return boolean
  */
 function bibdk_provider_wayf_accept_validate_check_user($form_state) {
-  
-  
-  
-  if (!isset($form_state['values']['mail'])) {
-    return FALSE;
-  }
 
   $username = $form_state['values']['mail'];
   // set SESSION variables
@@ -316,7 +319,7 @@ function bibdk_provider_wayf_accept_validate_check_user($form_state) {
   // we know that user has not yet logged on via way or we wouldn't be here
   // check if user is known
   $status = ding_provider_invoke('user', 'verify', $username);
-  
+
   if (!$status) {
     // no bibdk user
     $_SESSION['accept_wayf']['status'] = 'no_user';
@@ -333,7 +336,7 @@ function bibdk_provider_wayf_accept_validate_check_user($form_state) {
  *
  * @param type $form
  * @param type $form_state
- * @return type 
+ * @return type
  */
 function bibdk_provider_wayf_process_user_register_form($form, &$form_state) {
   // check if $_SESSION variables are set
@@ -355,17 +358,9 @@ function bibdk_provider_wayf_process_user_register_form($form, &$form_state) {
       return;
     }
   }
-  if ($status == 'no_user') { 
+  if ($status == 'no_user') {
     bibdk_provider_wayf_accept_create_new_user($form, $form_state);
   }
-}
-
-function _bibdk_provider_test($user, $wayf){
-
-  $_SESSION['accept_wayf']['name'] = $user;
-  $_SESSION['wayf_login']['pass'] = $wayf;
-  bibdk_provider_wayf_confirm_existing_user();
-  return 'this is a test';
 }
 
 /**
@@ -378,6 +373,9 @@ function bibdk_provider_wayf_confirm_existing_user(){
   $username = $_SESSION['accept_wayf']['name'];
 
   $users = user_load_multiple(array(), array('mail' => $username, 'status' => '1'));
+
+  // TODO : user is a provider user but is not yet a drupal user
+
   if (!isset($users) || !is_array($users)) {
     // This should never happen
     drupal_set_message(t('Internal error please contact administrator if problem persists',array(),array('context'=>'bibdk_provider')), 'error');
@@ -420,7 +418,7 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
   $hash = user_pass_rehash($account->pass, $timestamp, $account->login);
 
   if (!$action && $hash === $token){
-    $form['message'] = array('#markup' => t('<p>This is a one-time login for %user_name and will expire on %expiration_date.</p><p>Click on this button to log in to the site and change your password.</p>', array('%user_name' => $account->name, '%expiration_date' => format_date($timestamp + $timeout))));
+    $form['message'] = array('#markup' => t('<p>This is a one-time login for %user_name and will expire on %expiration_date.</p><p>Click on this button to log in to the site and verify your wayf login.</p>', array('%user_name' => $account->name, '%expiration_date' => format_date($timestamp + 86400))));
     $form['help'] = array('#markup' => '<p>' . t('This login can be used only once.') . '</p>');
     $form['actions'] = array('#type' => 'actions');
     $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Log in'));
@@ -439,6 +437,7 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
     exit;
   }
 
+  drupal_goto('<front>');
   // Check if variables matches the expected
   // check if wayf have been saved on user
   // Add wayf to openuserinfo

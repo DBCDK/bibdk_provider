@@ -6,7 +6,7 @@ require_once('bibdk_provider.wayf.inc');
 
 function bibdk_provider_menu(){
   $items['user/wayf/%/confirm/%/%'] = array(
-    'title' => 'Reset password',
+    'title' => 'Verify WAYF/NEMID',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('bibdk_provider_wayf_confirm_form', 2, 4, 5),
     'access callback' => TRUE,
