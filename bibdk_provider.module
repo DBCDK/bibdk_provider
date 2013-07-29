@@ -112,10 +112,6 @@ function bibdk_provider_form_user_register_form_submit($form, &$form_state) {
  * catch username and password (not encrypted) and save them using ding_user_creds_save
  */
 function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
-  if (!isset($_GET['pass-reset-token'])) {
-    unset($form['account']['pass']);
-  }
-
   if (!isset($form['#user_category']) || $form['#user_category'] !== 'account') {
     return;
   }
