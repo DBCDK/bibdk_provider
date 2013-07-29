@@ -535,15 +535,15 @@ class BibdkUser {
 // only verify once - that should be enough
     static $response;
 
-    if (empty($response)) {
+    if (empty($response[$name])) {
       $params = array(
         'oui:userId' => $name,
         'oui:outputType' => 'xml',
       );
-      $response = $this->makeRequest('verifyUserRequest', $params);
+      $response[$name] = $this->makeRequest('verifyUserRequest', $params);
     }
 
-    $xmlmessage = $this->responseExtractor($response, 'verifyUserResponse');
+    $xmlmessage = $this->responseExtractor($response[$name], 'verifyUserResponse');
 
     if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:verified') {
       return preg_match('/true/i', $xmlmessage->nodeValue);
@@ -607,6 +607,37 @@ class BibdkUser {
       return FALSE;
     }
   }
+  
+     
+  /** Verify user with wayfid exists
+   *
+   * @param string $wayfId
+   * @param string $loginType
+   * @return mixed; userid(string) if user exists, FALSE if not
+   * @throws Exception 
+   */
+  public function verifyWayf($wayfId, $loginType) {
+    $params = array(
+      'oui:loginType' => $loginType,
+      'oui:loginId' => $wayfId,
+      'oui:outputType' => 'xml',
+    );
+    $response = $this->makeRequest('verifyWayfRequest', $params);
+    $xmlmessage = $this->responseExtractor($response, 'verifyWayfResponse');
+
+    if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+      return $xmlmessage->nodeValue;
+    }
+    else {
+      if ($xmlmessage->nodeName == 'oui:error') {
+        throw new Exception($xmlmessage->nodeValue);
+      }
+      else {
+        return FALSE;
+      }
+    }
+  }
+
 
   /**
    * Login using WAYF.
