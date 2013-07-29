@@ -94,8 +94,9 @@ function bibdk_provider_form_user_register_form_alter(&$form, &$form_state) {
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
 
   $function = 'bibdk_provider_wayf_alter_user_register_form';
-  if (function_exists($function))
+  if (function_exists($function)) {
     $function($form, $form_state);
+  }
 }
 
 /**
@@ -111,19 +112,30 @@ function bibdk_provider_form_user_register_form_submit($form, &$form_state) {
  * catch username and password (not encrypted) and save them using ding_user_creds_save
  */
 function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
-//make email-address readonly for now
-  $form['account']['mail']['#attributes']['readonly'] = 'readonly';
-
   if (!isset($_GET['pass-reset-token'])) {
     unset($form['account']['pass']);
   }
 
-  $form['account']['pincode']['#process'][] = 'user_form_process_password_confirm';
-  // set length of pincode field
-  $form['account']['pincode']['#size'] = 16;
-  $form['account']['pincode']['#maxlength'] = 64;
+  if (!isset($form['#user_category']) || $form['#user_category'] !== 'account') {
+    return;
+  }
 
-  $form['account']['pincode']['#minlength'] = 6;
+  //make email-address readonly for now
+  $form['account']['mail']['#attributes']['readonly'] = 'readonly';
+
+  global $user;
+
+  if (ding_user_is_provider_user($user)) {
+    $form['account']['pass']['#process'][] = 'form_process_password_confirm';
+  }
+
+  $form['account']['pass']['#process'][] = 'user_form_process_password_confirm';
+
+  // set length of pincode field
+  $form['account']['pass']['#size'] = 16;
+  $form['account']['pass']['#maxlength'] = 64;
+
+  $form['account']['pass']['#minlength'] = 6;
 
   $form['actions']['cancel']['#limit_validation_errors'] = array();
 
@@ -213,7 +225,8 @@ function _bibdk_provider_profile_form_login($form, &$form_state) {
       form_set_error('submit', t('BIBDK_CREATE_USER_ERROR_MESSAGE', array(), array('context' => 'bibdk_provider:error')));
       return FALSE;
     }
-  } catch (Exception $e) {
+  }
+  catch (Exception $e) {
     // TODO log
     //throw $e;
     return FALSE;
@@ -232,23 +245,20 @@ function _bibdk_provider_user_profile_form_save($form, &$form_state) {
 
   // on pass-reset $form_state['values']['pass'] is set. When editing
   // account $form_state['values']['pincode'] is set. What a mess ..
-  // @TODO fix this
+  // @TODO fix this and clean up
   // quickfix: make sure both are set
-  if (isset($form_state['values']['pincode'])) {
-    $form_state['values']['pass'] = $form_state['values']['pincode'];
-  }
-  elseif (isset($form_state['values']['pass'])) {
+  if (isset($form_state['values']['pass'])) {
     $form_state['values']['pincode'] = $form_state['values']['pass'];
   }
 
   // check if password i min. 6 characters
-  if (strlen($form_state['values']['pincode']) < $form['account']['pincode']['#minlength']) {
-    form_set_error('pass', t('Password must be !length characters or more', array('!length' => $form['account']['pincode']['#minlength']), array('context' => 'bibdk_provider')));
+  if (strlen($form_state['values']['pass']) < $form['account']['pass']['#minlength']) {
+    form_set_error('pass', t('Password must be !length characters or more', array('!length' => $form['account']['pass']['#minlength']), array('context' => 'bibdk_provider')));
   }
 
   // check if password i min. 6 characters
-  if (strlen($form_state['values']['pincode']) < $form['account']['pincode']['#minlength']) {
-    form_set_error('pass', t('Password must be !length characters or more', array('!length' => $form['account']['pincode']['#minlength']), array('context' => 'bibdk_provider')));
+  if (strlen($form_state['values']['pass']) < $form['account']['pass']['#minlength']) {
+    form_set_error('pass', t('Password must be !length characters or more', array('!length' => $form['account']['pass']['#minlength']), array('context' => 'bibdk_provider')));
   }
 
   if (!empty($form_state['values']['mail']) && !empty($form_state['values']['pass'])) {
@@ -270,7 +280,7 @@ function _bibdk_provider_user_profile_form_save($form, &$form_state) {
       if (!empty($drupal_user->data['temporary'])) {
         // this is a temporary user created if bibdk user forgot password
         // update bibdkprovider with new password
-        if (bibdk_provider_user_update_password($form_state['values']['mail'], $form_state['values']['pass'])) {
+        if (bibdk_provider_user_update_password($form_state['values']['mail'], $form_state['values']['pincode'])) {
           // log user in
           _bibdk_provider_profile_form_login($form, $form_state);
         }
@@ -334,7 +344,8 @@ function bibdk_provider_user_delete($account) {
         watchdog('BIBDK user_delete', $creds['name'] . $creds['pass']);
       }
       drupal_set_message(t('Your account has been deleted', array(), array('context' => 'bibdk_provider')));
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       //do nothing
     }
   }
@@ -447,7 +458,7 @@ function _bibdk_provider_create_random_user($mail) {
     'name' => $mail,
     'init' => $mail,
     'mail' => $mail,
-    'pass' => hash('hest' . time() . $mail),
+    'pass' => hash('sha256', 'hest' . time() . $mail),
     'status' => 1,
     'data' => array('temporary' => 1, 'timestamp' => time()),
   );

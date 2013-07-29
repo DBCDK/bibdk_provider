@@ -474,8 +474,7 @@ class BibdkUser {
    * @param $pass
    *   Password for the user.
    *
-   * @return
-   *   Boolean telling if the login attempt was successful.
+   * @return bool Boolean telling if the login attempt was successful.
    */
   public function login($name, $pass) {
     $params = array(
