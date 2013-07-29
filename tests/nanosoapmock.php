@@ -45,7 +45,7 @@ class NanoSOAPClient {
   }
 
   private function verifyUserRequest($request) {
-    $userId = $request['userId'];
+    $userId = $request['oui:userId'];
     if (empty($userId)) {
       $response = '<oui:error>Missing</oui:error>';
     }
@@ -57,13 +57,14 @@ class NanoSOAPClient {
         $response = '<oui:verified>false</oui:verified>';
       }
     }
+    debug($response);
 
     return $this->soapEnveloping('verifyUserResponse', $response);
   }
 
   private function loginRequest($request) {
-    $userId = $request['userId'];
-    $password = $request['userPinCode'];
+    $userId = $request['oui:userId'];
+    $password = $request['oui:userPinCode'];
 
     if (empty($userId) || empty($password)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -81,8 +82,8 @@ class NanoSOAPClient {
   }
 
   private function createUserRequest($request) {
-    $userId = $request['userId'];
-    $password = $request['userPinCode'];
+    $userId = $request['oui:userId'];
+    $password = $request['oui:userPinCode'];
 
     if (empty($userId) || empty($password)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -100,8 +101,8 @@ class NanoSOAPClient {
   }
 
   private function updatePasswordRequest($request) {
-    $userId = $request['userId'];
-    $password = $request['userPinCode'];
+    $userId = $request['oui:userId'];
+    $password = $request['oui:userPinCode'];
 
     if (empty($userId) || empty($password)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -119,7 +120,7 @@ class NanoSOAPClient {
   }
 
   private function deleteUserRequest($request) {
-    $userId = $request['userId'];
+    $userId = $request['oui:userId'];
 
     if (empty($userId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -132,8 +133,8 @@ class NanoSOAPClient {
   }
 
   private function loginWayfRequest($request) {
-    $userId = $request['userId'];
-    $wayfId = $request['wayfId'];
+    $userId = $request['oui:userId'];
+    $wayfId = $request['oui:loginId'];
 
     if (empty($userId) || empty($wayfId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -159,8 +160,8 @@ class NanoSOAPClient {
   }
 
   private function bindWayfRequest($request) {
-    $userId = $request['userId'];
-    $wayfId = $request['wayfId'];
+    $userId = $request['oui:userId'];
+    $wayfId = $request['oui:loginId'];
 
     if (empty($userId) || empty($wayfId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -178,7 +179,7 @@ class NanoSOAPClient {
   }
 
   private function deleteWayfRequest($request) {
-    $userId = $request['userId'];
+    $userId = $request['oui:userId'];
 
     if (empty($userId)) {
       $response = '<oui:error>Missing</oui:error>';
@@ -187,7 +188,7 @@ class NanoSOAPClient {
       if ($userId == 'validUser') {
         $response = "<oui:userId>$userId</oui:userId>";
       }
-      else {
+      else if ($userId == 'invalidUser'){
         $response = '<oui:error>no such user</oui:error>';
       }
     }

@@ -6,7 +6,7 @@ class BibdkUserTest extends DrupalUnitTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'bibdk user provider client',
+      'name' => 'bibdk user provider client unittest',
       'description' => 'Interface to web service',
       'group' => 'bibliotek.dk - provider',
     );
@@ -46,11 +46,11 @@ class BibdkUserTest extends DrupalUnitTestCase {
     $this->assertTrue($validUser, 'Got valid user');
   }
 
-  /*public function testVerifyInvalid() {
+  public function testVerifyInvalid() {
     $client = BibdkUser::instance();
     $invalidUser = $client->verify('invalidUser');
     $this->assertFalse($invalidUser, 'Got invalid user');
-  }*/
+  }
 
   public function testCreateUser() {
     $client = BibdkUser::instance();

@@ -13,14 +13,14 @@
 class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
-      'name' => 'bibdk user provider',
+      'name' => 'bibdk provider webtest',
       'description' => 'Test bibdk user provider functionality.',
-      'group' => 'Ding! - bibdk provider',
+      'group' => 'bibliotek.dk - provider',
     );
   }
 
   function setUp() {
-    parent::setup(array('bibdk_provider', 'ding_user', 'profile2', 'ding_provider', 'bibdk_webservice'));
+    parent::setup(array('bibdk_provider', 'ding_user', 'profile2', 'ding_provider', 'bibdk_webservice', 'devel'));
     variable_set('bibdk_provider_webservice_url', $this->getAbsoluteUrl('bibdk_webservice'));
     variable_set('bibdk_provider_security_code', 'securityCode');
   }
