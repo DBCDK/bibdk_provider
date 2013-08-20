@@ -92,6 +92,8 @@ function bibdk_provider_form_user_register_form_alter(&$form, &$form_state) {
   array_unshift($form['#submit'], 'bibdk_provider_form_user_register_form_submit');
   // add validation handler for bibdk
   $form['#validate'][] = 'bibdk_provider_user_register_form_validate';
+  // set page title
+  drupal_set_title(t('Create new account'));
 
   $function = 'bibdk_provider_wayf_alter_user_register_form';
   if (function_exists($function)) {
