@@ -46,11 +46,11 @@ function bibdk_provider_wayf_authenticate($name, $wayfid) {
 /** Implements hook_user_login
  *  unset wayf-SESSION variables - we don't want them once user has logged in
  */
-function bibdk_provider_user_login(&$edit, $account){
-  if(isset($_SESSION['wayf_login'])){
+function bibdk_provider_user_login(&$edit, $account) {
+  if (isset($_SESSION['wayf_login'])) {
     unset($_SESSION['wayf_login']);
   }
-  if(isset($_SESSION['accept_wayf'])) {
+  if (isset($_SESSION['accept_wayf'])) {
     unset($_SESSION['accept_wayf']);
   }
   // TODO remove wayf data from use
@@ -72,7 +72,7 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
   if ($url !== FALSE) {
     // somewhere along the way $_GET['destination'] is set
     // and that overrules drupal_goto; .. unset
-    if (isset($_GET['destination'])){
+    if (isset($_GET['destination'])) {
       unset($_GET['destination']);
     }
     drupal_goto($url);
@@ -85,7 +85,7 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
   if ($url !== FALSE) {
     // somewhere along the way $_GET['destination'] is set
     // and that overrules drupal_goto; .. unset
-    if (isset($_GET['destination'])){
+    if (isset($_GET['destination'])) {
       unset($_GET['destination']);
     }
     drupal_goto($url);
@@ -205,7 +205,6 @@ function bibdk_provider_wayf_clear_element_error($form, $errors, $element) {
   }
 }
 
-
 function bibdk_provider_wayf_login_creds($authentication_attributes, $notify_by_mail) {
   // set authentication provider for ding_user (@see ding_user_user_login_validate)
   $form_state['values']['authentication_provider'] = 'wayf';
@@ -227,11 +226,27 @@ function bibdk_provider_wayf_accept_form() {
   return 'user_register_form';
 }
 
+/** \brief Check if wayf loginflow has been interrupted.
+ * User may abort flow while accepting wayf binding -if so SESSION variables
+ * are set .. unset them
+ * 
+ */
+function bibdk_provider_wayf_check_logintype() {
+  $args = arg();
+  if (end($args) != 'accept') {
+    if (isset($_SESSION['wayf_login'])) {
+      unset($_SESSION['wayf_login']);
+    }
+  }
+}
+
 /**
  * Custom form alter - called from bibdk_provider.module::bibdk_provider_form_user_register_form_alter
  * @param type $form
  */
 function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
+  bibdk_provider_wayf_check_logintype();
+
   // this belongs in bibdk_provider.wayf.inc
   if (module_exists('ding_wayf')) {
     if (isset($_SESSION['wayf_login']['login_type'])) {
@@ -263,6 +278,9 @@ function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
       //add validation handler for checkbox
       //array_unshift($form['#validate'], 'bibdk_provider_accept_form_validate');
       $form['#validate'][] = 'bibdk_provider_accept_form_validate';
+
+      // set page title
+      drupal_set_title(t('Accept match of profiles', array(), array('context' => 'ding_wayf')));
     }
   }
 }
@@ -277,7 +295,7 @@ function bibdk_provider_accept_form_validate($form, &$form_state) {
   // check if $_SESSION variables are set
   if (!isset($_SESSION['accept_wayf'])) {
     // all of this is of no good if this variable is not set - redirect user to try again
-    drupal_set_message('ding_wayf',t('Something went wrong. try logging in with wayf again', array(), array('context' => 'ding_wayf')));
+    drupal_set_message('ding_wayf', t('Something went wrong. try logging in with wayf again', array(), array('context' => 'ding_wayf')));
     form_set_error('form', t('Something went wrong. try logging in with wayf again', array(), array('context' => 'ding_wayf')));
     drupal_goto('user/login');
   }
@@ -368,7 +386,7 @@ function bibdk_provider_wayf_process_user_register_form($form, &$form_state) {
  *
  * @return null
  */
-function bibdk_provider_wayf_confirm_existing_user(){
+function bibdk_provider_wayf_confirm_existing_user() {
   // Load user
   $username = $_SESSION['accept_wayf']['name'];
 
@@ -378,13 +396,12 @@ function bibdk_provider_wayf_confirm_existing_user(){
 
   if (!isset($users) || !is_array($users)) {
     // This should never happen
-    drupal_set_message(t('Internal error please contact administrator if problem persists',array(),array('context'=>'bibdk_provider')), 'error');
+    drupal_set_message(t('Internal error please contact administrator if problem persists', array(), array('context' => 'bibdk_provider')), 'error');
     return;
   }
   $account = reset($users);
 
   // Save wayf_login on user
-
   // Make sure the data element on the user is an array
   if (!isset($account->data) || !is_array($account->data))
     $account->data = array();
@@ -400,24 +417,25 @@ function bibdk_provider_wayf_confirm_existing_user(){
   drupal_goto();
 }
 
-function bibdk_provider_wayf_send_confirmation_mail($account){
+function bibdk_provider_wayf_send_confirmation_mail($account) {
   global $language;
   $params['account'] = $account;
   $language = $language ? $language : user_preferred_language($account);
-  if(drupal_mail('bibdk_provider', 'wayf_confirm_user', $account->mail, $language, $params)){
+  if (drupal_mail('bibdk_provider', 'wayf_confirm_user', $account->mail, $language, $params)) {
     // Send message to user
-    drupal_set_message(t('Confirmation mail have been sent',array(),array('context'=>'bibdk_provider')), 'status');
-  } else {
-    drupal_set_message(t('A mail could not be sent please try again later',array(),array('context'=>'bibdk_provider')), 'status');
+    drupal_set_message(t('Confirmation mail have been sent', array(), array('context' => 'bibdk_provider')), 'status');
+  }
+  else {
+    drupal_set_message(t('A mail could not be sent please try again later', array(), array('context' => 'bibdk_provider')), 'status');
   }
 }
 
-function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp, $token, $action = false){
+function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp, $token, $action = false) {
   $users = user_load_multiple(array($uid), array('status' => '1'));
   $account = reset($users);
   $hash = user_pass_rehash($account->pass, $timestamp, $account->login);
 
-  if (!$action && $hash === $token){
+  if (!$action && $hash === $token) {
     $form['message'] = array('#markup' => t('<p>This is a one-time login for %user_name and will expire on %expiration_date.</p><p>Click on this button to log in to the site and verify your wayf login.</p>', array('%user_name' => $account->name, '%expiration_date' => format_date($timestamp + 86400))));
     $form['help'] = array('#markup' => '<p>' . t('This login can be used only once.') . '</p>');
     $form['actions'] = array('#type' => 'actions');
@@ -425,7 +443,7 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
     $form['#action'] = url("user/wayf/$uid/confirm/$timestamp/$token/login");
     return $form;
   }
-  else if ($hash === $token){
+  else if ($hash === $token) {
 
     $_SESSION['accept_wayf'] = $account->data['accept_wayf'];
     $_SESSION['wayf_login'] = $account->data['wayf_login'];
@@ -442,7 +460,6 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
   // check if wayf have been saved on user
   // Add wayf to openuserinfo
   // login user
-
   // Handle errors
 }
 
@@ -478,7 +495,7 @@ function bibdk_provider_wayf_user_register_add_wayf_data($form, $form_state) {
     // get the user
     $account = $form['#user'];
     // add wayf-data
-    $account->data = array('wayf'=>$_SESSION['wayf_login']);
+    $account->data = array('wayf' => $_SESSION['wayf_login']);
     // save user
     user_save($account);
   }
@@ -506,16 +523,16 @@ function bibdk_provider_accept_form_bind_and_login($account) {
     }
     else {
       // this is an ERROR - login function was not found
-      drupal_set_message(t('Internal error please contact administrator if problem persists',array(),array('context'=>'ding_wayf')), 'error');
-      watchdog('wayf login', $function.' WAS NOT FOUND ', array(), WATCHDOG_ERROR);
+      drupal_set_message(t('Internal error please contact administrator if problem persists', array(), array('context' => 'ding_wayf')), 'error');
+      watchdog('wayf login', $function . ' WAS NOT FOUND ', array(), WATCHDOG_ERROR);
     }
   }
   else {
     // wayf bind did not succeed.
     // notice for the user
-    drupal_set_message(t('Sorry we could not bind your wayf_id with your account',array(),array('context'=>'ding_wayf')), 'warning');
+    drupal_set_message(t('Sorry we could not bind your wayf_id with your account', array(), array('context' => 'ding_wayf')), 'warning');
     // error for the log
-    watchdog('wayf login', 'bibdk_provider::bind_wayf failed in binding %username with %wayf_id' , array('%username'=>$username, '%wayf_id'=>$wayf_id), WATCHDOG_ERROR);
+    watchdog('wayf login', 'bibdk_provider::bind_wayf failed in binding %username with %wayf_id', array('%username' => $username, '%wayf_id' => $wayf_id), WATCHDOG_ERROR);
   }
 }
 
