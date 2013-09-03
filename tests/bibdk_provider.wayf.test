@@ -33,8 +33,12 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
 
 
   private function testflowThroughGateway() {
-    $this->clickLink(t('Login using NEMLOGIN'));
-    $this->assertUrl($this->getAbsoluteUrl('wayf/gateway') . '?returnUrl=' . $this->getAbsoluteUrl('') . 'wayf/login&idp=nemlogin', array(), t('User is redirected to gateway'));
+    $this->drupalGet('wayf/login', array(
+      'query' => array(
+        'idp' => 'nemlogin',
+        'destination' => 'user/login,'
+      )));
+    $this->assertUrl($this->getAbsoluteUrl('wayf/gateway') . '?returnUrl=' . $this->getAbsoluteUrl('/') . 'wayf/login&idp=nemlogin', array(), t('User is redirected to gateway'));
     $this->drupalPost(null, array(), 'accept');
 
     // check if acceptpage is ok
@@ -82,8 +86,10 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
 
   private function testWayfIsActivated() {
     $this->drupalGet('user/login');
-    $this->assertText('Login using NEMLOGIN');
-    $this->assertText('Login using WAYF');
+    $this->assertLinkByHref('wayf/login', 0, t('Nemlogin found'));
+    $this->assertLinkByHref('wayf/login', 1, t('wayf found'));
+    //$this->assertText('Login using NEMLOGIN');
+    //$this->assertText('Login using WAYF');
   }
 
   private function validateNewUser() {
@@ -110,9 +116,12 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
 
   private function  testExcistingUser() {
     //test existing user
-    $this->drupalGet('user/login');
-    $this->clickLink(t('Login using NEMLOGIN'));
-    $this->assertUrl($this->getAbsoluteUrl('wayf/gateway') . '?returnUrl=' . $this->getAbsoluteUrl('') . 'wayf/login&idp=nemlogin', array(), t('User is redirected to gateway'));
+    $this->drupalGet('wayf/login', array(
+      'query' => array(
+        'idp' => 'nemlogin',
+        'destination' => 'user/login,'
+      )));
+    $this->assertUrl($this->getAbsoluteUrl('wayf/gateway') . '?returnUrl=' . $this->getAbsoluteUrl('/') . 'wayf/login&idp=nemlogin', array(), t('User is redirected to gateway'));
 
     // At the moment bibdk_provider does not redirect properly without the bibdk_frontend module
     $this->drupalPost(null, array(), 'accept');
@@ -129,9 +138,12 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
     bibdk_provider_wayf_delete('dummy@dbc.dk');
 
     // login with nemlogin
-    $this->drupalGet('user/login');
-    $this->clickLink(t('Login using NEMLOGIN'));
-    $this->assertUrl($this->getAbsoluteUrl('wayf/gateway') . '?returnUrl=' . $this->getAbsoluteUrl('') . 'wayf/login&idp=nemlogin', array(), t('User is redirected to gateway'));
+    $this->drupalGet('wayf/login', array(
+      'query' => array(
+        'idp' => 'nemlogin',
+        'destination' => 'user/login,'
+      )));
+    $this->assertUrl($this->getAbsoluteUrl('wayf/gateway') . '?returnUrl=' . $this->getAbsoluteUrl('/') . 'wayf/login&idp=nemlogin', array(), t('User is redirected to gateway'));
     $this->drupalPost(null, array(), 'accept');
     // Test we end up at the right url
     $this->assertUrl('wayf/accept');
