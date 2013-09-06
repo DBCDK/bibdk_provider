@@ -23,7 +23,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
    * Setting up webservice mockup.
    */
   function setUp() {
-    parent::setUp(bibdk_webservice');
+    parent::setUp('bibdk_webservice');
     variable_set('securityCode', $this->securityCode);
   }
 
