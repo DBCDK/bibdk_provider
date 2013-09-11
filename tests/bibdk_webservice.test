@@ -23,7 +23,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
    * Setting up webservice mockup.
    */
   function setUp() {
-    parent::setUp('devel', 'bibdk_webservice');
+    parent::setUp('bibdk_webservice');
     variable_set('securityCode', $this->securityCode);
   }
 
@@ -35,7 +35,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
     $this->_testWebserviceLoginSuccessful();
     $this->_testWebserviceLoginCredentials();
     $this->_testWebserviceLoginMissingUsername();
-    $this->_testWebserviceLoginMissingPassword(¡);
+    $this->_testWebserviceLoginMissingPassword();
     $this->_testWebserviceLoginMissingSecurityCode();
     $this->_testWebserviceLoginWrongSecurityCode();
     $this->_testWebserviceCartGooduser();

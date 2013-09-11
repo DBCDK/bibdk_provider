@@ -20,7 +20,7 @@ class BibdkUserProviderImplementationTestCase extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setup(array('bibdk_provider', 'ding_user', 'profile2', 'ding_provider', 'bibdk_webservice', 'devel'));
+    parent::setup(array('bibdk_provider', 'ding_user', 'profile2', 'ding_provider', 'bibdk_webservice'));
     variable_set('bibdk_provider_webservice_url', $this->getAbsoluteUrl('bibdk_webservice'));
     variable_set('bibdk_provider_security_code', 'securityCode');
   }
