@@ -70,6 +70,26 @@ function bibdk_test_provider_user_get_favourites($name) {
   return $ret;
 }
 
+/** Fake user_get_setting 
+ *  this one return settings for bibdk_actions_sb_selfpickup type
+ * 
+ * * */
+function bibdk_test_provider_user_get_setting($username, $settingtype) {
+  $ret = '<?xml version="1.0" encoding="UTF-8"?>
+    <oui:getSettingResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
+    <oui:userId>pjo@dbc.dk</oui:userId>
+    <oui:settingString>
+    <oui:settingId>55</oui:settingId>
+    <oui:settingType>bibdk_actions_sb_selfpickup</oui:settingType>
+    <oui:settingString>
+    </oui:settingString>
+    <oui:settingTime>2013-07-26 14:06:36.336017</oui:settingTime>
+    </oui:settingString>
+    </oui:getSettingResponse>';
+
+  return $ret;
+}
+
 function bibdk_test_provider_user_add_favourite($name, $agencyId) {
   return true;
 }
