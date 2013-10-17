@@ -6,21 +6,11 @@ php = 5.2.4
 version = 7.x-0.22
 project = bibdk_provider
 
-dependencies[] = ctools
 dependencies[] = ding_user
-dependencies[] = features
+
 dependencies[] = nanosoap
-dependencies[] = page_manager
-dependencies[] = panels
 
 configure = admin/config/ding/provider/bibdk_provider
-
-features[ctools][] = page_manager:pages_default:1
-features[features_api][] = api:1
-features[page_manager_pages][] = create_login
-features[page_manager_pages][] = reset_password
-features[page_manager_pages][] = user_password_change
-
 
 files[] = bibdk_provider.user.inc
 files[] = BibdkUser.php
