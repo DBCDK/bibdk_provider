@@ -123,36 +123,3 @@ function bibdk_test_provider_mail($key, &$message, $params) {
 function _bibdk_test_provider_wayf_new_user_message($account, $langcode) {
   return t("Dear !username\n\n wayf_account_created.", array('!username' => $account->mail), array('langcode' => $langcode, 'context' => 'ding_wayf'));
 }
-
-class BibdkUser {
-
-  private static $instance;
-  protected $test_users = array();
-
-  private function __construct() {
-    $this->test_users = variable_get('bibdk_test_users', array());
-  }
-
-  public static function instance() {
-    if (!isset(self::$instance)) {
-      self::$instance = new BibdkUser();
-    }
-    return self::$instance;
-  }
-
-  public function create($name, $pass) {
-    $this->test_users[$name] = $pass;
-    variable_set('bibdk_test_users', $this->test_users);
-    return TRUE;
-  }
-
-  public function verify($name) {
-    return isset($this->test_users[$name]);
-  }
-
-  public function update_password($name, $pass) {
-    $this->test_users[$name] = $pass;
-    variable_set('bibdk_test_users', $this->test_users);
-  }
-
-}

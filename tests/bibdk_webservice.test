@@ -15,7 +15,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'bibdk provider webservice test',
       'description' => 'Test bibdk provider webservice mockup.',
-      'group' => 'bibliotek.dk - provider',
+      'group' => 'Bibliotek.dk - Provider',
     );
   }
 
