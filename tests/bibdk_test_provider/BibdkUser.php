@@ -38,6 +38,10 @@ class BibdkUser {
     variable_set('bibdk_test_users', $this->test_users);
   }
 
+  public function delete(){
+
+  }
+
   /**
    * @return bool
    */
