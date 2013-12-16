@@ -133,7 +133,7 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
   }
 
   private function testConfirmWayfLink() {
-    module_load_include('user.inc', 'bibdk_provider');
+    module_load_include('wayf.inc', 'bibdk_provider');
     // delete wayf binding
     bibdk_provider_wayf_delete('dummy@dbc.dk');
 
