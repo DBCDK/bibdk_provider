@@ -92,7 +92,7 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
   }
 
   private function validateNewUser() {
-
+    module_load_include('user.inc', 'bibdk_provider');
     // Get reset link
     $this->assertFalse(bibdk_provider_user_verify('dummy@dbc.dk'));
     $users = user_load_multiple(array(), array('mail' => 'dummy@dbc.dk'));
@@ -133,6 +133,7 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
   }
 
   private function testConfirmWayfLink() {
+    module_load_include('user.inc', 'bibdk_provider');
     // delete wayf binding
     bibdk_provider_wayf_delete('dummy@dbc.dk');
 
