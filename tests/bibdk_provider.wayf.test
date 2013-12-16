@@ -11,6 +11,10 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
   }
 
   function setUp() {
+    
+    module_enable(array('bibdk_test_provider'));
+    menu_rebuild();
+    
     parent::setup(array('bibdk_test_provider', 'ding_user', 'ding_wayf', 'wayf_test_gateway'));
    // variable_set('bibdk_provider_webservice_url', 'http://guesstimate.dbc.dk/~pjo/webservices/OpenUserInfo/trunk/server.php'); 
     variable_set('bibdk_provider_security_code', 'testhest');

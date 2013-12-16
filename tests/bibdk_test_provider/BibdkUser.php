@@ -4,7 +4,6 @@
  * Class BibdkUser
  * Provider test class
  */
-
 class BibdkUser {
 
   private static $instance;
@@ -38,14 +37,15 @@ class BibdkUser {
     variable_set('bibdk_test_users', $this->test_users);
   }
 
-  public function delete(){
-
+  public function delete($name) {
+    unset($this->test_users[$name]);
   }
 
   /**
    * @return bool
    */
-  public function deleteWayf(){
+  public function deleteWayf() {
     return TRUE;
   }
+
 }
