@@ -37,4 +37,11 @@ class BibdkUser {
     $this->test_users[$name] = $pass;
     variable_set('bibdk_test_users', $this->test_users);
   }
+
+  /**
+   * @return bool
+   */
+  public function deleteWayf(){
+    return TRUE;
+  }
 }
