@@ -27,6 +27,15 @@ class BibdkUser {
 
     return TRUE;
   }
+  
+  public function verifyWayf($wayfId, $loginType){
+    return in_array($this->test_users,$wayfid);
+  }
+  
+  public function bindWayf($name, $loginId, $loginType = 'wayf_id'){
+    $this->test_users[$name] = $loginId;
+    variable_set('bibdk_test_users', $this->test_users);
+  }
 
   public function verify($name) {
     return isset($this->test_users[$name]);
