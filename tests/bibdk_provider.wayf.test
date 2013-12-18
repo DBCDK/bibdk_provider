@@ -18,6 +18,7 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
   }
 
   public function testRunner() {
+    module_load_include('BibdkUser.php', 'bibdk_provider');
     BibdkUser::instance()->delete('dummy@dbc.dk');
     $this->testWayfNotActivated();
     $this->setupConfiguration();
