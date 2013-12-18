@@ -6,13 +6,13 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'bibdk provider wayf test',
       'description' => 'Test bibdk provider wayf functionality.',
-      'group' => 'bibliotek.dk - provider',
+      'group' => 'Bibliotek.dk - Provider',
     );
   }
 
   function setUp() {
-    parent::setup(array('bibdk_test_provider', 'ding_user', 'ding_wayf', 'wayf_test_gateway'));
-   // variable_set('bibdk_provider_webservice_url', 'http://guesstimate.dbc.dk/~pjo/webservices/OpenUserInfo/trunk/server.php'); 
+    parent::setup(array('bibdk_provider', 'ding_user', 'ding_wayf', 'wayf_test_gateway','devel'));
+    variable_set('bibdk_provider_webservice_url', 'http://guesstimate/~pjo/webservices/OpenUserInfo/trunk/server.php'); 
     variable_set('bibdk_provider_security_code', 'testhest');
     variable_set('user_register', USER_REGISTER_VISITORS);
   }
@@ -33,6 +33,12 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
 
 
   private function testflowThroughGateway() {
+    
+    //bibdk_test_provider_user_create_account($name, $pass)
+    
+   // $path = drupal_get_path('module', 'bibdk_provider');
+   // require_once $path.'/bibdk_provider.wayf.inc';
+    
     $this->drupalGet('wayf/login', array(
       'query' => array(
         'idp' => 'nemlogin',
@@ -93,7 +99,7 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
   }
 
   private function validateNewUser() {
-
+    module_load_include('user.inc', 'bibdk_provider');
     // Get reset link
     $this->assertFalse(bibdk_provider_user_verify('dummy@dbc.dk'));
     $users = user_load_multiple(array(), array('mail' => 'dummy@dbc.dk'));
@@ -134,6 +140,7 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
   }
 
   private function testConfirmWayfLink() {
+    module_load_include('wayf.inc', 'bibdk_provider');
     // delete wayf binding
     bibdk_provider_wayf_delete('dummy@dbc.dk');
 

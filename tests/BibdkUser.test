@@ -1,6 +1,6 @@
 <?php
 
-class BibdkUserTest extends DrupalUnitTestCase {
+class BibdkProviderUnitTest extends DrupalUnitTestCase {
 
   private $enable_logging;
 
@@ -8,7 +8,7 @@ class BibdkUserTest extends DrupalUnitTestCase {
     return array(
       'name' => 'bibdk user provider client unittest',
       'description' => 'Interface to web service',
-      'group' => 'bibliotek.dk - provider',
+      'group' => 'Bibliotek.dk - Provider',
     );
   }
 

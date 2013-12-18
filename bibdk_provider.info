@@ -3,7 +3,7 @@ description = Implementation of bibdk provider API.
 core = 7.x
 package = DBCDK
 php = 5.2.4
-version = 7.x-0.24
+version = 7.x-0.25
 project = bibdk_provider
 
 dependencies[] = ding_user
@@ -16,6 +16,6 @@ files[] = bibdk_provider.user.inc
 files[] = BibdkUser.php
 files[] = tests/bibdk_provider.test
 files[] = tests/bibdk_webservice.test
-files[] = tests/BibdkUser.test
+;files[] = tests/BibdkUser.test
 files[] = tests/bibdk_provider.wayf.test
 files[] = bibdk_provider.wayf.inc
