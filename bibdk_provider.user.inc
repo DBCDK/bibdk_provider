@@ -63,16 +63,6 @@ function _bibdk_provider_wayf_new_user_message($account, $langcode) {
   return t("Dear !username\n\n wayf_account_created.", array('!username' => $account->mail), array('langcode' => $langcode, 'context' => 'ding_wayf'));
 }
 
-/**
- * pjo testing - should it be deleted?
- * Implements hook_user_view
- * NOTE; this skips the userview page and redirects to user edit page.
- * what do we need the userview page for anyway ..
- * */
-function bibdk_provider_user_view($account, $view_mode, $langcode) {
-  drupal_goto('user/' . $account->uid . '/edit');
-}
-
 //TODO this function should do something
 /**
  * @return bool
