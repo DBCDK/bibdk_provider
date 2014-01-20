@@ -211,6 +211,11 @@ function _bibdk_webservice_lookup_user($username, $password) {
       'user' => 'dummy@dbc.dk',
       'password' => 'secretPassword',
     ),
+    array(
+      'user' => 'good_user',
+      'password' => 'pass',
+    ),
+
   );
 
   foreach ($users as $user) {
