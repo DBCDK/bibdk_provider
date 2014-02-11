@@ -68,7 +68,7 @@ function bibdk_test_provider_user_authenticate($name, $pass) {
         'mail' => $name,
   );
   $return['success'] = TRUE;
-  $return['messages'] = array('HEJ', 'notice');
+  $return['messages'] = array('HEJ', 'status');
 
   return $return;
 }
@@ -85,7 +85,7 @@ function bibdk_test_provider_wayf_authenticate($name, $wayfid){
         'mail' => $name,
   );
   $return['success'] = TRUE;
-  $return['messages'] = array('HEJ', 'notice');
+  $return['messages'] = array('HEJ', 'status');
 
   return $return;
 }
