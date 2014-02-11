@@ -56,6 +56,10 @@ function bibdk_webservice_request($reset = false) {
         return bibdk_webservice_update_cart_content($request);
         break;
 
+      case 'getFavouritesRequest':
+        return bibdk_webservice_get_favourites($request);
+        break;
+
       default:
         return SOAP_FAULT;
     }
@@ -63,6 +67,17 @@ function bibdk_webservice_request($reset = false) {
   catch (Exception $e) {
     return SOAP_FAULT;
   }
+}
+
+/**
+ * Method for to favourites
+ * used by bibdk_openuserstatus_webtest.test
+ * @param $request
+ * @return string
+ */
+function bibdk_webservice_get_favourites($request) {
+  $path = drupal_get_path('module', 'bibdk_webservice');
+  return file_get_contents($path . '/xml/get_favourite_libraries.xml');
 }
 
 function bibdk_webservice_get_cart($request, $cart = null){
