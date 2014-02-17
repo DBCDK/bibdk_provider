@@ -32,7 +32,7 @@ function bibdk_provider_wayf_authenticate($name, $wayfid) {
       'mail' => $name,
     );
     $return['success'] = TRUE;
-    $return['messages'] = array('HEJ', 'notice'); //???
+    $return['messages'] = array('HEJ', 'status'); //???
   } catch (Exception $e) {
     $enable_logging = variable_get('bibdk_provider_enable_logging');
     if ($enable_logging) {

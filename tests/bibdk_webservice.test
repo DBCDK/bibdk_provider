@@ -302,7 +302,7 @@ XML;
                                             CURLOPT_POSTFIELDS => $post,
                                             CURLOPT_HTTPHEADER => $headers));
     $this->verbose(htmlentities($response));
-    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:getCartResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:cartContent></oui:cartContent><oui:userId>good_user</oui:userId></oui:getCartResponse>
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:getCartResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>good_user</oui:userId></oui:getCartResponse>
 
 </SOAP-ENV:Body></SOAP-ENV:Envelope>';
 
