@@ -46,7 +46,7 @@ function bibdk_provider_wayf_authenticate($name, $wayfid) {
 /** Implements hook_user_login
  *  unset wayf-SESSION variables - we don't want them once user has logged in
  */
-function bibdk_provider_user_login(&$edit, $account) {
+function _bibdk_provider_wayf_user_login(&$edit, $account) {
   if (isset($_SESSION['wayf_login'])) {
     unset($_SESSION['wayf_login']);
   }
@@ -229,7 +229,7 @@ function bibdk_provider_wayf_accept_form() {
 /** \brief Check if wayf loginflow has been interrupted.
  * User may abort flow while accepting wayf binding -if so SESSION variables
  * are set .. unset them
- * 
+ *
  */
 function bibdk_provider_wayf_check_logintype() {
   $args = arg();
@@ -603,4 +603,73 @@ function bibdk_provider_wayf_verify($wayfId) {
  */
 function bibdk_provider_wayf_delete($name) {
   return BibdkUser::instance()->deleteWayf($name);
+}
+
+
+/** Helper function to generate mail content
+ * @param $key
+ * @param null $langcode
+ * @param array $variables
+ * @param bool $replace
+ * @return mixed|null|string
+ */
+function _bibdk_provider_wayf_mail_text($key, $language = null, $variables = array(), $replace = true){
+  $langcode = isset($language) ? $language->language : NULL;
+  switch($key){
+    case 'wayf_new_user_subject' :
+      $text = t('Notification from [site:name]', array(), array('langcode' => $langcode));
+      break;
+    case 'wayf_new_user_body' :
+      $text = t("Dear ['user:name']\n\n wayf_account_created.", array(), array('langcode' => $langcode, 'context' => 'ding_wayf'));
+      break;
+
+    case 'wayf_confirm_user_subject' :
+      $text = t('confirm wayf binding for [user:name] at [site:name]', array(), array('langcode' => $langcode));
+      break;
+    case 'wayf_confirm_user_body' :
+      $text = t("Thank you for for using wayf at [site:name]. You may now confirm by clicking this link or copying and pasting it to your browser:
+
+[user:confirm_wayf_url]
+
+This link can only be used once to log in and will log you in, and make sure you can user wayf in the future", array(), array('langcode' => $langcode));
+      break;
+  }
+
+  if ($replace) {
+    // We do not sanitize the token replacement, since the output of this
+    // replacement is intended for an e-mail message, not a web browser.
+    return token_replace($text, $variables, array('language' => $language, 'callback' => 'bibdk_provider_mail_tokens', 'sanitize' => FALSE, 'clear' => TRUE));
+  }
+
+  return $text;
+}
+
+
+
+/**
+ * Token callback to add tokens for bibdk_provider mails.
+ */
+function bibdk_provider_mail_tokens(&$replacements, $data, $options) {
+  if (isset($data['user'])) {
+    $replacements['[user:confirm_wayf_url]'] = bibdk_provider_wayf_confirm_url($data['user']);
+  }
+}
+
+function bibdk_provider_wayf_confirm_url($account){
+  $timestamp = REQUEST_TIME;
+  $hash = user_pass_rehash($account->pass, $timestamp, $account->login);
+  return url("user/wayf/$account->uid/confirm/$timestamp/" . $hash, array('absolute' => TRUE));
+}
+
+/**
+ * Implements hook_ding_wayf_attributes().
+ *
+ * Bibliotek.dk needs unique WAYF identifier called 'eduPersonTargetedID' and
+ * email address for WAYF authentication.
+ */
+function bibdk_provider_ding_wayf_attributes() {
+  return array(
+    'eduPersonTargetedID' => array(),
+    'mail' => array('authname' => TRUE),
+  );
 }
