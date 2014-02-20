@@ -90,6 +90,17 @@ function _bibdk_provider_user_check() {
   return FALSE;
 }
 
+
+/************** VOXB ****************/
+
+function bibdk_provider_user_get_voxb($username){
+    return BibdkUser::instance()->getVoxbId($username);
+}
+
+function bibdk_provider_user_bind_voxb($userName,$voxbId){
+    return BibdkUser::instance()->bindVoxb($userName,$voxbId);
+}
+
 /************START SETTING(S)****************/
 
 /**
