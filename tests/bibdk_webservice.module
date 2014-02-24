@@ -41,6 +41,9 @@ function bibdk_webservice_request($reset = false) {
       case 'loginRequest':
         return bibdk_webservice_loginRequest($request);
       break;
+      case 'verifyUserRequest':
+        return bibdk_webservice_verifyUserRequest($request);
+      break;
       case 'getCartRequest':
         return bibdk_webservice_get_cart($request, $cart);
         break;
@@ -209,6 +212,24 @@ function bibdk_webservice_loginRequest($request) {
   return "<oui:loginResponse>$response</oui:loginResponse>";
 }
 
+
+function bibdk_webservice_verifyUserRequest($request) {
+  $username = (string) $request->verifyUserRequest->userId;
+
+  switch ($username) {
+    case 'existing_user@dbc.dk' :
+      $result = 'TRUE';
+      break;
+    case 'new_user@dbc.dk' :
+      $result = 'FALSE';
+      break;
+    default :
+      $result = 'FALSE';
+  }
+    return "<oui:verifyUserResponse><oui:verified>$result</oui:verified></oui:verifyUserResponse>";
+}
+
+
 /**
  * Emulating looking up user credentials
  *
@@ -230,7 +251,10 @@ function _bibdk_webservice_lookup_user($username, $password) {
       'user' => 'good_user',
       'password' => 'pass',
     ),
-
+    array(
+      'user' => 'existing_user@dbc.dk',
+      'password' => 'pass',
+    ),
   );
 
   foreach ($users as $user) {
