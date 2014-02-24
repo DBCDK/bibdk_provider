@@ -72,10 +72,12 @@ function bibdk_provider_form_user_register_form_submit($form, &$form_state) {
   $account = _ding_user_create_account($email, array());
   bibdk_provider_user_create_account($email, $account->pass);
 
-  // If user_email_verification is required
+  // User_email_verification is required
   if ($account->status) {
+    // Send registration mail to user as in a normal drupal registration
     _user_mail_notify('register_no_approval_required', $account);
     drupal_set_message(t('A welcome message with further instructions has been sent to your e-mail address.'));
+    // Goto frontpage
     $form_state['redirect'] = '';
   }
 }
@@ -106,7 +108,6 @@ function bibdk_provider_user_login(&$edit, $account) {
  * catch username and password (not encrypted) and save them using ding_user_creds_save
  */
 function bibdk_provider_form_user_profile_form_alter(&$form, &$form_state) {
-  dpm($form);
   //make email-address readonly for now
   $form['account']['mail']['#attributes']['readonly'] = 'readonly';
   global $user;
@@ -216,11 +217,24 @@ function bibdk_provider_user_delete($account) {
  * add custom validate function
  */
 function bibdk_provider_form_user_pass_alter(&$form, &$form_state) {
-  if (isset($form_state['input']['name'])) {
-    $form_state['input']['mail'] = $form_state['input']['name'];
-  }
+  array_unshift($form['#validate'], '_bibdk_provider_user_pass_validate');
 }
 
+/**
+ * custom validator for user_pass (change password)
+ * check if user exists on drupal if not create a temporary user
+ * for drupal to have an email to confirm against
+ */
+function _bibdk_provider_user_pass_validate(&$form, &$form_state) {
+  $mail = $form_state['values']['name'];
+
+  if (valid_email_address($mail)) {
+    if (bibdk_provider_user_verify($mail) && !user_load_by_mail($mail)) {
+      // create a drupal user here, for drupal to have an email-address to confirm against
+      _ding_user_create_account($mail, array());
+    }
+  }
+}
 
 /**
  * Implement hook_ding_provider().
