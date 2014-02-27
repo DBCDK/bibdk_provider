@@ -245,6 +245,33 @@ function _bibdk_provider_user_pass_validate(&$form, &$form_state) {
 }
 
 /**
+ * Implement user_account_update called from ding_user/ding_user_user_presave
+ * this method handles updates when user is a ding_provider_user
+ */
+function bibdk_provider_user_account_update($account, $changes) {
+  $result = array();
+  // if pass is not set do nothing
+  if (isset($changes['pass'])) {
+    if (!bibdk_provider_user_update_password($account->mail, $changes['pass'])) {
+      // Password could not be updated
+      drupal_set_message(t('Bibliotek.dk password was not saved. You can log on the site with your password, but library specific settings will not be available', array(), array('context' => 'bibdk_provider')));
+    }
+    else {
+      // Log changes
+      if (variable_get('bibdk_provider_enable_logging')) {
+        watchdog('BIBDK', '%user , %pass user_account_update', array('%user' => $account->mail, '%pass' => $changes['pass']));
+      }
+      // Set new password locally.
+      $creds['pass'] = $changes['pass'];
+      $creds['name'] = $account->mail;
+      // Update creds.
+      $result['creds'] = $creds;
+    }
+  }
+  return $result;
+}
+
+/**
  * Implement hook_ding_provider().
  */
 function bibdk_provider_ding_provider() {
