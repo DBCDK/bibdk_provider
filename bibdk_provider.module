@@ -15,6 +15,8 @@ function bibdk_provider_menu(){
     'type' => MENU_CALLBACK,
     'file' => 'bibdk_provider.wayf.inc',
   );
+
+  return $items;
 }
 
 /**
@@ -55,7 +57,7 @@ function bibdk_provider_form_user_register_form_alter(&$form, &$form_state) {
 function bibdk_provider_user_register_form_validate(&$form, &$form_state) {
   $mail = check_plain($form_state['values']['mail']);
 
-  if (bibdk_provider_user_verify($mail)) {
+  if (valid_email_address($mail) && bibdk_provider_user_verify($mail)) {
     form_set_error('mail', t('The e-mail address %email is already registered. <a href="@password">Have you forgotten your password?</a>', array('%email' => $form_state['values']['mail'], '@password' => url('user/password'))));
   }
 
@@ -71,6 +73,18 @@ function bibdk_provider_user_register_form_validate(&$form, &$form_state) {
  */
 function bibdk_provider_form_user_register_form_submit($form, &$form_state) {
   $email = $form_state['values']['mail'];
+  if (bibdk_provider_register_new_user($email)){
+    $form_state['redirect'] = '';
+  }
+}
+
+
+/**
+ * Create a new user and send a registration link
+ *
+ * @param $email
+ */
+function bibdk_provider_register_new_user($email){
   $account = _ding_user_create_account($email, array());
   bibdk_provider_user_create_account($email, $account->pass);
 
@@ -79,9 +93,9 @@ function bibdk_provider_form_user_register_form_submit($form, &$form_state) {
     // Send registration mail to user as in a normal drupal registration
     _user_mail_notify('register_no_approval_required', $account);
     drupal_set_message(t('A welcome message with further instructions has been sent to your e-mail address.'));
-    // Goto frontpage
-    $form_state['redirect'] = '';
+
   }
+  return $account;
 }
 
 /**
@@ -230,8 +244,8 @@ function bibdk_provider_form_user_pass_alter(&$form, &$form_state) {
 
 /**
  * custom validator for user_pass (change password)
- * check if user exists on drupal if not create a temporary user
- * for drupal to have an email to confirm against
+ * check if user exists on drupal if not create a user
+ * in drupal to have an email to confirm against
  */
 function _bibdk_provider_user_pass_validate(&$form, &$form_state) {
   $mail = $form_state['values']['name'];
