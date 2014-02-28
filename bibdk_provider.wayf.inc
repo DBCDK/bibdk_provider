@@ -159,7 +159,6 @@ function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
       drupal_set_title(t('Accept match of profiles', array(), array('context' => 'ding_wayf')));
     }
 
-  dpm($form);
 }
 
 
