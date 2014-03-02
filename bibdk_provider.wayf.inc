@@ -210,6 +210,9 @@ function bibdk_provider_accept_form_submit($form, &$form_state) {
   else {
     bibdk_provider_wayf_accept_create_new_user($mail);
   }
+
+  $form_state['redirect'] = '';
+
 }
 
 
