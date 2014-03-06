@@ -51,8 +51,8 @@ function bibdk_provider_update_7002() {
 }
 
 
-function bibdk_provider_update_7003(){
+/*function bibdk_provider_update_7003(){
   db_query('DELETE FROM {users} u USING {authmap} a WHERE u.uid = a.uid AND a.module = :module', array(':module' => 'ding_user'));
   db_delete('authmap')->condition('module', 'ding_user')->execute();
 
-}
+}*/
