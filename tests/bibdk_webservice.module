@@ -41,6 +41,17 @@ function bibdk_webservice_request($reset = false) {
       case 'loginRequest':
         return bibdk_webservice_loginRequest($request);
       break;
+
+      case 'loginWayfRequest':
+        return bibdk_webservice_loginWayfRequest($request);
+      break;
+
+      case 'verifyUserRequest':
+        return bibdk_webservice_verifyUserRequest($request);
+      break;
+      case 'verifyWayfRequest':
+        return bibdk_webservice_verifyWayfRequest($request);
+      break;
       case 'getCartRequest':
         return bibdk_webservice_get_cart($request, $cart);
         break;
@@ -55,11 +66,12 @@ function bibdk_webservice_request($reset = false) {
       case 'updateCartContentRequest':
         return bibdk_webservice_update_cart_content($request);
         break;
-
       case 'getFavouritesRequest':
         return bibdk_webservice_get_favourites($request);
         break;
-
+      case 'bindWayfRequest':
+        return bibdk_webservice_bindWayfRequest($request);
+        break;
       default:
         return SOAP_FAULT;
     }
@@ -209,6 +221,69 @@ function bibdk_webservice_loginRequest($request) {
   return "<oui:loginResponse>$response</oui:loginResponse>";
 }
 
+function bibdk_webservice_loginWayfRequest($request) {
+  $username = (string) $request->loginWayfRequest->userId;
+  $password = (string) $request->loginWayfRequest->loginId;
+
+ if ($username && $password) {
+    if ($userId = _bibdk_webservice_wayf_lookup_user($username, $password)) {
+      $response = "<oui:userId>$userId</oui:userId>";
+    }
+    else {
+      $response = '<oui:error>Wrong username or password</oui:error>';
+    }
+  }
+  else {
+    $response = '<oui:error>No userid or no password given</oui:error>';
+  }
+  return "<oui:loginWayfResponse>$response</oui:loginWayfResponse>";
+}
+
+
+function bibdk_webservice_verifyUserRequest($request) {
+  $username = (string) $request->verifyUserRequest->userId;
+
+  switch ($username) {
+    case 'existing_user_no_bind@dbc.dk' :
+    case 'existing_user@dbc.dk' :
+      $result = 'TRUE';
+      break;
+    case 'new_user@dbc.dk' :
+      $result = 'FALSE';
+      break;
+    default :
+      $result = 'FALSE';
+  }
+  if ($result){
+    return "<oui:verifyUserResponse><oui:verified>$result</oui:verified></oui:verifyUserResponse>";
+  }
+
+}
+
+function bibdk_webservice_verifyWayfRequest($request) {
+  $username = (string) $request->verifyWayfRequest->loginId;
+
+  switch ($username) {
+    case 'WAYF-test-ID' :
+      $result = 'existing_user@dbc.dk';
+      break;
+  }
+  if ($result){
+    return "<oui:verifyWayfResponse><oui:userId>$result</oui:userId></oui:verifyWayfResponse>";
+  }
+  else {
+    return "<oui:verifyWayfResponse><oui:error>WAYF: no such user</oui:error></oui:verifyWayfResponse>";
+  }
+
+}
+
+function bibdk_webservice_bindWayfRequest($request) {
+  $username = (string) $request->bindWayfRequest->userId;
+
+  return '<oui:bindWayfResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>' . $username . '</oui:userId></oui:bindWayfResponse>';
+}
+
+
 /**
  * Emulating looking up user credentials
  *
@@ -230,7 +305,35 @@ function _bibdk_webservice_lookup_user($username, $password) {
       'user' => 'good_user',
       'password' => 'pass',
     ),
+    array(
+      'user' => 'existing_user@dbc.dk',
+      'password' => 'pass',
+    ),
+    array(
+      'user' => 'existing_user_no_bind@dbc.dk',
+      'password' => 'pass',
+    ),
+  );
 
+  foreach ($users as $user) {
+    if ($user['user'] == $username && $user['password'] == $password) {
+      return $username;
+    }
+  }
+
+  return FALSE;
+}
+
+function _bibdk_webservice_wayf_lookup_user($username, $password) {
+  $users = array(
+    array(
+      'user' => 'dummy@dbc.dk',
+      'password' => 'WAYF-test-ID',
+    ),
+    array(
+      'user' => 'existing_user_no_bind@dbc.dk',
+      'password' => 'WAYF-test-ID',
+    ),
   );
 
   foreach ($users as $user) {

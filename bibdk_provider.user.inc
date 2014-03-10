@@ -23,8 +23,8 @@ function bibdk_provider_user_authenticate($name, $pass) {
       'data' => array('display_name' => $name),
       'mail' => $name,
     );
+    $return['authname'] = $name;
     $return['success'] = TRUE;
-    $return['messages'] = array('HEJ', 'status');
   }
   else {
     /* advanced regex to match e-mail addresses including obscure usernames and
