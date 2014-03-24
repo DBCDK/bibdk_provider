@@ -99,6 +99,18 @@ function bibdk_provider_wayf_login_creds($authentication_attributes, $notify_by_
   $form_state['values']['name'] = isset($authentication_attributes['mail'][0]) ? $authentication_attributes['mail'][0] : null;
   $form_state['values']['mail'] = $form_state['values']['name'];
   $form_state['values']['pass'] = $authentication_attributes['eduPersonTargetedID'][0];
+
+  // # Bug 17442
+  // check if name is set.. if not get it from OUI
+  if(empty($form_state['values']['name'])){
+    //@TODO get logintype from somewhere
+    $logintype = 'wayf_id';
+    $username = ding_provider_invoke('wayf', 'verify', $form_state['values']['pass'], $logintype);
+    if(!empty($username)){
+      $form_state['values']['name'] = $username;
+    }
+  }
+
   if (isset($notify_by_mail)) {
     $form_state['mail_me'] = $notify_by_mail;
   }
