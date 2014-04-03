@@ -300,7 +300,7 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
     bibdk_provider_accept_form_bind_and_login($account);
   }
   else {
-    drupal_set_message(t('The acceptlink is either not valid, or has been used before'), 'error');
+    drupal_set_message(t('The acceptlink is either not valid, or has been used before', array(), array('context' => 'bibdk_provider')), 'error');
     drupal_access_denied();
     exit;
   }
