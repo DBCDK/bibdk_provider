@@ -3,7 +3,7 @@ description = Implementation of bibdk provider API.
 core = 7.x
 package = DBCDK
 php = 5.2.4
-version = 7.x-0.31
+version = 7.x-0.32
 project = bibdk_provider
 
 dependencies[] = ding_user
