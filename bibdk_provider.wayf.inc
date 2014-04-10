@@ -284,17 +284,7 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
   $users = user_load_multiple(array($uid), array('status' => '1'));
   $account = reset($users);
   $hash = user_pass_rehash($account->pass, $timestamp, $account->login);
-
-  if (!$action && $hash === $token) {
-    $form['message'] = array('#markup' => t('<p>This is a one-time login for %user_name and will expire on %expiration_date.</p><p>Click on this button to log in to the site and verify your wayf login.</p>', array('%user_name' => $account->mail, '%expiration_date' => format_date($timestamp + 86400))));
-    $form['help'] = array('#markup' => '<p>' . t('This login can be used only once.') . '</p>');
-    $form['actions'] = array('#type' => 'actions');
-    $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Log in'));
-    $form['#action'] = url("user/wayf/$uid/confirm/$timestamp/$token/login");
-    return $form;
-  }
-  else if ($hash === $token) {
-
+  if ($hash === $token) {
     $_SESSION['accept_wayf'] = $account->data['accept_wayf'];
     $_SESSION['wayf_login'] = $account->data['wayf_login'];
     bibdk_provider_accept_form_bind_and_login($account);
