@@ -104,7 +104,7 @@ function bibdk_provider_register_new_user($email){
  */
 function bibdk_provider_user_login(&$edit, $account) {
   if ($account) {
-    if (isset($_POST['form_id']) && $_POST['form_id'] == 'user_pass_reset') {
+    if (arg(0) == 'user' && arg(1) == 'reset'){
       $creds = array(
         'creds' => array(
           'name' => $account->mail,
@@ -354,4 +354,17 @@ function bibdk_provider_mail($key, &$message, $params) {
   $variables = array('user' => $params['account']);
   $message['subject'] = _bibdk_provider_wayf_mail_text($key . '_subject', $language, $variables);
   $message['body'][] = _bibdk_provider_wayf_mail_text($key .  '_body', $language, $variables);
+}
+
+
+/** Implements hook_form_formID_alter
+ * Skip the confirmation page when resetting your password
+ * @param $form
+ * @param $form_state
+ */
+function bibdk_provider_form_user_pass_reset_alter($form, &$form_state) {
+  if (isset($form['#action'])) {
+    header('location: ' . $form['#action']);
+    exit;
+  }
 }
