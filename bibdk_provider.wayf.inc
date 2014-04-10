@@ -112,7 +112,6 @@ function bibdk_provider_wayf_login_creds($authentication_attributes, $notify_by_
   // # Bug 17442
   // check if name is set.. if not get it from OUI
   if(empty($form_state['values']['name'])){
-    //@TODO get logintype from somewhere
     $logintype = $_SESSION['wayf_login']['login_type'];
     $username = ding_provider_invoke('wayf', 'verify', $form_state['values']['pass'], $logintype);
     if(!empty($username)){
@@ -136,7 +135,6 @@ function bibdk_provider_wayf_accept_form() {
 /** \brief Check if wayf loginflow has been interrupted.
  * User may abort flow while accepting wayf binding -if so SESSION variables
  * are set .. unset them
- * TODO : Try to delete
  */
 function bibdk_provider_wayf_check_logintype() {
   if (end($args) != 'accept') {
