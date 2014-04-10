@@ -90,7 +90,6 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
     drupal_goto('wayf/accept');
   }
   else if (!empty($email) && $email != $verified_email) {
-    debug('new code man ...');
     // Email coupled with wayf_id has changed
     if (isset($_GET['destination'])) {
       unset($_GET['destination']);
