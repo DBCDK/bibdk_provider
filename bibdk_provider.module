@@ -364,7 +364,9 @@ function bibdk_provider_mail($key, &$message, $params) {
  */
 function bibdk_provider_form_user_pass_reset_alter($form, &$form_state) {
   if (isset($form['#action'])) {
-    header('location: ' . $form['#action']);
-    exit;
+    $user_id = $form_state['build_info']['args'][0];
+    $timestamp = $form_state['build_info']['args'][1];
+    $token = $form_state['build_info']['args'][2];
+    drupal_goto("user/reset/$user_id/$timestamp/$token/login");
   }
 }
