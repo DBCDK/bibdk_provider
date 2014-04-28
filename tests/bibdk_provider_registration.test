@@ -136,7 +136,7 @@ class BibdkProviderRegistrationTestCase extends DrupalWebTestCase {
     // Test valid registration link
     $timestamp = REQUEST_TIME;
     $this->drupalGet("user/reset/$account->uid/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login));
-    $this->drupalPost(null, array(), t('Log in'));
+    //$this->drupalPost(null, array(), t('Log in'));
     $this->assertText('You have just used your one-time login link. It is no longer necessary to use this link to log in. Please change your password.');
 
 
