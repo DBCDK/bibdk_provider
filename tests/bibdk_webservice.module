@@ -73,6 +73,10 @@ function bibdk_webservice_request($reset = false) {
         return bibdk_webservice_bindWayfRequest($request);
         break;
       default:
+     case 'deleteWayfRequest':
+        return bibdk_webservice_deleteWayfRequest($request);
+        break;
+      default:
         return SOAP_FAULT;
     }
   }
@@ -267,6 +271,9 @@ function bibdk_webservice_verifyWayfRequest($request) {
     case 'WAYF-test-ID' :
       $result = 'existing_user@dbc.dk';
       break;
+    case 'WAYF-test-ID-new-bind' :
+      $result = 'existing_user_no_bind@dbc.dk';
+      break;
   }
   if ($result){
     return "<oui:verifyWayfResponse><oui:userId>$result</oui:userId></oui:verifyWayfResponse>";
@@ -281,6 +288,12 @@ function bibdk_webservice_bindWayfRequest($request) {
   $username = (string) $request->bindWayfRequest->userId;
 
   return '<oui:bindWayfResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>' . $username . '</oui:userId></oui:bindWayfResponse>';
+}
+
+function bibdk_webservice_deleteWayfRequest($request) {
+  $username = (string) $request->deleteWayfRequest->userId;
+
+  return '<oui:deleteWayfResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>' . $username . '</oui:userId></oui:deleteWayfResponse>';
 }
 
 
@@ -332,6 +345,10 @@ function _bibdk_webservice_wayf_lookup_user($username, $password) {
     ),
     array(
       'user' => 'existing_user_no_bind@dbc.dk',
+      'password' => 'WAYF-test-ID-new-bind',
+    ),
+    array(
+      'user' => 'existing_user@dbc.dk',
       'password' => 'WAYF-test-ID',
     ),
   );
