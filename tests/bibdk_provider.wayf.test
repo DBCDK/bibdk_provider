@@ -148,7 +148,7 @@ class BibdkProviderWAYFTestCase extends DrupalWebTestCase {
     // Validate account
     $url = url("user/wayf/$account->uid/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login), array('absolute' => TRUE));
     $this->drupalGet("user/wayf/$account->uid/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login));
-    //$this->drupalPost(null, array(), t('Log in'));
+    $this->drupalPost(null, array(), t('Log in'));
     $this->assertLink(t('My account'), 0, t('user have been logged in'));
 
     // log out
