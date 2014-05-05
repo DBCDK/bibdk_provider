@@ -58,7 +58,6 @@ function _bibdk_provider_wayf_user_login(&$edit, $account) {
     bibdk_provider_wayf_bind($account->mail, $wayf_id, $login_type);
   }
 
-  // TODO: Try to remove the following
   if (isset($_SESSION['wayf_login'])) {
     unset($_SESSION['wayf_login']);
   }
@@ -79,13 +78,23 @@ function bibdk_provider_wayf_validate(&$form, &$form_state) {
   }
 
   // Try to validate user
+  $email = isset($form_state['values']['name']) ? $form_state['values']['name'] : NULL;
   $pass = $form_state['values']['pass'];
   $loginType = $_SESSION['wayf_login']['login_type'];
-  if(!ding_provider_invoke('wayf', 'verify', $pass, $loginType)){
+  $verified_email = ding_provider_invoke('wayf', 'verify', $pass, $loginType);
+  if(!$verified_email){
     if (isset($_GET['destination'])) {
       unset($_GET['destination']);
     }
     bibdk_provider_wayf_set_session('unknown', $pass);
+    drupal_goto('wayf/accept');
+  }
+  else if (!empty($email) && $email != $verified_email) {
+    // Email coupled with wayf_id has changed
+    if (isset($_GET['destination'])) {
+      unset($_GET['destination']);
+    }
+    bibdk_provider_wayf_set_session($email, $pass, 'unbind');
     drupal_goto('wayf/accept');
   }
 }
@@ -103,8 +112,7 @@ function bibdk_provider_wayf_login_creds($authentication_attributes, $notify_by_
   // # Bug 17442
   // check if name is set.. if not get it from OUI
   if(empty($form_state['values']['name'])){
-    //@TODO get logintype from somewhere
-    $logintype = 'wayf_id';
+    $logintype = $_SESSION['wayf_login']['login_type'];
     $username = ding_provider_invoke('wayf', 'verify', $form_state['values']['pass'], $logintype);
     if(!empty($username)){
       $form_state['values']['name'] = $username;
@@ -127,7 +135,6 @@ function bibdk_provider_wayf_accept_form() {
 /** \brief Check if wayf loginflow has been interrupted.
  * User may abort flow while accepting wayf binding -if so SESSION variables
  * are set .. unset them
- * TODO : Try to delete
  */
 function bibdk_provider_wayf_check_logintype() {
   if (end($args) != 'accept') {
@@ -169,8 +176,11 @@ function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
       $form['#submit'] = array('bibdk_provider_accept_form_submit');
       // set page title
       drupal_set_title(t('Accept match of profiles', array(), array('context' => 'ding_wayf')));
+      // If wayf id is bound to another account give the user a message
+      if (isset($_SESSION['accept_wayf']['status']) && $_SESSION['accept_wayf']['status'] == 'unbind') {
+        drupal_set_message(t('This wayf_id is already connected to a different email. If you accept this connection, wayf_id will be bound to new email'), 'warning');
+      }
     }
-
 }
 
 
@@ -191,7 +201,6 @@ function bibdk_provider_accept_form_validate($form, &$form_state) {
   if (!valid_email_address($form_state['values']['mail'])) {
     form_set_error('mail', t('You need to provide a valid email address', array(), array('context' => 'ding_wayf')));
   }
-
 }
 
 /**
@@ -284,7 +293,6 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
   $users = user_load_multiple(array($uid), array('status' => '1'));
   $account = reset($users);
   $hash = user_pass_rehash($account->pass, $timestamp, $account->login);
-
   if (!$action && $hash === $token) {
     $form['message'] = array('#markup' => t('<p>This is a one-time login for %user_name and will expire on %expiration_date.</p><p>Click on this button to log in to the site and verify your wayf login.</p>', array('%user_name' => $account->mail, '%expiration_date' => format_date($timestamp + 86400))));
     $form['help'] = array('#markup' => '<p>' . t('This login can be used only once.') . '</p>');
@@ -294,9 +302,15 @@ function bibdk_provider_wayf_confirm_form($form, &$form_state, $uid, $timestamp,
     return $form;
   }
   else if ($hash === $token) {
-
     $_SESSION['accept_wayf'] = $account->data['accept_wayf'];
     $_SESSION['wayf_login'] = $account->data['wayf_login'];
+    // Remove existing binding
+    $verified_email = ding_provider_invoke('wayf', 'verify', $account->data['accept_wayf']['pass'], $account->data['wayf_login']['login_type']);
+    if ($verified_email){
+      $verified_email = ding_provider_invoke('wayf', 'verify', $account->data['accept_wayf']['pass'], $account->data['wayf_login']['login_type']);
+      bibdk_provider_wayf_delete($verified_email);
+    }
+    // Create new binding
     bibdk_provider_accept_form_bind_and_login($account);
   }
   else {
@@ -366,7 +380,6 @@ function bibdk_provider_wayf_login($wayf_id, $mail){
 /**
  * Add wayf parameters to SESSION
  *
- * TODO: IS this used?
  * */
 function bibdk_provider_wayf_set_session($name, $pass, $status = 'no_user') {
   if (!isset($_SESSION)) {
