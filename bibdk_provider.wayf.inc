@@ -214,7 +214,7 @@ function bibdk_provider_accept_form_validate($form, &$form_state) {
  *
  */
 function bibdk_provider_accept_form_submit($form, &$form_state) {
-  $mail = $form_state['values']['mail'];
+  $mail = strtolower($form_state['values']['mail']);
 
   // Tjek if user exists as provider user
   $user_exists = ding_provider_invoke('user', 'verify', $mail);
@@ -332,7 +332,7 @@ function bibdk_provider_accept_form_bind_and_login($account) {
     $login_type = isset($account->data['wayf_login']['login_type']) ? $account->data['wayf_login']['login_type'] : 'wayf_id';
     if(bibdk_provider_wayf_bind($account->mail, $wayf_id, $login_type)) {
       $attributes['eduPersonTargetedID'][0] = $wayf_id;
-      $attributes['mail'][0] = $account->mail;
+      $attributes['mail'][0] = strtolower($account->mail);
 
       $function = 'ding_wayf_login';
       if (function_exists($function)) {
