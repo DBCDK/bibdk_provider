@@ -113,6 +113,9 @@ function bibdk_test_provider_user_delete_account($name) {
 }
 
 function bibdk_test_provider_user_get_favourites($name) {
+  if($name=='testuser@test.dk'){
+    return array();
+  }
   $path = drupal_get_path('module', 'bibdk_test_provider');
 
   $ret = file_get_contents($path . '/responses/getFavourites.xml');
