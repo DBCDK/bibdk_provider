@@ -181,6 +181,11 @@ class BibdkUser
 
     /************** VOXB *********************/
 
+    public function verifyVoxb($voxbid){
+      $params = array('oui:voxbId' => $voxbid);
+      $response = $this->makeRequest('verifyVoxbRequest',$params);
+    }
+
     public function getVoxbId($username) {
         static $response;
         $params = array('oui:userId' => $username);

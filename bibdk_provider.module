@@ -214,6 +214,13 @@ function bibdk_provider_user_cancel_form_submit($form, &$form_state) {
   }
 }
 
+/** implements hook_user_id_from_voxb_id (@see bibdk_voxb.node.inc)
+ * @param $voxbid
+ */
+function bibdk_provider_user_id_from_voxb_id($voxbid){
+  return bibdk_provider_user_verify_voxb($voxbid);
+}
+
 /**
  * Implements hook_user_delete().
  */

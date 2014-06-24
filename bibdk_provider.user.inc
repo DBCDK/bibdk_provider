@@ -93,6 +93,10 @@ function _bibdk_provider_user_check() {
 
 /************** VOXB ****************/
 
+function bibdk_provider_user_verify_voxb($voxbid){
+  return BibdkUser::instance()->verifyVoxb($voxbid);
+}
+
 function bibdk_provider_user_get_voxb($username){
     return BibdkUser::instance()->getVoxbId($username);
 }
