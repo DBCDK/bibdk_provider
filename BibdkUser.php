@@ -184,6 +184,14 @@ class BibdkUser
     public function verifyVoxb($voxbid){
       $params = array('oui:voxbId' => $voxbid);
       $response = $this->makeRequest('verifyVoxbRequest',$params);
+
+      $xmlmessage = $this->responseExtractor($response, 'verifyVoxbResponse');
+
+      if ($xmlmessage != FALSE && $xmlmessage->nodeName == 'oui:userId') {
+        return $xmlmessage->nodeValue;
+      } else {
+        return FALSE;
+      }
     }
 
     public function getVoxbId($username) {
