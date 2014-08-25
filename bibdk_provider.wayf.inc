@@ -105,8 +105,8 @@ function bibdk_provider_wayf_login_creds($authentication_attributes, $notify_by_
   $form_state['values']['authentication_provider'] = 'wayf';
 
 // set name and password for login
-  $form_state['values']['name'] = isset($authentication_attributes['mail'][0]) ? $authentication_attributes['mail'][0] : null;
-  $form_state['values']['mail'] = $form_state['values']['name'];
+  $form_state['values']['name'] = isset($authentication_attributes['mail'][0]) ? strtolower($authentication_attributes['mail'][0]) : null;
+  $form_state['values']['mail'] = strtolower($form_state['values']['name']);
   $form_state['values']['pass'] = $authentication_attributes['eduPersonTargetedID'][0];
 
   // # Bug 17442
@@ -156,7 +156,7 @@ function bibdk_provider_wayf_alter_user_register_form(&$form, &$form_state) {
 
       // new text on submit button
       $form['actions']['submit']['#value'] = t('Update/create account', array(), array('context' => 'bibdk_provider'));
-      $form['account']['mail']['#default_value'] = !empty($_SESSION['wayf_login']['mail'][0]) ? $_SESSION['wayf_login']['mail'][0] : '';
+      $form['account']['mail']['#default_value'] = !empty($_SESSION['wayf_login']['mail'][0]) ? strtolower($_SESSION['wayf_login']['mail'][0]) : '';
       $form['wayf_accept'] = array(
         'messages' => array(
           'message' => array(
