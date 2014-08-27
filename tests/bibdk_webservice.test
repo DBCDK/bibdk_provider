@@ -40,6 +40,7 @@ class BibdkProviderWebserviceMockupTestCase extends DrupalWebTestCase {
     $this->_testWebserviceLoginWrongSecurityCode();
     $this->_testWebserviceCartGooduser();
     $this->_testWebserviceCartBaduser();
+    $this->_testWebserviceGetCartCount();
     $this->_testWebserviceAddCartContent();
     $this->_testWebserviceRemoveCartContent();
     $this->_testWebserviceUpdateCartContent();
@@ -308,6 +309,34 @@ XML;
 
     $this->assertTrue($expected_soap == $response, t('empty Cart returned'));
   }
+
+  function _testWebserviceGetCartCount(){
+    $xml =  <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo">
+<SOAP-ENV:Body>
+    <oui:getCartCountRequest>
+        <oui:userId>cart_count_user</oui:userId>
+        <oui:securityCode>testhest</oui:securityCode>
+    </oui:getCartCountRequest>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+XML;
+
+    $post = array('xml' => $xml,);
+    $action = $this->getAbsoluteUrl('bibdk_webservice');
+    $headers = array();
+    $response = $this->curlExec(array(CURLOPT_URL => $action,
+      CURLOPT_POST => TRUE,
+      CURLOPT_POSTFIELDS => $post,
+      CURLOPT_HTTPHEADER => $headers));
+    $this->verbose(htmlentities($response));
+    $expected_soap = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope" xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><SOAP-ENV:Body><oui:cartCountResponse xmlns:oui="http://oss.dbc.dk/ns/openuserinfo"><oui:userId>cart_count_user</oui:userId><oui:cartCount>75</oui:cartCount></oui:cartCountResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+    $this->verbose(htmlentities($expected_soap));
+
+    $this->assertTrue($expected_soap == $response, t('Cart count returned'));
+  }
+
  function _testWebserviceAddCartContent(){
     $xml =  <<<XML
 <?xml version="1.0" encoding="utf-8"?>
