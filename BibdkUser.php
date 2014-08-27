@@ -139,8 +139,8 @@ class BibdkUser {
   /**
    * Function which parses the response.
    *
-   * @param $xmlstring The reponse as a xml string.
-   * @param $xmltag Which XPath element should extracted from the response.
+   * @param $xmlstring string The reponse as a xml string.
+   * @param $xmltag string Which XPath element should extracted from the response.
    *
    * @return bool FALSE if the xpath can't be set otherwise value of the xmltag to be
    */
@@ -287,7 +287,8 @@ class BibdkUser {
     }
   }
 
-  /** \brief get all favourite agencies for a given user
+  /**
+   * Get all favourite agencies for a given user
    * @staticvar type $response
    * @param type $username
    * @return type xml
@@ -315,6 +316,30 @@ class BibdkUser {
     else {
       $ret['response'] = $xmlmessage->nodeValue;
     }
+    return $ret;
+  }
+
+  /**
+   * Get cart count from from webservice
+   *
+   * @param $username
+   * @return array
+   */
+  public function getCartCount($username) {
+    $params = array('oui:userId' => $username);
+    $response = $this->makeRequest('getCartCountRequest', $params);
+
+    $xmlmessage = $this->responseExtractor($response, 'getCartCountResponse');
+
+    $ret = array('status' => 'error', 'response' => '');
+    if ($xmlmessage->nodeName != 'oui:error') {
+      $ret['status'] = 'success';
+      $ret['response'] = $response;
+    }
+    else {
+      $ret['response'] = $xmlmessage->nodeValue;
+    }
+
     return $ret;
   }
 
