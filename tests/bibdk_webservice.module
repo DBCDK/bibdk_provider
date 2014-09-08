@@ -55,6 +55,9 @@ function bibdk_webservice_request($reset = false) {
       case 'getCartRequest':
         return bibdk_webservice_get_cart($request, $cart);
         break;
+      case 'getCartCountRequest':
+        return bibdk_webservice_get_cart_count($request, $cart);
+        break;
       case 'addCartContentRequest':
         $cart = 'content';
         return bibdk_webservice_add_cart_content($request);
@@ -108,6 +111,14 @@ function bibdk_webservice_get_cart($request, $cart = null){
       return file_get_contents($path.'/xml/get_cart_results.xml');
   } else {
     return file_get_contents($path.'/xml/get_cart_no_results.xml');
+  }
+}
+
+function bibdk_webservice_get_cart_count($request){
+  $path = drupal_get_path('module', 'bibdk_webservice');
+  $username = (string) $request->getCartCountRequest->userId;
+  if ($username == 'cart_count_user') {
+    return file_get_contents($path . '/xml/get_cart_count_response.xml');
   }
 }
 

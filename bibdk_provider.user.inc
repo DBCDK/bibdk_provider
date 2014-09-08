@@ -203,6 +203,16 @@ function bibdk_provider_user_get_cart($name) {
 }
 
 /**
+ * Get cart count from provider
+ *
+ * @param $name
+ * @return array|bool
+ */
+function bibdk_provider_user_get_cart_count($name) {
+  return BibdkUser::instance()->getCartCount($name);
+}
+
+/**
  * Add Content to cart
  *
  * @param $name
